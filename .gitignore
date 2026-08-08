@@ -1,0 +1,101 @@
+# =====================================================================
+# Unity project generated folders & files
+# =====================================================================
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]serSettings/
+[Mm]emoryCaptures/
+[Cc]rashReport/
+
+# Asset meta data - keep them! Only ignore if you regenerate manually
+# Use case: ignore a specific file:
+#   Assets/MyPlugin/Editor/*.meta
+
+# =====================================================================
+# IDE / Editor generated files
+# =====================================================================
+.idea/
+.vs/
+.vscode/
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.exe
+*.so
+*.dll
+*.dylib
+
+# Unity generated Visual Studio / Rider / VS Code files
+*.csproj
+*.sln
+*.suo
+*.tmp
+*.csi
+*.vcxproj
+*.unityproj
+
+# VS Code / Cursor settings that are machine-specific
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# =====================================================================
+# Git / GitHub
+# =====================================================================
+.gitattributes
+*.orig
+*~
+
+# =====================================================================
+# Android / mobile builds (Unity)
+# =====================================================================
+# Builds
+*.apk
+*.aab
+*.obb
+*.xapkg
+*.appx
+*.appxbundle
+*.ipa
+
+# Signing keys & credentials - NEVER commit these
+*.keystore
+*.jks
+*.key
+*.p12
+*.pfx
+*.pem
+
+# Gradle (Unity-generated Android builds)
+android/**.gradle
+android/**/local.properties
+android/**/gradle-wrapper.jar
+android/**/.gradle/
+android/**/build/
+android/**/bin/
+android/**/gen/
+android/**/obj/
+android/**/.idea/
+android/**/*.iml
+.gradle/
+
+# =====================================================================
+# macOS / Windows junk
+# =====================================================================
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
