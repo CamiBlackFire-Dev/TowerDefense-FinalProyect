@@ -11,6 +11,10 @@
 [Mm]emoryCaptures/
 [Cc]rashReport/
 
+# Recorder output folders
+@Recordings/
+Recordings/
+
 # Asset meta data - keep them! Only ignore if you regenerate manually
 # Use case: ignore a specific file:
 #   Assets/MyPlugin/Editor/*.meta
