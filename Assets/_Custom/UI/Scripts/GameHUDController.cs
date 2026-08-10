@@ -1,50 +1,46 @@
 using UnityEngine;
 using UnityEngine.UIElements;
-using UnityEngine.SceneManagement;
 
 namespace Custom.UI
 {
     [RequireComponent(typeof(UIDocument))]
-    public class MainMenuController : MonoBehaviour
+    public class GameHUDController : MonoBehaviour
     {
         private UIDocument _uiDocument;
-        private VisualElement _gameLogo;
-        private Button _playButton;
+        private Label _currencyText;
+        private Label _waveText;
         private Button _optionsButton;
-        private Button _quitButton;
+        private Button _startWaveButton;
 
-        // Opciones
+        private VisualElement _bigAnnouncerContainer;
+        private Label _bigAnnouncerText;
+
         private VisualElement _optionsOverlay;
         private Button _backButton;
         private Slider _masterVolumeSlider;
         private Slider _musicVolumeSlider;
         private Slider _sfxVolumeSlider;
 
-        [Header("Animación del Logo")]
-        public float animSpeed = 2f;
-        public float animAmplitude = 10f;
-
         [Header("Audio")]
-        public AudioClip menuMusic;
         public AudioClip hoverSound;
         public AudioClip clickSound;
+        public AudioClip waveAnnouncerSound;
+
+        private int _currentCurrency = 0;
 
         private void OnEnable()
         {
             _uiDocument = GetComponent<UIDocument>();
             var root = _uiDocument.rootVisualElement;
-
             if (root == null) return;
 
-            if (AudioManager.Instance != null && menuMusic != null)
-            {
-                AudioManager.Instance.PlayMusic(menuMusic);
-            }
-
-            _gameLogo = root.Q<VisualElement>("GameLogo");
-            _playButton = root.Q<Button>("PlayButton");
+            _currencyText = root.Q<Label>("CurrencyText");
+            _waveText = root.Q<Label>("WaveText");
             _optionsButton = root.Q<Button>("OptionsButton");
-            _quitButton = root.Q<Button>("QuitButton");
+            _startWaveButton = root.Q<Button>("StartWaveButton");
+
+            _bigAnnouncerContainer = root.Q<VisualElement>("BigAnnouncerContainer");
+            _bigAnnouncerText = root.Q<Label>("BigAnnouncerText");
 
             _optionsOverlay = root.Q<VisualElement>("OptionsOverlay");
             _backButton = root.Q<Button>("BackButton");
@@ -52,21 +48,18 @@ namespace Custom.UI
             _musicVolumeSlider = root.Q<Slider>("MusicVolumeSlider");
             _sfxVolumeSlider = root.Q<Slider>("SFXVolumeSlider");
 
-            if (_playButton != null)
-            {
-                _playButton.clicked += OnPlayClicked;
-                _playButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
-            }
             if (_optionsButton != null)
             {
                 _optionsButton.clicked += OnOptionsClicked;
                 _optionsButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
             }
-            if (_quitButton != null)
+
+            if (_startWaveButton != null)
             {
-                _quitButton.clicked += OnQuitClicked;
-                _quitButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+                _startWaveButton.clicked += OnStartWaveClicked;
+                _startWaveButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
             }
+
             if (_backButton != null)
             {
                 _backButton.clicked += OnBackClicked;
@@ -91,24 +84,21 @@ namespace Custom.UI
                     _sfxVolumeSlider.RegisterValueChangedCallback(evt => AudioManager.Instance.SetSFXVolume(evt.newValue));
                 }
             }
+
+            UpdateCurrency(100);
         }
 
         private void OnDisable()
         {
-            if (_playButton != null)
-            {
-                _playButton.clicked -= OnPlayClicked;
-                _playButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
-            }
             if (_optionsButton != null)
             {
                 _optionsButton.clicked -= OnOptionsClicked;
                 _optionsButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
             }
-            if (_quitButton != null)
+            if (_startWaveButton != null)
             {
-                _quitButton.clicked -= OnQuitClicked;
-                _quitButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
+                _startWaveButton.clicked -= OnStartWaveClicked;
+                _startWaveButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
             }
             if (_backButton != null)
             {
@@ -117,13 +107,72 @@ namespace Custom.UI
             }
         }
 
+        public void UpdateCurrency(int amount)
+        {
+            _currentCurrency = amount;
+            if (_currencyText != null)
+            {
+                _currencyText.text = _currentCurrency.ToString();
+            }
+        }
+
         private void Update()
         {
-            if (_gameLogo != null)
+            if (UnityEngine.InputSystem.Keyboard.current != null &&
+                UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame)
             {
-                float offset = Mathf.Sin(Time.time * animSpeed) * animAmplitude;
-                _gameLogo.style.translate = new StyleTranslate(new Translate(0, offset, 0));
+                UpdateWave(UnityEngine.Random.Range(2, 10));
+                SetWaveActive(true);
+
+                if (_bigAnnouncerContainer != null)
+                {
+                    _bigAnnouncerContainer.schedule.Execute(() =>
+                    {
+                        SetWaveActive(false);
+                    }).StartingIn(5000);
+                }
             }
+        }
+
+        public void UpdateWave(int waveNumber)
+        {
+            if (_waveText != null)
+            {
+                _waveText.text = "OLEADA " + waveNumber;
+            }
+            ShowWaveAnnouncer(waveNumber);
+        }
+
+        public void SetWaveActive(bool isActive)
+        {
+            if (_startWaveButton != null)
+            {
+                _startWaveButton.style.display = isActive ? DisplayStyle.None : DisplayStyle.Flex;
+            }
+        }
+
+        public void ShowWaveAnnouncer(int waveNumber)
+        {
+            if (_bigAnnouncerContainer == null || _bigAnnouncerText == null) return;
+
+            _bigAnnouncerText.text = "WAVE " + waveNumber;
+
+            if (AudioManager.Instance != null && waveAnnouncerSound != null)
+                AudioManager.Instance.PlaySFX(waveAnnouncerSound);
+
+            _bigAnnouncerContainer.AddToClassList("fade-in");
+
+            _bigAnnouncerContainer.schedule.Execute(() =>
+            {
+                _bigAnnouncerContainer.RemoveFromClassList("fade-in");
+            }).StartingIn(2500);
+        }
+
+        private void OnStartWaveClicked()
+        {
+            PlayClickSound();
+            Debug.Log("Iniciando Oleada por click...");
+            SetWaveActive(true);
         }
 
         private void OnButtonHover(PointerEnterEvent evt)
@@ -138,12 +187,6 @@ namespace Custom.UI
                 AudioManager.Instance.PlaySFX(clickSound);
         }
 
-        private void OnPlayClicked()
-        {
-            PlayClickSound();
-            SceneManager.LoadScene("0_Main");
-        }
-
         private void OnOptionsClicked()
         {
             PlayClickSound();
@@ -154,16 +197,6 @@ namespace Custom.UI
         {
             PlayClickSound();
             if (_optionsOverlay != null) _optionsOverlay.style.display = DisplayStyle.None;
-        }
-
-        private void OnQuitClicked()
-        {
-            PlayClickSound();
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
         }
     }
 }
