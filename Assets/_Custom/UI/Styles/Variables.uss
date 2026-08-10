@@ -1,0 +1,15 @@
+:root {
+    --color-primary: rgba(0,0,0,0);
+    --color-secondary: rgba(255, 255, 255, 0.2);
+    --color-accent: #F1C40F;
+    --color-text: #ECF0F1;
+    --color-text-dark: #2C3E50;
+    --color-background: rgba(15, 10, 5, 0.95);
+    --font-size-title: 120px;
+    --font-size-subtitle: 32px;
+    --font-size-button: 45px;
+    --font-size-body: 18px;
+    --border-radius-btn: 12px;
+    --border-radius-panel: 20px;
+    -unity-font-definition: url("project://database/Assets/_Custom/UI/Fonts/Bangers-Regular.ttf?fileID=12800000&guid=5cc4a18f6681fb04e8882d2de18e9e44&type=3#Bangers-Regular");
+}

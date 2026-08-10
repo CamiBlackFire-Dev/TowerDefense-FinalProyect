@@ -1,0 +1,40 @@
+.unity-button {
+    font-size: var(--font-size-button);
+    color: white;
+    background-color: var(--color-primary);
+    border-radius: 15px;
+    border-width: 0;
+    padding: 25px 80px;
+    margin: 25px;
+    transition-duration: 0.1s;
+    transition-property: scale, background-color;
+    -unity-font-style: bold;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    background-image: url("project://database/Assets/_Custom/UI/Sprites/Boton%20Temporal.jpg?fileID=2800000&guid=0edd68321b1cc2941a75812ab4aced75&type=3#Boton Temporal");
+}
+
+.unity-button:hover {
+    background-color: var(--color-secondary);
+    scale: 1.05;
+}
+
+.unity-button:active {
+    background-color: var(--color-accent);
+    scale: 0.95;
+}
+
+.panel-container {
+    background-color: rgba(0, 0, 0, 0); /* Totalmente transparente */
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+    border-width: 0; /* Sin borde dorado */
+}
+
+.game-logo {
+    width: 800px;
+    height: 450px;
+    margin-top: 40px; /* Para alejarlo del borde superior (Safe Area) */
+    margin-bottom: 0px; /* Eliminamos el margen negativo para subir el logo y que no pise el botón JUGAR */
+    -unity-background-scale-mode: scale-to-fit;
+}
