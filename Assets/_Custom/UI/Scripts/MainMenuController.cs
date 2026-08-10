@@ -13,6 +13,13 @@ namespace Custom.UI
         private Button _optionsButton;
         private Button _quitButton;
 
+        // Opciones
+        private VisualElement _optionsOverlay;
+        private Button _backButton;
+        private Slider _masterVolumeSlider;
+        private Slider _musicVolumeSlider;
+        private Slider _sfxVolumeSlider;
+
         [Header("Animación del Logo")]
         public float animSpeed = 2f;
         public float animAmplitude = 10f;
@@ -27,11 +34,7 @@ namespace Custom.UI
             _uiDocument = GetComponent<UIDocument>();
             var root = _uiDocument.rootVisualElement;
 
-            if (root == null)
-            {
-                Debug.LogError("MainMenuController: No se encontró el rootVisualElement.");
-                return;
-            }
+            if (root == null) return;
 
             // Iniciar música
             if (AudioManager.Instance != null && menuMusic != null)
@@ -39,11 +42,19 @@ namespace Custom.UI
                 AudioManager.Instance.PlayMusic(menuMusic);
             }
 
+            // Bind UI elements
             _gameLogo = root.Q<VisualElement>("GameLogo");
             _playButton = root.Q<Button>("PlayButton");
             _optionsButton = root.Q<Button>("OptionsButton");
             _quitButton = root.Q<Button>("QuitButton");
+            
+            _optionsOverlay = root.Q<VisualElement>("OptionsOverlay");
+            _backButton = root.Q<Button>("BackButton");
+            _masterVolumeSlider = root.Q<Slider>("MasterVolumeSlider");
+            _musicVolumeSlider = root.Q<Slider>("MusicVolumeSlider");
+            _sfxVolumeSlider = root.Q<Slider>("SFXVolumeSlider");
 
+            // Register button callbacks
             if (_playButton != null) 
             {
                 _playButton.clicked += OnPlayClicked;
@@ -59,10 +70,36 @@ namespace Custom.UI
                 _quitButton.clicked += OnQuitClicked;
                 _quitButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
             }
+            if (_backButton != null)
+            {
+                _backButton.clicked += OnBackClicked;
+                _backButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+
+            // Init and bind sliders to AudioManager
+            if (AudioManager.Instance != null)
+            {
+                if (_masterVolumeSlider != null) 
+                {
+                    _masterVolumeSlider.value = AudioManager.Instance.GetMasterVolume();
+                    _masterVolumeSlider.RegisterValueChangedCallback(evt => AudioManager.Instance.SetMasterVolume(evt.newValue));
+                }
+                if (_musicVolumeSlider != null) 
+                {
+                    _musicVolumeSlider.value = AudioManager.Instance.GetMusicVolume();
+                    _musicVolumeSlider.RegisterValueChangedCallback(evt => AudioManager.Instance.SetMusicVolume(evt.newValue));
+                }
+                if (_sfxVolumeSlider != null) 
+                {
+                    _sfxVolumeSlider.value = AudioManager.Instance.GetSFXVolume();
+                    _sfxVolumeSlider.RegisterValueChangedCallback(evt => AudioManager.Instance.SetSFXVolume(evt.newValue));
+                }
+            }
         }
 
         private void OnDisable()
         {
+            // Unregister callbacks
             if (_playButton != null) 
             {
                 _playButton.clicked -= OnPlayClicked;
@@ -77,6 +114,11 @@ namespace Custom.UI
             {
                 _quitButton.clicked -= OnQuitClicked;
                 _quitButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+            if (_backButton != null)
+            {
+                _backButton.clicked -= OnBackClicked;
+                _backButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
             }
         }
 
@@ -104,20 +146,24 @@ namespace Custom.UI
         private void OnPlayClicked()
         {
             PlayClickSound();
-            Debug.Log("Cargando escena principal...");
-            SceneManager.LoadScene("0_Main");
+            SceneManager.LoadScene("0_Main"); 
         }
 
         private void OnOptionsClicked()
         {
             PlayClickSound();
-            Debug.Log("Abriendo opciones...");
+            if (_optionsOverlay != null) _optionsOverlay.style.display = DisplayStyle.Flex;
+        }
+
+        private void OnBackClicked()
+        {
+            PlayClickSound();
+            if (_optionsOverlay != null) _optionsOverlay.style.display = DisplayStyle.None;
         }
 
         private void OnQuitClicked()
         {
             PlayClickSound();
-            Debug.Log("Saliendo del juego...");
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else
