@@ -7,6 +7,23 @@ public class TowerTargetDetector : MonoBehaviour
 
     private Transform currentTarget;
 
+    // Enemigo elegido en este momento. Lo usa TowerAttack para dispararle.
+    public Transform CurrentTarget
+    {
+        get { return currentTarget; }
+    }
+
+    // El alcance y la capa los define TowerAttack segun el nivel de la torre.
+    public void SetDetectionRange(float range)
+    {
+        detectionRange = range;
+    }
+
+    public void SetEnemyLayer(LayerMask layer)
+    {
+        enemyLayer = layer;
+    }
+
     private void Update()
     {
         FindClosestEnemy();

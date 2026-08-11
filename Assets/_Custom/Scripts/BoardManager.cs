@@ -35,6 +35,10 @@ public class BoardManager : MonoBehaviour
         new Color(1f, 1f, 1f),      // nivel 6 o mas: blanco
     };
 
+    [Header("Combate")]
+    public bool towersAttack = true;   // las torres disparan solas a los enemigos
+    public TowerCatalog towerCatalog;  // dano, alcance y cadencia de cada nivel
+
     [Header("Animacion")]
     public float moveDuration = 0.14f;          // duracion del deslizamiento
     public float mergeFeedbackDuration = 0.22f; // duracion del pulso de fusion
@@ -243,6 +247,20 @@ public class BoardManager : MonoBehaviour
     private void ApplyTowerColors(Tower tower)
     {
         tower.Visual.SetLevelColors(towerLevelColors, useLevelColors);
+    }
+
+    // Le pone a la torre el script de disparo, para que ataque sola.
+    // TowerAttack trae consigo el detector de enemigos de Jean.
+    private void ApplyTowerAttack(Tower tower)
+    {
+        if (!towersAttack)
+            return;
+
+        TowerAttack attack = tower.GetComponent<TowerAttack>();
+        if (attack == null)
+            attack = tower.gameObject.AddComponent<TowerAttack>();
+
+        attack.catalog = towerCatalog;
     }
 
     // Procesa en orden el movimiento actual y todos los encolados.
@@ -538,6 +556,7 @@ public class BoardManager : MonoBehaviour
             {
                 tower.SetModel(TowerModelForLevel(level));
                 ApplyTowerColors(tower);
+                ApplyTowerAttack(tower);
                 tower.SetLevel(level);
                 tower.PositionOnCell(TowerPosition(x, y));
                 return;
@@ -570,6 +589,7 @@ public class BoardManager : MonoBehaviour
 
         towerScript.SetModel(TowerModelForLevel(level));
         ApplyTowerColors(towerScript);
+        ApplyTowerAttack(towerScript);
         towerScript.SetLevel(level);
         towerScript.PositionOnCell(TowerPosition(x, y));
 

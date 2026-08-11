@@ -9,9 +9,15 @@ public class Path : MonoBehaviour
         return waypoints;
     }
 
+    // Permite que PathBuilder arme los waypoints por codigo.
+    public void SetWaypoints(Transform[] newWaypoints)
+    {
+        waypoints = newWaypoints;
+    }
+
     private void OnDrawGizmos()
     {
-        if (waypoints.Length > 0)
+        if (waypoints != null && waypoints.Length > 0)
         {
             for (int i = 0; i < waypoints.Length; i++)
             {
