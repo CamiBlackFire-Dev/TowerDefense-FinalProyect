@@ -57,7 +57,6 @@
 .bottom-bar {
     width: 100%;
     height: 150px;
-    /* Placeholder para botones de comprar/vender */
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 20px;
     align-items: center;
@@ -70,7 +69,7 @@
     padding: 10px 40px;
     border-radius: 15px;
     border-width: 4px;
-    border-color: #D35400; /* Naranja/Bronce para destacarlo de las monedas */
+    border-color: #D35400;
     align-items: center;
     justify-content: center;
 }
@@ -84,10 +83,10 @@
 
 .start-wave-btn {
     position: absolute;
-    bottom: 170px; /* Justo arriba de la barra inferior de torres */
+    bottom: 170px;
     right: 20px;
-    background-color: #27ae60; /* Verde esmeralda */
-    background-image: none; /* Quitamos la textura de madera para que resalte verde */
+    background-color: #27ae60;
+    background-image: none;
     border-color: #2ecc71;
     border-width: 4px;
     padding: 15px 30px;

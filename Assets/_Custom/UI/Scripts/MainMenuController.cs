@@ -13,7 +13,6 @@ namespace Custom.UI
         private Button _optionsButton;
         private Button _quitButton;
 
-        // Opciones
         private VisualElement _optionsOverlay;
         private Button _backButton;
         private Slider _masterVolumeSlider;
