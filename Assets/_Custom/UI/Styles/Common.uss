@@ -1,0 +1,111 @@
+.unity-button {
+    font-size: 55px;
+    color: rgb(80, 60, 40);
+    background-color: transparent;
+    border-width: 0;
+    width: 380px;
+    height: 140px;
+    margin: 15px;
+    transition-duration: 0.1s;
+    transition-property: scale, -unity-background-image-tint-color;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    background-image: url("project://database/Assets/_Custom/UI/Sprites/Boton.png?fileID=2800000&guid=b6a8459c55edcee49a0391d6800af88f&type=3#Boton");
+}
+
+.unity-button:hover {
+    scale: 1.05;
+    -unity-background-image-tint-color: rgb(220, 220, 220);
+}
+
+.unity-button:active {
+    scale: 0.95;
+    -unity-background-image-tint-color: rgb(180, 180, 180);
+}
+
+.panel-container {
+    background-color: rgba(0, 0, 0, 0);
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+    border-width: 0;
+}
+
+.game-logo {
+    width: 800px;
+    height: 450px;
+    margin-top: 40px;
+    margin-bottom: 0;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.options-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.667);
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.options-panel {
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 0;
+    padding: 80px 100px;
+    border-width: 0;
+    min-width: 600px;
+    align-items: stretch;
+}
+
+.title-text {
+    font-size: 80px;
+    color: rgb(62, 35, 18);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-bottom: 50px;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(255, 132, 0);
+}
+
+.slider-container {
+    margin-bottom: 40px;
+}
+
+.slider-label {
+    font-size: 40px;
+    color: rgb(55, 28, 12);
+    -unity-font-style: bold;
+    margin-bottom: 15px;
+    -unity-text-align: middle-center;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(255, 128, 0);
+}
+
+.unity-base-slider__tracker {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-color: rgb(127, 140, 141);
+    border-width: 2px;
+    border-radius: 10px;
+    height: 20px;
+    margin-top: -10px;
+}
+
+.unity-base-slider__dragger {
+    background-color: var(--color-accent);
+    border-color: rgb(211, 84, 0);
+    border-width: 4px;
+    border-radius: 20px;
+    width: 40px;
+    height: 40px;
+    margin-top: -20px;
+    transition-duration: 0.1s;
+}
+
+.unity-base-slider__dragger:hover {
+    scale: 1.2;
+    background-color: var(--color-secondary);
+}

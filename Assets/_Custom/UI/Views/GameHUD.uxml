@@ -1,0 +1,42 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/_Custom/UI/Styles/Variables.uss?fileID=7433441132597879392&amp;guid=0d88b972d2caa264ca392885da4c93eb&amp;type=3#Variables"/>
+    <Style src="project://database/Assets/_Custom/UI/Styles/Common.uss?fileID=7433441132597879392&amp;guid=777eec23bf60d49468cb154ccb488532&amp;type=3#Common"/>
+    <Style src="project://database/Assets/_Custom/UI/Styles/GameHUD.uss?fileID=7433441132597879392&amp;guid=3a01055e8addfa449a85750b996d09e3&amp;type=3#GameHUD"/>
+    <ui:VisualElement name="HUDContainer" class="hud-container">
+        <ui:VisualElement class="top-bar">
+            <ui:VisualElement class="currency-container">
+                <ui:VisualElement class="currency-icon" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
+                <ui:Label text="0" name="CurrencyText" class="currency-text"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="wave-container">
+                <ui:Label text="OLEADA 1" name="WaveText" class="wave-text"/>
+            </ui:VisualElement>
+            <ui:Button name="OptionsButton" text="⚙" class="options-btn-small" style="color: white; font-size: 50px; -unity-font-style: bold; -unity-text-align: middle-center; text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);"/>
+        </ui:VisualElement>
+        <ui:Button name="StartWaveButton" text="EMPEZAR OLEADA" class="unity-button start-wave-btn"/>
+        <ui:VisualElement class="bottom-bar">
+            <ui:Label text="[Espacio Reservado para Botones de Torres o habilidades]" style="color: rgba(0, 0, 0, 0.5); font-size: 80px;"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="BigAnnouncerContainer" picking-mode="Ignore" class="big-announcer-container">
+            <ui:Label text="WAVE 1" name="BigAnnouncerText" class="big-announcer-text"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="OptionsOverlay" class="options-overlay" style="display: none;">
+        <ui:VisualElement class="options-panel" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Backgrounds/FondoPanelOpciones.jpg?fileID=2800000&amp;guid=c4e09637cf73e1148bb20844f06456c5&amp;type=3#FondoPanelOpciones&quot;); display: flex;">
+            <ui:Label text="OPCIONES" class="title-text"/>
+            <ui:VisualElement class="slider-container">
+                <ui:Label text="Volumen Maestro" class="slider-label"/>
+                <ui:Slider name="MasterVolumeSlider" high-value="1" low-value="0"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="slider-container">
+                <ui:Label text="Música" class="slider-label"/>
+                <ui:Slider name="MusicVolumeSlider" high-value="1" low-value="0"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="slider-container">
+                <ui:Label text="Efectos (SFX)" class="slider-label"/>
+                <ui:Slider name="SFXVolumeSlider" high-value="1" low-value="0"/>
+            </ui:VisualElement>
+            <ui:Button text="VOLVER" name="BackButton" class="unity-button" style="margin-top: 50px;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
