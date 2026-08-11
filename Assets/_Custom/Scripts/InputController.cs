@@ -9,6 +9,7 @@ namespace TowerDefense
     public class InputController : MonoBehaviour
     {
         public event Action<GridDirection> MoveRequested;
+        public event Action BuyRequested;
 
         private void Update()
         {
@@ -39,6 +40,12 @@ namespace TowerDefense
                 return;
             }
 
+            // Tecla temporal para comprar torres hasta que exista la interfaz.
+            if (Keyboard.current.bKey.wasPressedThisFrame)
+            {
+                if (BuyRequested != null)
+                    BuyRequested();
+            }
         }
 
         // Permite probar la correspondencia entre teclas y direcciones sin hardware.
@@ -66,6 +73,12 @@ namespace TowerDefense
                     direction = GridDirection.Left;
                     return false;
             }
+        }
+
+        // Indica si una tecla corresponde a comprar una torre.
+        public static bool IsBuyKey(Key key)
+        {
+            return key == Key.B;
         }
 
         private bool IsPressed(KeyControl primary, KeyControl alternative)

@@ -109,6 +109,44 @@ namespace TowerDefense
             Assert.AreEqual(4, torre.Level);
         }
 
+        // Colocar al azar usa una celda libre.
+        [Test]
+        public void PlaceTowerRandom_ColocaEnUnaCeldaLibre()
+        {
+            BoardManager board = CrearBoard();
+
+            bool colocado = board.PlaceTowerRandom(1);
+
+            Assert.IsTrue(colocado);
+            Assert.AreEqual(1, ContarOcupadas(board));
+        }
+
+        // Colocar al azar con el tablero lleno falla.
+        [Test]
+        public void PlaceTowerRandom_TableroLleno_Rechaza()
+        {
+            BoardManager board = CrearBoard();
+            for (int x = 0; x < board.Grid.Size; x++)
+                for (int y = 0; y < board.Grid.Size; y++)
+                    board.PlaceTower(x, y, 1);
+
+            bool colocado = board.PlaceTowerRandom(1);
+
+            Assert.IsFalse(colocado);
+        }
+
+        // Cuenta las casillas ocupadas del tablero.
+        private int ContarOcupadas(BoardManager board)
+        {
+            int count = 0;
+            for (int x = 0; x < board.Grid.Size; x++)
+                for (int y = 0; y < board.Grid.Size; y++)
+                    if (board.Grid.GetLevel(x, y) > 0)
+                        count++;
+
+            return count;
+        }
+
         // Crea un BoardManager de prueba con un tablero vacio.
         private BoardManager CrearBoard()
         {

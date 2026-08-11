@@ -33,5 +33,14 @@ namespace TowerDefense
 
             Assert.IsFalse(found);
         }
+
+        // Solo la tecla B corresponde a comprar.
+        [TestCase(Key.B, true)]
+        [TestCase(Key.Space, false)]
+        [TestCase(Key.UpArrow, false)]
+        public void IsBuyKey_ReconoceSoloLaTeclaB(Key key, bool expected)
+        {
+            Assert.AreEqual(expected, InputController.IsBuyKey(key));
+        }
     }
 }

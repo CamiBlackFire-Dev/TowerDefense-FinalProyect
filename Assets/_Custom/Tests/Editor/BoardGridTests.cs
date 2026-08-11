@@ -234,6 +234,110 @@ namespace TowerDefense
             AssertBoard(grid, "1,0,0,0|0,0,0,0|0,0,0,0|0,0,0,0");
         }
 
+        // Una fusion registra el destino, las dos fuentes y el nivel resultante.
+        [Test]
+        public void Left_Fusion_RegistraElEventoCompleto()
+        {
+            var grid = FromString("1,1,0,0|0,0,0,0|0,0,0,0|0,0,0,0");
+
+            var result = grid.Move(GridDirection.Left);
+
+            Assert.AreEqual(1, result.Merges.Count);
+            Assert.AreEqual(0, result.Moves.Count);
+            TowerMergeEvent merge = result.Merges[0];
+            Assert.AreEqual((0, 0), merge.To);
+            Assert.AreEqual((0, 0), merge.FirstSource);
+            Assert.AreEqual((1, 0), merge.SecondSource);
+            Assert.AreEqual(2, merge.ResultLevel);
+        }
+
+        // Una fusion con hueco registra fuentes no adyacentes.
+        [Test]
+        public void Left_FusionConHueco_RegistraFuentesLejanas()
+        {
+            var grid = FromString("1,0,1,0|0,0,0,0|0,0,0,0|0,0,0,0");
+
+            var result = grid.Move(GridDirection.Left);
+
+            Assert.AreEqual(1, result.Merges.Count);
+            Assert.AreEqual((0, 0), result.Merges[0].FirstSource);
+            Assert.AreEqual((2, 0), result.Merges[0].SecondSource);
+        }
+
+        // Cuatro torres iguales generan dos fusiones independientes.
+        [Test]
+        public void Left_CuatroUnos_RegistraDosFusiones()
+        {
+            var grid = FromString("1,1,1,1|0,0,0,0|0,0,0,0|0,0,0,0");
+
+            var result = grid.Move(GridDirection.Left);
+
+            Assert.AreEqual(2, result.Merges.Count);
+            Assert.AreEqual(2, result.Merges[0].ResultLevel);
+            Assert.AreEqual(2, result.Merges[1].ResultLevel);
+            Assert.AreEqual((0, 0), result.Merges[0].To);
+            Assert.AreEqual((1, 0), result.Merges[1].To);
+        }
+
+        // Un deslizamiento sin fusion registra el movimiento.
+        [Test]
+        public void Left_Deslizamiento_RegistraElMovimiento()
+        {
+            var grid = FromString("0,1,0,0|0,0,0,0|0,0,0,0|0,0,0,0");
+
+            var result = grid.Move(GridDirection.Left);
+
+            Assert.AreEqual(1, result.Moves.Count);
+            Assert.AreEqual(0, result.Merges.Count);
+            TowerMoveEvent move = result.Moves[0];
+            Assert.AreEqual((1, 0), move.From);
+            Assert.AreEqual((0, 0), move.To);
+            Assert.AreEqual(1, move.Level);
+        }
+
+        // La torre creada por una fusion no vuelve a fusionarse: aparece como
+        // movimiento de la siguiente torre, no como una segunda fusion.
+        [Test]
+        public void Left_FusionYDeslizamiento_RegistraAmbosEventos()
+        {
+            var grid = FromString("1,1,2,0|0,0,0,0|0,0,0,0|0,0,0,0");
+
+            var result = grid.Move(GridDirection.Left);
+
+            Assert.AreEqual(1, result.Merges.Count);
+            Assert.AreEqual(1, result.Moves.Count);
+            Assert.AreEqual(2, result.Merges[0].ResultLevel);
+            Assert.AreEqual((2, 0), result.Moves[0].From);
+            Assert.AreEqual((1, 0), result.Moves[0].To);
+            Assert.AreEqual(2, result.Moves[0].Level);
+        }
+
+        // Mover hacia arriba registra la casilla destino en la parte alta.
+        [Test]
+        public void Up_Desplazamiento_RegistraMovimientoVertical()
+        {
+            var grid = FromString("1,0,0,0|0,0,0,0|0,0,0,0|0,0,0,0");
+
+            var result = grid.Move(GridDirection.Up);
+
+            Assert.AreEqual(1, result.Moves.Count);
+            Assert.AreEqual((0, 0), result.Moves[0].From);
+            Assert.AreEqual((0, 3), result.Moves[0].To);
+        }
+
+        // Un movimiento sin cambios no genera ningun evento.
+        [Test]
+        public void Left_SinCambios_NoGeneraEventos()
+        {
+            var grid = FromString("2,3,4,5|0,0,0,0|0,0,0,0|0,0,0,0");
+
+            var result = grid.Move(GridDirection.Left);
+
+            Assert.IsFalse(result.Changed);
+            Assert.AreEqual(0, result.Moves.Count);
+            Assert.AreEqual(0, result.Merges.Count);
+        }
+
         // Cada fila se procesa de forma independiente en el mismo movimiento.
         [Test]
         public void Left_MultipleRows_MoveIndependently()

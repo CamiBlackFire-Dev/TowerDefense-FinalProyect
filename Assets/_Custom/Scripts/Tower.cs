@@ -1,80 +1,120 @@
+using System.Collections;
 using UnityEngine;
 
 namespace TowerDefense
 {
-    // Representa una torre y su apariencia basica.
+    // Ancla logica de una torre en el tablero.
+    // No conoce la malla: toda la apariencia la maneja TowerVisual.
+    // Esto permite cambiar el cubo por cualquier modelo 3D sin tocar este codigo.
     public class Tower : MonoBehaviour
     {
         [SerializeField] private int level = 1;
-        [SerializeField] private Color[] levelColors;
-        [SerializeField] private float baseScale = 0.6f;
-        [SerializeField] private float scalePerLevel = 0.15f;
 
-        private MaterialPropertyBlock _propertyBlock;
+        private TowerVisual _visual;
 
         public int Level
         {
             get { return level; }
         }
 
+        // Componente visual de la torre (se crea solo si falta).
+        public TowerVisual Visual
+        {
+            get
+            {
+                EnsureVisual();
+                return _visual;
+            }
+        }
+
         private void Awake()
         {
-            ApplyAppearance();
+            EnsureVisual();
         }
 
         private void OnValidate()
         {
-            if (!Application.isPlaying)
-                ApplyAppearance();
+            if (Application.isPlaying)
+                return;
+
+            if (_visual == null)
+                _visual = GetComponent<TowerVisual>();
+
+            if (_visual != null)
+                _visual.ApplyLevel(level);
         }
 
-        // Cambia el nivel y actualiza tamano y color.
+        // Cambia el nivel y actualiza la apariencia.
         public void SetLevel(int newLevel)
         {
             level = Mathf.Max(1, newLevel);
-            ApplyAppearance();
+            Visual.ApplyLevel(level);
         }
 
-        private void ApplyAppearance()
+        // Posicion final del root sobre la casilla, con el modelo apoyado.
+        public Vector3 GetPositionOnCell(int x, int y, Vector3 anchor)
         {
-            EnsurePalette();
+            Vector3 position = anchor;
+            position.y += Visual.GetStandingOffset();
+            return position;
+        }
 
-            float size = baseScale + level * scalePerLevel;
-            transform.localScale = new Vector3(size, size, size);
+        // Coloca el root sobre la casilla, con el modelo apoyado en la celda.
+        public void PositionOnCell(int x, int y, Vector3 anchor)
+        {
+            transform.localPosition = GetPositionOnCell(x, y, anchor);
+        }
 
-            Renderer renderer = GetComponent<Renderer>();
-            if (renderer == null || levelColors.Length == 0)
+        // Desliza la torre hasta una posicion local con suavizado.
+        public void AnimateToLocalPosition(Vector3 target, float duration,
+            AnimationCurve curve, System.Action onComplete)
+        {
+            StartCoroutine(SlideCoroutine(target, duration, curve, onComplete));
+        }
+
+        // Anima la aparicion de la torre (crece desde pequena).
+        public void PlaySpawnFeedback()
+        {
+            Visual.PlaySpawnFeedback();
+        }
+
+        // Anima la fusion: nuevo nivel, pulso y destello.
+        public void PlayMergeFeedback(int newLevel, float duration)
+        {
+            level = Mathf.Max(1, newLevel);
+            Visual.PlayMergeFeedback(level, duration);
+        }
+
+        // Garantiza que la torre tenga un componente visual.
+        private void EnsureVisual()
+        {
+            if (_visual != null)
                 return;
 
-            int colorIndex = Mathf.Clamp(level - 1, 0, levelColors.Length - 1);
-            if (_propertyBlock == null)
-                _propertyBlock = new MaterialPropertyBlock();
+            _visual = GetComponent<TowerVisual>();
+            if (_visual == null)
+                _visual = gameObject.AddComponent<TowerVisual>();
 
-            renderer.GetPropertyBlock(_propertyBlock);
-            _propertyBlock.SetColor("_BaseColor", levelColors[colorIndex]);
-            renderer.SetPropertyBlock(_propertyBlock);
+            _visual.ApplyLevel(level);
         }
 
-        private void EnsurePalette()
+        private IEnumerator SlideCoroutine(Vector3 target, float duration,
+            AnimationCurve curve, System.Action onComplete)
         {
-            if (levelColors != null && levelColors.Length > 0)
-                return;
-
-            levelColors = DefaultPalette();
-        }
-
-        // Paleta de colores por defecto para distinguir niveles en el prototipo.
-        private static Color[] DefaultPalette()
-        {
-            return new Color[]
+            Vector3 start = transform.localPosition;
+            float t = 0f;
+            while (t < duration)
             {
-                new Color(0.3f, 0.6f, 1f),
-                new Color(0.3f, 1f, 0.5f),
-                new Color(1f, 0.7f, 0.2f),
-                new Color(1f, 0.3f, 0.3f),
-                new Color(0.8f, 0.4f, 1f),
-                new Color(1f, 1f, 1f),
-            };
+                t += Time.deltaTime;
+                float progress = Mathf.Clamp01(t / duration);
+                float eased = curve != null ? curve.Evaluate(progress) : progress;
+                transform.localPosition = Vector3.LerpUnclamped(start, target, eased);
+                yield return null;
+            }
+
+            transform.localPosition = target;
+            if (onComplete != null)
+                onComplete();
         }
     }
 }
