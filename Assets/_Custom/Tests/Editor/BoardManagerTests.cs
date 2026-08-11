@@ -147,6 +147,55 @@ namespace TowerDefense
             return count;
         }
 
+        // Con la animacion activa, los movimientos se encolan sin perderse.
+        [Test]
+        public void Move_DuranteAnimacion_EncolaElMovimiento()
+        {
+            BoardManager board = CrearBoard();
+
+            // Simulamos una animacion en curso (en pruebas de editor no hay corutinas).
+            SetPrivateField(board, "_isAnimating", true);
+
+            board.Move(GridDirection.Left);
+            board.Move(GridDirection.Up);
+
+            Assert.AreEqual(2, board.PendingMoveCount);
+        }
+
+        // La cola de movimientos no supera el maximo configurado.
+        [Test]
+        public void Move_DuranteAnimacion_RespetaElMaximo()
+        {
+            BoardManager board = CrearBoard();
+            SetPrivateField(board, "_isAnimating", true);
+
+            for (int i = 0; i < 20; i++)
+                board.Move(GridDirection.Left);
+
+            Assert.AreEqual(8, board.PendingMoveCount);
+        }
+
+        // Sin animacion los movimientos se ejecutan al instante y no se encolan.
+        [Test]
+        public void Move_SinAnimacion_NoEncola()
+        {
+            BoardManager board = CrearBoard();
+            board.PlaceTower(0, 0, 1);
+
+            board.Move(GridDirection.Left);
+
+            Assert.AreEqual(0, board.PendingMoveCount);
+            Assert.IsFalse(board.IsAnimating);
+        }
+
+        // Asigna un campo privado desde la prueba (los campos serializados son privados).
+        private static void SetPrivateField(object target, string fieldName, object value)
+        {
+            System.Reflection.FieldInfo field = target.GetType().GetField(fieldName,
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            field.SetValue(target, value);
+        }
+
         // Crea un BoardManager de prueba con un tablero vacio.
         private BoardManager CrearBoard()
         {

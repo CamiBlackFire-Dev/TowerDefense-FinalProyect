@@ -30,6 +30,7 @@ namespace TowerDefense
         [SerializeField] private float moveDuration = 0.14f;      // duracion del deslizamiento
         [SerializeField] private float mergeFeedbackDuration = 0.22f; // duracion del pulso de fusion
         [SerializeField] private AnimationCurve moveCurve;        // suavizado del deslizamiento
+        [SerializeField] private int maxBufferedMoves = 8;        // movimientos encolados maximo
 
         [Header("Input")]
         [SerializeField] private InputController inputController;
@@ -47,6 +48,7 @@ namespace TowerDefense
             new Dictionary<(int x, int y), GameObject>();
         private readonly Dictionary<(int x, int y), GameObject> _towers =
             new Dictionary<(int x, int y), GameObject>();
+        private readonly Queue<GridDirection> _pendingMoves = new Queue<GridDirection>();
 
         public BoardGrid Grid
         {
@@ -60,6 +62,18 @@ namespace TowerDefense
         public int GridSize
         {
             get { return BoardGrid.DefaultSize; }
+        }
+
+        // Cantidad de movimientos encolados esperando su turno.
+        public int PendingMoveCount
+        {
+            get { return _pendingMoves.Count; }
+        }
+
+        // True mientras el tablero esta animando un movimiento.
+        public bool IsAnimating
+        {
+            get { return _isAnimating; }
         }
 
         private void Awake()
@@ -171,32 +185,63 @@ namespace TowerDefense
         // Ejecuta un movimiento estilo 2048.
         // En Play Mode anima los desplazamientos y las fusiones; fuera de el
         // (por ejemplo en pruebas de editor) actualiza las torres al instante.
-        // Mientras la animacion corre se ignoran nuevos movimientos.
+        // Si ya hay una animacion corriendo, el movimiento se encola para no
+        // perder las pulsaciones rapidas del jugador.
         public MoveResult Move(GridDirection direction)
         {
             EnsureInitialized();
+
+            // Con la animacion activa se encola y se devuelve un resultado vacio.
             if (_isAnimating)
+            {
+                if (_pendingMoves.Count < maxBufferedMoves)
+                    _pendingMoves.Enqueue(direction);
                 return new MoveResult(false, 0,
                     new List<TowerMoveEvent>(), new List<TowerMergeEvent>());
+            }
 
             MoveResult result = _grid.Move(direction);
             if (!result.Changed)
                 return result;
 
             if (Application.isPlaying)
-                StartCoroutine(AnimateMove(result));
+            {
+                _isAnimating = true;
+                StartCoroutine(ProcessMoveQueue(result));
+            }
             else
+            {
                 UpdateTowers();
+            }
 
             return result;
         }
 
+        // Procesa en orden el movimiento actual y todos los encolados.
+        // Los movimientos que no cambian el tablero se consumen sin animar.
+        private IEnumerator ProcessMoveQueue(MoveResult firstResult)
+        {
+            yield return StartCoroutine(AnimateMove(firstResult));
+
+            while (_pendingMoves.Count > 0)
+            {
+                GridDirection direction = _pendingMoves.Dequeue();
+                MoveResult result = _grid.Move(direction);
+                if (!result.Changed)
+                    continue;
+
+                yield return StartCoroutine(AnimateMove(result));
+            }
+
+            _isAnimating = false;
+        }
+
         // Anima un movimiento: primero deslizan todas las torres y luego
         // se aplican las fusiones con su feedback.
+        // Solo espera el deslizamiento: el pulso de fusion sigue en paralelo
+        // y no bloquea al jugador para mover de nuevo.
         private IEnumerator AnimateMove(MoveResult result)
         {
-            _isAnimating = true;
-
             var sliding = new List<(Tower tower, (int x, int y) to, Vector3 target)>();
             var merging = new List<(Tower survivor, Tower consumed, (int x, int y) to, Vector3 target)>();
 
@@ -250,8 +295,8 @@ namespace TowerDefense
             foreach (var item in merging)
                 _towers[item.to] = item.survivor.gameObject;
 
-            yield return new WaitForSeconds(mergeFeedbackDuration);
-            _isAnimating = false;
+            // No se espera el pulso de fusion: el siguiente movimiento puede
+            // comenzar ya mientras el pulso termina por su cuenta.
         }
 
         // Curva por defecto: arranque rapido y frenado suave (ease-out).

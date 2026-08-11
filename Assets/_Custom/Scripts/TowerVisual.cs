@@ -38,6 +38,8 @@ namespace TowerDefense
         private float _currentScaleFactor = 1f;
         private int _currentLevel = 1;
         private bool _setupDone;
+        private Coroutine _spawnCoroutine;
+        private Coroutine _pulseCoroutine;
 
         // Factor de escala actual (tamano del modelo en este nivel).
         public float CurrentScaleFactor
@@ -86,7 +88,8 @@ namespace TowerDefense
             if (!Application.isPlaying || spawnDuration <= 0f)
                 return;
 
-            StartCoroutine(SpawnCoroutine());
+            StopAllVisualFeedback();
+            _spawnCoroutine = StartCoroutine(SpawnCoroutine());
         }
 
         // Si se reemplaza el modelo 3D por otro, se restablece la escala base
@@ -102,13 +105,34 @@ namespace TowerDefense
 
         // Anima la fusion: cambia de nivel y hace un pulso con destello.
         // El feedback es mas vistoso cuanto mayor es el nivel.
+        // Si la torre se fusiona otra vez, se cancela el pulso anterior.
         public void PlayMergeFeedback(int level, float duration)
         {
             ApplyLevel(level);
             if (!Application.isPlaying || duration <= 0f)
                 return;
 
-            StartCoroutine(PulseCoroutine(duration));
+            StopAllVisualFeedback();
+            _pulseCoroutine = StartCoroutine(PulseCoroutine(duration));
+        }
+
+        // Detiene cualquier animacion visual previa y restaura la escala exacta.
+        private void StopAllVisualFeedback()
+        {
+            if (_spawnCoroutine != null)
+            {
+                StopCoroutine(_spawnCoroutine);
+                _spawnCoroutine = null;
+            }
+
+            if (_pulseCoroutine != null)
+            {
+                StopCoroutine(_pulseCoroutine);
+                _pulseCoroutine = null;
+            }
+
+            ApplyScale(_currentScaleFactor);
+            ApplyAppearance(_currentLevel);
         }
 
         // Prepara las referencias del modelo. Se llama una sola vez.
@@ -219,6 +243,7 @@ namespace TowerDefense
             }
 
             ApplyScale(target);
+            _spawnCoroutine = null;
         }
 
         private IEnumerator PulseCoroutine(float duration)
@@ -254,6 +279,7 @@ namespace TowerDefense
 
             ApplyScale(target);
             ApplyAppearance(_currentLevel);
+            _pulseCoroutine = null;
         }
 
         // Intensidad del pulso segun el nivel alcanzado.
