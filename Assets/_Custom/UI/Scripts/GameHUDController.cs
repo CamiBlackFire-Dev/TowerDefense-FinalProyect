@@ -68,8 +68,6 @@ namespace Custom.UI
             {
                 _buyTowerButton.clicked += OnBuyTowerClicked;
                 _buyTowerButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
-                // Lo dejamos inactivo (gris) por petición, pero ya está enlazado y listo
-                _buyTowerButton.SetEnabled(false);
             }
 
             if (_backButton != null)
@@ -97,16 +95,16 @@ namespace Custom.UI
                 }
             }
 
-            // Conectar con la economía real del juego
+
             _economyManager = Object.FindFirstObjectByType<EconomyManager>();
             if (_economyManager != null)
             {
                 _economyManager.MoneyChanged += UpdateCurrency;
-                UpdateCurrency(_economyManager.Money); // Actualizar con el dinero inicial
+                UpdateCurrency(_economyManager.Money);
             }
             else
             {
-                UpdateCurrency(0); // Fallback si probamos en UI_Sandbox sin EconomyManager
+                UpdateCurrency(0);
             }
 
             _towerShop = Object.FindFirstObjectByType<TowerShop>();

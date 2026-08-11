@@ -15,7 +15,7 @@
         </ui:VisualElement>
         <ui:Button name="StartWaveButton" text="EMPEZAR OLEADA" class="unity-button start-wave-btn"/>
         <ui:VisualElement class="bottom-bar" style="height: 115px;">
-            <ui:VisualElement style="flex: 1;"/>
+            <ui:VisualElement style="flex: 1; flex-basis: 0; min-width: 300px;"/>
             <ui:VisualElement class="abilities-container">
                 <ui:VisualElement class="ability-slot">
                     <ui:Label text="1" class="ability-hotkey"/>
@@ -30,8 +30,8 @@
                     <ui:Label text="4" class="ability-hotkey"/>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement style="flex: 1; align-items: flex-end; justify-content: center;">
-                <ui:Button name="BuyTowerButton" class="unity-button buy-tower-btn">
+            <ui:VisualElement style="flex: 1; flex-basis: 0; min-width: 300px; align-items: flex-end; justify-content: center;">
+                <ui:Button name="BuyTowerButton" class="unity-button buy-tower-btn" style="display: flex;">
                     <ui:Label text="COMPRAR TORRE" class="buy-tower-title"/>
                     <ui:Label text="(50 ORO)" class="buy-tower-price"/>
                 </ui:Button>
