@@ -11,11 +11,31 @@
             <ui:VisualElement class="wave-container">
                 <ui:Label text="OLEADA 1" name="WaveText" class="wave-text"/>
             </ui:VisualElement>
-            <ui:Button name="OptionsButton" text="⚙" class="options-btn-small" style="color: white; font-size: 50px; -unity-font-style: bold; -unity-text-align: middle-center; text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);"/>
+            <ui:Button name="OptionsButton" text="" class="options-btn-small" style="border-left-color: rgb(241, 196, 15); border-right-color: rgb(241, 196, 15); border-top-color: rgb(241, 196, 15); border-bottom-color: rgb(241, 196, 15);"/>
         </ui:VisualElement>
         <ui:Button name="StartWaveButton" text="EMPEZAR OLEADA" class="unity-button start-wave-btn"/>
-        <ui:VisualElement class="bottom-bar">
-            <ui:Label text="[Espacio Reservado para Botones de Torres o habilidades]" style="color: rgba(0, 0, 0, 0.5); font-size: 80px;"/>
+        <ui:VisualElement class="bottom-bar" style="height: 115px;">
+            <ui:VisualElement style="flex: 1;"/>
+            <ui:VisualElement class="abilities-container">
+                <ui:VisualElement class="ability-slot">
+                    <ui:Label text="1" class="ability-hotkey"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="ability-slot">
+                    <ui:Label text="2" class="ability-hotkey"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="ability-slot">
+                    <ui:Label text="3" class="ability-hotkey"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="ability-slot" style="margin-right: 0;">
+                    <ui:Label text="4" class="ability-hotkey"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement style="flex: 1; align-items: flex-end; justify-content: center;">
+                <ui:Button name="BuyTowerButton" class="unity-button buy-tower-btn">
+                    <ui:Label text="COMPRAR TORRE" class="buy-tower-title"/>
+                    <ui:Label text="(50 ORO)" class="buy-tower-price"/>
+                </ui:Button>
+            </ui:VisualElement>
         </ui:VisualElement>
         <ui:VisualElement name="BigAnnouncerContainer" picking-mode="Ignore" class="big-announcer-container">
             <ui:Label text="WAVE 1" name="BigAnnouncerText" class="big-announcer-text"/>

@@ -11,6 +11,7 @@ namespace Custom.UI
         private Label _waveText;
         private Button _optionsButton;
         private Button _startWaveButton;
+        private Button _buyTowerButton;
 
         private VisualElement _bigAnnouncerContainer;
         private Label _bigAnnouncerText;
@@ -27,6 +28,8 @@ namespace Custom.UI
         public AudioClip waveAnnouncerSound;
 
         private int _currentCurrency = 0;
+        private EconomyManager _economyManager;
+        private TowerShop _towerShop;
 
         private void OnEnable()
         {
@@ -38,6 +41,7 @@ namespace Custom.UI
             _waveText = root.Q<Label>("WaveText");
             _optionsButton = root.Q<Button>("OptionsButton");
             _startWaveButton = root.Q<Button>("StartWaveButton");
+            _buyTowerButton = root.Q<Button>("BuyTowerButton");
 
             _bigAnnouncerContainer = root.Q<VisualElement>("BigAnnouncerContainer");
             _bigAnnouncerText = root.Q<Label>("BigAnnouncerText");
@@ -58,6 +62,14 @@ namespace Custom.UI
             {
                 _startWaveButton.clicked += OnStartWaveClicked;
                 _startWaveButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+
+            if (_buyTowerButton != null)
+            {
+                _buyTowerButton.clicked += OnBuyTowerClicked;
+                _buyTowerButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+                // Lo dejamos inactivo (gris) por petición, pero ya está enlazado y listo
+                _buyTowerButton.SetEnabled(false);
             }
 
             if (_backButton != null)
@@ -85,7 +97,19 @@ namespace Custom.UI
                 }
             }
 
-            UpdateCurrency(100);
+            // Conectar con la economía real del juego
+            _economyManager = Object.FindFirstObjectByType<EconomyManager>();
+            if (_economyManager != null)
+            {
+                _economyManager.MoneyChanged += UpdateCurrency;
+                UpdateCurrency(_economyManager.Money); // Actualizar con el dinero inicial
+            }
+            else
+            {
+                UpdateCurrency(0); // Fallback si probamos en UI_Sandbox sin EconomyManager
+            }
+
+            _towerShop = Object.FindFirstObjectByType<TowerShop>();
         }
 
         private void OnDisable()
@@ -100,10 +124,20 @@ namespace Custom.UI
                 _startWaveButton.clicked -= OnStartWaveClicked;
                 _startWaveButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
             }
+            if (_buyTowerButton != null)
+            {
+                _buyTowerButton.clicked -= OnBuyTowerClicked;
+                _buyTowerButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
             if (_backButton != null)
             {
                 _backButton.clicked -= OnBackClicked;
                 _backButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+
+            if (_economyManager != null)
+            {
+                _economyManager.MoneyChanged -= UpdateCurrency;
             }
         }
 
@@ -173,6 +207,19 @@ namespace Custom.UI
             PlayClickSound();
             Debug.Log("Iniciando Oleada por click...");
             SetWaveActive(true);
+        }
+
+        private void OnBuyTowerClicked()
+        {
+            PlayClickSound();
+            if (_towerShop != null)
+            {
+                _towerShop.TryBuyTower();
+            }
+            else
+            {
+                Debug.LogWarning("TowerShop no encontrado en la escena. La torre no se comprará.");
+            }
         }
 
         private void OnButtonHover(PointerEnterEvent evt)
