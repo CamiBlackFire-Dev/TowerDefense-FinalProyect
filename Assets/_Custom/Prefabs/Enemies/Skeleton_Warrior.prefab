@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8908542888303111513}
   - component: {fileID: 136688936428972049}
   - component: {fileID: 2364010295908377697}
+  - component: {fileID: 4710723690431259778}
   m_Layer: 3
   m_Name: Skeleton_Warrior
   m_TagString: Untagged
@@ -104,6 +105,24 @@ MonoBehaviour:
   deathEffect: {fileID: 0}
   deathDelay: 1.2
   dieTrigger: Die
+  showHealthBar: 1
+--- !u!114 &4710723690431259778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8142345231341369619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43fa7129f2102c7418ca88e309b1cf86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealthBar
+  barWidth: 1.6
+  barHeight: 0.18
+  barOffset: {x: 0, y: 2.8, z: 0}
+  fullColor: {r: 0.2, g: 1, b: 0.3, a: 1}
+  emptyColor: {r: 1, g: 0.2, b: 0.2, a: 1}
 --- !u!1001 &2062208208502392293
 PrefabInstance:
   m_ObjectHideFlags: 0

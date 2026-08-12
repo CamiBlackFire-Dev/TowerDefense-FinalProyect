@@ -8,7 +8,9 @@ public class EnemyHealthBar : MonoBehaviour
     [Header("Tamanos")]
     public float barWidth = 1.6f;   // ancho de la barra
     public float barHeight = 0.18f; // alto de la barra
-    public float offsetAbove = 0.4f; // altura extra sobre la cabeza del enemigo
+
+    [Header("Posicion")]
+    public Vector3 barOffset = new Vector3(0f, 1.5f, 0f); // donde vive la barra, local al enemigo
 
     [Header("Colores")]
     public Color fullColor = new Color(0.2f, 1f, 0.3f); // vida llena
@@ -67,15 +69,11 @@ public class EnemyHealthBar : MonoBehaviour
         _fillRenderer = _fill.GetComponent<Renderer>();
     }
 
-    // Altura de la barra: encima del collider del enemigo.
+    // Coloca la barra en el offset elegido, local al enemigo.
+    // Con barOffset se edita la posicion completa (X, Y, Z) desde el Inspector.
     private void PositionAboveEnemy()
     {
-        float halfHeight = 1f;
-        Collider collider = GetComponentInChildren<Collider>();
-        if (collider != null)
-            halfHeight = collider.bounds.size.y * 0.5f;
-
-        _barRoot.localPosition = new Vector3(0f, halfHeight + offsetAbove, 0f);
+        _barRoot.localPosition = barOffset;
     }
 
     // Actualiza el ancho y el color de la barra segun la vida.

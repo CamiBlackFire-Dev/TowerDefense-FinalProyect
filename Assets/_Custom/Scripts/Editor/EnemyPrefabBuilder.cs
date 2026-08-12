@@ -119,6 +119,9 @@ public static class EnemyPrefabBuilder
         root.AddComponent<TestEnemyMovement>();
         root.AddComponent<EnemyFacing>();
         root.AddComponent<EnemyHealth>();
+        // La barra de vida se puede ajustar desde el propio prefab
+        // (posicion, tamano y colores) sin entrar en Play Mode.
+        root.AddComponent<EnemyHealthBar>();
 
         footOffset = -bounds.min.y;
 
