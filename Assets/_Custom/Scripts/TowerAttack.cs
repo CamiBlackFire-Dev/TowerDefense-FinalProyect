@@ -1,4 +1,5 @@
 using UnityEngine;
+using DamageNumbersPro;
 
 // Hace que la torre dispare al enemigo que tiene mas cerca.
 // La deteccion y la punteria las hace TowerTargetDetector (script de Jean);
@@ -19,8 +20,14 @@ public class TowerAttack : MonoBehaviour
     [Header("Deteccion")]
     public LayerMask enemyLayer;   // vacio = se usa la capa "Enemy"
 
+    [Header("Proyectil")]
+    public GameObject projectilePrefab; // bala visible (bola de canon)
+    public float projectileSpeed = 10f; // velocidad de la bala
+    public float muzzleHeight = 1.2f;   // altura de donde sale el disparo
+
     [Header("Efectos")]
     public GameObject impactEffect; // efecto opcional donde pega el disparo
+    public DamageNumber popupPrefab; // numero de dano al pegar (opcional)
 
     private TowerTargetDetector _detector;
     private Tower _tower;
@@ -65,9 +72,25 @@ public class TowerAttack : MonoBehaviour
     {
         _cooldown = attackRate > 0f ? 1f / attackRate : 1f;
 
+        if (projectilePrefab != null && target != null)
+        {
+            // Disparo visible: sale una bala que persigue al enemigo
+            // y le pega al llegar (el dano se aplica en el impacto).
+            Vector3 origen = transform.position + Vector3.up * muzzleHeight;
+            GameObject bala = Instantiate(projectilePrefab, origen, Quaternion.identity);
+            TowerProjectile projectile = bala.GetComponent<TowerProjectile>();
+            if (projectile != null)
+                projectile.Setup(target, damage, popupPrefab, impactEffect);
+            return;
+        }
+
+        // Sin bala asignada el dano es instantaneo, como antes.
         EnemyHealth health = target.GetComponent<EnemyHealth>();
         if (health != null)
             health.TakeDamage(damage);
+
+        if (popupPrefab != null)
+            popupPrefab.Spawn(target.position, damage);
 
         if (impactEffect != null)
             Instantiate(impactEffect, target.position, Quaternion.identity);

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using DamageNumbersPro;
 
 // Conecta BoardGrid con los objetos visibles de la escena.
 // ExecuteAlways permite ver y editar el tablero sin entrar en Play Mode.
@@ -36,8 +37,10 @@ public class BoardManager : MonoBehaviour
     };
 
     [Header("Combate")]
-    public bool towersAttack = true;   // las torres disparan solas a los enemigos
-    public TowerCatalog towerCatalog;  // dano, alcance y cadencia de cada nivel
+    public bool towersAttack = true;    // las torres disparan solas a los enemigos
+    public TowerCatalog towerCatalog;   // dano, alcance y cadencia de cada nivel
+    public GameObject projectilePrefab; // bala visible de las torres (bola de canon)
+    public DamageNumber damagePopup;    // numero de dano al pegar (Damage Numbers Pro)
 
     [Header("Animacion")]
     public float moveDuration = 0.14f;          // duracion del deslizamiento
@@ -261,6 +264,8 @@ public class BoardManager : MonoBehaviour
             attack = tower.gameObject.AddComponent<TowerAttack>();
 
         attack.catalog = towerCatalog;
+        attack.projectilePrefab = projectilePrefab;
+        attack.popupPrefab = damagePopup;
     }
 
     // Procesa en orden el movimiento actual y todos los encolados.

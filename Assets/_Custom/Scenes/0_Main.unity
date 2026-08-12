@@ -276,7 +276,11 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 10
+  muzzleHeight: 1.2
   impactEffect: {fileID: 0}
+  popupPrefab: {fileID: 0}
 --- !u!114 &22764578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1732,7 +1736,11 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 10
+  muzzleHeight: 1.2
   impactEffect: {fileID: 0}
+  popupPrefab: {fileID: 0}
 --- !u!114 &428731826
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2617,7 +2625,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1, y: 0.5, z: -1}
-  m_LocalScale: {x: 1.8, y: 0.3333333, z: 1.8}
+  m_LocalScale: {x: 1.8, y: 0.16, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 463112610}
@@ -2826,7 +2834,11 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 10
+  muzzleHeight: 1.2
   impactEffect: {fileID: 0}
+  popupPrefab: {fileID: 0}
 --- !u!114 &933273898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2895,6 +2907,8 @@ MonoBehaviour:
   - {r: 1, g: 1, b: 1, a: 1}
   towersAttack: 1
   towerCatalog: {fileID: 0}
+  projectilePrefab: {fileID: 4570541557667802443, guid: fd26bfe326f4783428bcf130c003beab, type: 3}
+  damagePopup: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
   moveDuration: 0.14
   mergeFeedbackDuration: 0.22
   moveCurve:
@@ -3443,7 +3457,11 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 10
+  muzzleHeight: 1.2
   impactEffect: {fileID: 0}
+  popupPrefab: {fileID: 0}
 --- !u!114 &1052343082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3586,7 +3604,11 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 10
+  muzzleHeight: 1.2
   impactEffect: {fileID: 0}
+  popupPrefab: {fileID: 0}
 --- !u!114 &1069203018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6017,7 +6039,11 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 10
+  muzzleHeight: 1.2
   impactEffect: {fileID: 0}
+  popupPrefab: {fileID: 0}
 --- !u!114 &1706886873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6384,7 +6410,11 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 10
+  muzzleHeight: 1.2
   impactEffect: {fileID: 0}
+  popupPrefab: {fileID: 0}
 --- !u!114 &1768331501
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6729,7 +6759,11 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 10
+  muzzleHeight: 1.2
   impactEffect: {fileID: 0}
+  popupPrefab: {fileID: 0}
 --- !u!114 &1925955840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7174,7 +7208,11 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 10
+  muzzleHeight: 1.2
   impactEffect: {fileID: 0}
+  popupPrefab: {fileID: 0}
 --- !u!114 &2140376658
 MonoBehaviour:
   m_ObjectHideFlags: 0

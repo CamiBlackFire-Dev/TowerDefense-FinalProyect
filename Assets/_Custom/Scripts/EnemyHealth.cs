@@ -13,6 +13,9 @@ public class EnemyHealth : MonoBehaviour
     public float deathDelay = 1.2f;      // tiempo para que se vea la animacion
     public string dieTrigger = "Die";    // trigger del EnemyAnimator
 
+    [Header("Barra de vida")]
+    public bool showHealthBar = true;    // barra flotante sobre el enemigo
+
     private EconomyManager _economy;
     private float _currentHealth;
     private bool _ready;
@@ -34,6 +37,7 @@ public class EnemyHealth : MonoBehaviour
     private void Awake()
     {
         EnsureReady();
+        EnsureHealthBar();
     }
 
     // El spawner define la vida y el pago de la oleada.
@@ -109,5 +113,15 @@ public class EnemyHealth : MonoBehaviour
 
         _ready = true;
         _currentHealth = maxHealth;
+    }
+
+    // La barra de vida es un componente aparte que se crea en Play Mode.
+    private void EnsureHealthBar()
+    {
+        if (!showHealthBar)
+            return;
+
+        if (GetComponent<EnemyHealthBar>() == null)
+            gameObject.AddComponent<EnemyHealthBar>();
     }
 }

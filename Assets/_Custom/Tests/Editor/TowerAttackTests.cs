@@ -105,6 +105,57 @@ public class TowerAttackTests
         Assert.AreEqual(5f, attack.range, 0.01f);
     }
 
+    // Con proyectil asignado, disparar crea una bala que le pega al enemigo.
+    [Test]
+    public void Shoot_ConProyectil_LaBalaLePegaAlEnemigo()
+    {
+        TowerAttack attack = CrearTorre(1); // dano 5
+        EnemyHealth enemy = CrearEnemigo(new Vector3(5f, 0f, 0f), 50f);
+        attack.RefreshStats();
+        attack.projectileSpeed = 15f;
+        attack.projectilePrefab = CrearTemplateProyectil();
+
+        attack.Shoot(enemy.transform);
+
+        // La bala instanciada se busca entre las copias del template.
+        TowerProjectile bala = BuscarBala(attack.projectilePrefab);
+        Assert.IsNotNull(bala, "Disparar con proyectil deberia crear una bala");
+
+        int pasos = 0;
+        while (bala != null && pasos < 300)
+        {
+            bala.MoveStep(0.1f);
+            pasos++;
+        }
+
+        // Un objeto destruido de Unity se compara con ==, no con IsNull.
+        Assert.IsTrue(bala == null, "La bala deberia haberse destruido al pegar");
+        Assert.AreEqual(45f, enemy.CurrentHealth, 0.01f);
+    }
+
+    // Crea una plantilla de proyectil para simular el prefab de la torre.
+    private GameObject CrearTemplateProyectil()
+    {
+        GameObject template = new GameObject("Projectile Template");
+        template.AddComponent<TowerProjectile>();
+        template.SetActive(false); // inactivo: no debe contarse como bala viva
+        return template;
+    }
+
+    // Busca la bala que creo el disparo, ignorando la plantilla inactiva.
+    private TowerProjectile BuscarBala(GameObject template)
+    {
+        // Se incluyen los inactivos porque la bala clona a la plantilla inactiva.
+        TowerProjectile[] balas = Object.FindObjectsByType<TowerProjectile>(
+            FindObjectsInactive.Include, FindObjectsSortMode.None);
+        for (int i = 0; i < balas.Length; i++)
+        {
+            if (balas[i].gameObject != template)
+                return balas[i];
+        }
+        return null;
+    }
+
     // Corre la deteccion de TowerTargetDetector (es privada) y devuelve el objetivo.
     private Transform BuscarObjetivo(TowerAttack attack, float alcance)
     {
