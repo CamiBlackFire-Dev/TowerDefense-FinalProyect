@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 // Saca enemigos por el inicio del camino cada cierto tiempo.
@@ -18,7 +19,7 @@ public class EnemySpawner : MonoBehaviour
     public int damagePerEnemy = 1;  // vidas que quita cada enemigo que llega al final
 
     [Header("Oleada")]
-    public bool spawnOnStart = true;
+    public bool spawnOnStart = false; // false: la oleada la arranca el boton del HUD
     public float startDelay = 2f;    // espera antes del primer enemigo
     public float spawnInterval = 2f; // segundos entre un enemigo y el siguiente
     public int enemiesPerWave = 8;   // cuantos salen (0 = sin parar)
@@ -30,6 +31,23 @@ public class EnemySpawner : MonoBehaviour
     private float _timer;
     private int _spawned;
     private bool _running;
+    private int _waveNumber;
+
+    // Avisos para la interfaz: el HUD se sincroniza con estos.
+    public event Action WaveStarted;
+    public event Action WaveFinished;
+
+    // Numero de la ultima oleada arrancada (1, 2, 3...).
+    public int WaveNumber
+    {
+        get { return _waveNumber; }
+    }
+
+    // True mientras la oleada esta sacando enemigos.
+    public bool IsRunning
+    {
+        get { return _running; }
+    }
 
     // Enemigos que ya salieron en esta oleada.
     public int SpawnedCount
@@ -81,11 +99,20 @@ public class EnemySpawner : MonoBehaviour
         _spawned = 0;
         _timer = startDelay;
         _running = true;
+        _waveNumber++;
+
+        if (WaveStarted != null)
+            WaveStarted();
     }
 
     public void StopWave()
     {
+        if (!_running)
+            return;
+
         _running = false;
+        if (WaveFinished != null)
+            WaveFinished();
     }
 
     private void Update()
@@ -100,8 +127,13 @@ public class EnemySpawner : MonoBehaviour
         _timer = spawnInterval;
         SpawnEnemy();
 
+        // Oleada completa: se avisa para que la interfaz muestre el boton.
         if (enemiesPerWave > 0 && _spawned >= enemiesPerWave)
+        {
             _running = false;
+            if (WaveFinished != null)
+                WaveFinished();
+        }
     }
 
     // Indica si hay al menos un prefab de enemigo en la lista.
@@ -126,7 +158,7 @@ public class EnemySpawner : MonoBehaviour
         // Se repite hasta encontrar uno que no este vacio.
         for (int intento = 0; intento < 10; intento++)
         {
-            GameObject elegido = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+            GameObject elegido = enemyPrefabs[UnityEngine.Random.Range(0, enemyPrefabs.Length)];
             if (elegido != null)
                 return elegido;
         }

@@ -21,6 +21,10 @@ namespace Custom.UI
         private Slider _musicVolumeSlider;
         private Slider _sfxVolumeSlider;
 
+        [Header("Referencias")]
+        public EnemySpawner spawner;   // quien lanza las oleadas (se busca solo si queda vacio)
+        public EconomyManager economy; // dinero que se muestra arriba
+
         [Header("Audio")]
         public AudioClip hoverSound;
         public AudioClip clickSound;
@@ -85,7 +89,25 @@ namespace Custom.UI
                 }
             }
 
-            UpdateCurrency(100);
+            if (spawner == null)
+                spawner = FindFirstObjectByType<EnemySpawner>();
+            if (economy == null)
+                economy = FindFirstObjectByType<EconomyManager>();
+
+            // La oleada avisa al HUD cuando arranca y cuando termina.
+            if (spawner != null)
+            {
+                spawner.WaveStarted += OnWaveStarted;
+                spawner.WaveFinished += OnWaveFinished;
+                SetWaveActive(spawner.IsRunning);
+            }
+
+            // El dinero se actualiza solo cuando cambia.
+            if (economy != null)
+            {
+                economy.MoneyChanged += OnMoneyChanged;
+                UpdateCurrency(economy.Money);
+            }
         }
 
         private void OnDisable()
@@ -105,6 +127,15 @@ namespace Custom.UI
                 _backButton.clicked -= OnBackClicked;
                 _backButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
             }
+
+            if (spawner != null)
+            {
+                spawner.WaveStarted -= OnWaveStarted;
+                spawner.WaveFinished -= OnWaveFinished;
+            }
+
+            if (economy != null)
+                economy.MoneyChanged -= OnMoneyChanged;
         }
 
         public void UpdateCurrency(int amount)
@@ -113,24 +144,6 @@ namespace Custom.UI
             if (_currencyText != null)
             {
                 _currencyText.text = _currentCurrency.ToString();
-            }
-        }
-
-        private void Update()
-        {
-            if (UnityEngine.InputSystem.Keyboard.current != null &&
-                UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame)
-            {
-                UpdateWave(UnityEngine.Random.Range(2, 10));
-                SetWaveActive(true);
-
-                if (_bigAnnouncerContainer != null)
-                {
-                    _bigAnnouncerContainer.schedule.Execute(() =>
-                    {
-                        SetWaveActive(false);
-                    }).StartingIn(5000);
-                }
             }
         }
 
@@ -171,8 +184,33 @@ namespace Custom.UI
         private void OnStartWaveClicked()
         {
             PlayClickSound();
-            Debug.Log("Iniciando Oleada por click...");
+
+            if (spawner == null)
+            {
+                Debug.LogWarning("GameHUD: falta el EnemySpawner, el boton no puede arrancar la oleada.", this);
+                return;
+            }
+
+            spawner.StartWave();
+        }
+
+        // La oleada arranco: se muestra el numero y se oculta el boton.
+        private void OnWaveStarted()
+        {
             SetWaveActive(true);
+            UpdateWave(spawner.WaveNumber);
+        }
+
+        // La oleada termino: vuelve a aparecer el boton para la siguiente.
+        private void OnWaveFinished()
+        {
+            SetWaveActive(false);
+        }
+
+        // El dinero cambio: se refresca el numero de arriba.
+        private void OnMoneyChanged(int money)
+        {
+            UpdateCurrency(money);
         }
 
         private void OnButtonHover(PointerEnterEvent evt)
