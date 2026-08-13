@@ -54,7 +54,7 @@
 .options-panel {
     background-color: rgba(0, 0, 0, 0);
     border-radius: 0;
-    padding: 80px 100px;
+    padding: 100px 100px 80px 100px;
     border-width: 0;
     min-width: 600px;
     align-items: stretch;
@@ -62,13 +62,15 @@
 
 .title-text {
     font-size: 80px;
-    color: rgb(62, 35, 18);
+    color: rgb(80, 60, 40);
     -unity-font-style: bold;
     -unity-text-align: middle-center;
-    margin-bottom: 50px;
-    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgb(255, 132, 0);
+    margin-bottom: 40px;
+    padding-bottom: 15px;
+    border-bottom-width: 4px;
+    border-bottom-color: rgba(80, 60, 40, 0.4);
+    text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.6);
+    -unity-text-outline-width: 0;
 }
 
 .slider-container {
@@ -77,12 +79,12 @@
 
 .slider-label {
     font-size: 40px;
-    color: rgb(55, 28, 12);
+    color: rgb(80, 60, 40);
     -unity-font-style: bold;
     margin-bottom: 15px;
     -unity-text-align: middle-center;
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgb(255, 128, 0);
+    -unity-text-outline-width: 0;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .unity-base-slider__tracker {
@@ -108,4 +110,56 @@
 .unity-base-slider__dragger:hover {
     scale: 1.2;
     background-color: var(--color-secondary);
+}
+
+.banner-image {
+    width: 800px;
+    height: 400px;
+    -unity-background-scale-mode: scale-to-fit;
+    margin-bottom: 20px;
+    align-self: center;
+}
+
+.mini-action-box {
+    background-color: rgba(0, 0, 0, 0);
+    padding: 0;
+    width: 700px;
+    height: 220px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    align-self: center;
+}
+
+.mini-action-box .unity-button {
+    margin: 0 10px;
+    width: 260px;
+    height: 110px;
+    font-size: 32px;
+    padding-bottom: 10px;
+}
+
+.credit-text {
+    font-size: 35px;
+    color: rgb(80, 60, 40);
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.8);
+}
+
+.panel-btn-next {
+    background-image: url('../Sprites/Panel/nuevoboton1.png');
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+    color: rgb(240, 240, 240);
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
+}
+
+.panel-btn-menu {
+    background-image: url('../Sprites/Panel/nuevoboton2.png');
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+    color: rgb(240, 240, 240);
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
 }

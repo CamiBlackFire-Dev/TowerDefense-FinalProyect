@@ -7,6 +7,7 @@ namespace Custom.UI
     [RequireComponent(typeof(UIDocument))]
     public class MainMenuController : MonoBehaviour
     {
+        #region UI Elements
         private UIDocument _uiDocument;
         private VisualElement _gameLogo;
         private Button _playButton;
@@ -18,7 +19,9 @@ namespace Custom.UI
         private Slider _masterVolumeSlider;
         private Slider _musicVolumeSlider;
         private Slider _sfxVolumeSlider;
+        #endregion
 
+        #region Audio & Animation
         [Header("Animación del Logo")]
         public float animSpeed = 2f;
         public float animAmplitude = 10f;
@@ -27,7 +30,9 @@ namespace Custom.UI
         public AudioClip menuMusic;
         public AudioClip hoverSound;
         public AudioClip clickSound;
+        #endregion
 
+        #region Unity Lifecycle
         private void OnEnable()
         {
             _uiDocument = GetComponent<UIDocument>();
@@ -124,7 +129,9 @@ namespace Custom.UI
                 _gameLogo.style.translate = new StyleTranslate(new Translate(0, offset, 0));
             }
         }
+        #endregion
 
+        #region UI Callbacks
         private void OnButtonHover(PointerEnterEvent evt)
         {
             if (AudioManager.Instance != null && hoverSound != null)
@@ -164,5 +171,6 @@ namespace Custom.UI
             Application.Quit();
 #endif
         }
+        #endregion
     }
 }
