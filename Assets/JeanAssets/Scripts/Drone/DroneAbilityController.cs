@@ -5,7 +5,9 @@ public class DroneAbilityController : MonoBehaviour
     public enum Ability
     {
         Bomb,
-        EMP
+        EMP,
+        Repair,
+        Repulsion
     }
 
     [Header("Ability")]
@@ -17,11 +19,13 @@ public class DroneAbilityController : MonoBehaviour
 
     [Header("Charges")]
     [SerializeField] private int maxCharges = 2;
-    private int currentCharges;
+    [SerializeField] private int currentCharges;
 
     [Header("Abilities")]
     [SerializeField] private BombAbility bombAbility;
     [SerializeField] private EMPAbility empAbility;
+    [SerializeField] private RepairAbility repairAbility;
+    [SerializeField] private RepulsionAbility repulsionAbility;
 
     private void Start()
     {
@@ -45,56 +49,84 @@ public class DroneAbilityController : MonoBehaviour
 
         ActivateAbility();
 
-        if (currentAbility == Ability.Bomb)
-        {
-            currentCharges--;
-        }
-        else if (currentAbility == Ability.EMP)
-        {
-            cooldownTimer = abilityCooldown;
-        }
+        ApplyAbilityCost();
 
         Debug.Log($"Habilidad activada: {currentAbility}");
     }
 
     private bool CanUseAbility()
     {
-        if (currentAbility == Ability.Bomb)
+        switch (currentAbility)
         {
-            return currentCharges > 0;
-        }
+            case Ability.Bomb:
+            case Ability.Repair:
+                return currentCharges > 0;
 
-        if (currentAbility == Ability.EMP)
+            case Ability.EMP:
+            case Ability.Repulsion:
+                return cooldownTimer <= 0f;
+
+            default:
+                return false;
+        }
+    }
+
+    private void ApplyAbilityCost()
+    {
+        switch (currentAbility)
         {
-            return cooldownTimer <= 0f;
-        }
+            case Ability.Bomb:
+            case Ability.Repair:
+                currentCharges--;
+                break;
 
-        return false;
+            case Ability.EMP:
+            case Ability.Repulsion:
+                cooldownTimer = abilityCooldown;
+                break;
+        }
     }
 
     private void ActivateAbility()
     {
-        if (currentAbility == Ability.Bomb)
+        switch (currentAbility)
         {
-            if (bombAbility != null)
-            {
-                bombAbility.DropBomb();
-            }
-        }
-        else if (currentAbility == Ability.EMP)
-        {
-            if (empAbility != null)
-            {
-                empAbility.ActivateEMP();
-            }
+            case Ability.Bomb:
+
+                if (bombAbility != null)
+                    bombAbility.DropBomb();
+
+                break;
+
+            case Ability.EMP:
+
+                if (empAbility != null)
+                    empAbility.ActivateEMP();
+
+                break;
+
+            case Ability.Repair:
+
+                if (repairAbility != null)
+                    repairAbility.RepairTowers();
+
+                break;
+
+            case Ability.Repulsion:
+
+                if (repulsionAbility != null)
+                    repulsionAbility.ActivateRepulsion();
+
+                break;
         }
     }
 
     public void SwitchAbility()
     {
-        currentAbility = currentAbility == Ability.Bomb
-            ? Ability.EMP
-            : Ability.Bomb;
+        int abilityCount = System.Enum.GetValues(typeof(Ability)).Length;
+
+        currentAbility =
+            (Ability)(((int)currentAbility + 1) % abilityCount);
 
         UpdateGizmos();
 
@@ -103,8 +135,16 @@ public class DroneAbilityController : MonoBehaviour
 
     private void UpdateGizmos()
     {
-        bombAbility.SetGizmoVisible(currentAbility == Ability.Bomb);
+        if (bombAbility != null)
+            bombAbility.SetGizmoVisible(currentAbility == Ability.Bomb);
 
-        empAbility.SetGizmoVisible(currentAbility == Ability.EMP);
+        if (empAbility != null)
+            empAbility.SetGizmoVisible(currentAbility == Ability.EMP);
+
+        if (repairAbility != null)
+            repairAbility.SetGizmoVisible(currentAbility == Ability.Repair);
+
+        if (repulsionAbility != null)
+            repulsionAbility.SetGizmoVisible(currentAbility == Ability.Repulsion);
     }
 }
