@@ -1,14 +1,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Arma el camino de los enemigos: una "C" cuadrada que rodea al tablero.
-// Crea las losetas que se ven y los waypoints que sigue TestEnemyMovement.
-// El recorrido empieza arriba a la derecha, va hacia la izquierda, baja por
-// el lado izquierdo y sale hacia la derecha por abajo.
+// Como arma el camino: Procedural genera la "C" alrededor del tablero
+// (comportamiento de siempre). Manual usa tal cual los puntos de
+// manualWaypoints, sin generar losetas ni waypoints propios; sirve para
+// caminos ya trazados a mano sobre un mapa o mesh que no hizo este script.
+public enum PathMode
+{
+    Procedural,
+    Manual
+}
+
+// Arma el camino de los enemigos. En modo Procedural es una "C" cuadrada
+// que rodea al tablero: crea las losetas que se ven y los waypoints que
+// sigue TestEnemyMovement. El recorrido empieza arriba a la derecha, va
+// hacia la izquierda, baja por el lado izquierdo y sale hacia la derecha
+// por abajo. En modo Manual solo conecta los puntos que se le asignen.
 // ExecuteAlways permite verlo y ajustarlo sin entrar en Play Mode.
 [ExecuteAlways]
 public class PathBuilder : MonoBehaviour
 {
+    [Header("Modo")]
+    public PathMode mode = PathMode.Procedural;
+
+    [Header("Camino manual")]
+    // Solo se usa en modo Manual. El orden importa: el primero es por
+    // donde salen los enemigos, el ultimo es donde termina el camino.
+    // Sirve para arrastrar marcadores puestos a mano sobre otro mapa/mesh.
+    public Transform[] manualWaypoints;
+
     [Header("Medidas")]
     public int boardCells = 4;     // casillas del tablero al que rodea
     public float tileSize = 2f;    // ancho de cada loseta (igual que Cell Size del tablero)
@@ -50,6 +70,12 @@ public class PathBuilder : MonoBehaviour
 
     private void OnEnable()
     {
+        if (mode == PathMode.Manual)
+        {
+            LinkManualWaypoints();
+            return;
+        }
+
         EnsureContainers();
 
         // Si el camino ya esta en la escena solo se vuelve a conectar.
@@ -59,9 +85,17 @@ public class PathBuilder : MonoBehaviour
             LinkWaypoints();
     }
 
-    // Borra el camino anterior y lo vuelve a construir.
+    // En modo Procedural borra el camino anterior y lo vuelve a construir.
+    // En modo Manual solo reconecta manualWaypoints (no genera nada, asi
+    // que no hay nada que borrar).
     public void Rebuild()
     {
+        if (mode == PathMode.Manual)
+        {
+            LinkManualWaypoints();
+            return;
+        }
+
         EnsureContainers();
         ClearContainer(_tileContainer);
         ClearContainer(_waypointContainer);
@@ -221,6 +255,26 @@ public class PathBuilder : MonoBehaviour
             waypoints[i] = _waypointContainer.GetChild(i);
 
         _path.SetWaypoints(waypoints);
+    }
+
+    // Le pasa al Path los puntos puestos a mano en el Inspector, tal cual.
+    private void LinkManualWaypoints()
+    {
+        EnsurePath();
+
+        if (manualWaypoints != null)
+        {
+            for (int i = 0; i < manualWaypoints.Length; i++)
+            {
+                if (manualWaypoints[i] == null)
+                {
+                    Debug.LogWarning("PathBuilder: el punto " + i + " del camino manual esta vacio.", this);
+                    break;
+                }
+            }
+        }
+
+        _path.SetWaypoints(manualWaypoints);
     }
 
     private void EnsurePath()

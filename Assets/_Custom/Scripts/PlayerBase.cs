@@ -7,12 +7,37 @@ public class PlayerBase : MonoBehaviour
     [Header("Vidas")]
     public int maxLives = 20;
 
+    private static PlayerBase _instance;
+
     private int _lives;
     private bool _ready;
 
     // Avisos para la interfaz.
     public event System.Action<int> LivesChanged;
     public event System.Action Defeated;
+
+    // Punto unico de acceso. Si cada script busca el suyo por separado
+    // (FindFirstObjectByType) el orden de Awake/Start puede hacer que uno
+    // cree su propio PlayerBase antes de que otro termine de buscar, y
+    // cada uno le queda escuchando a una instancia distinta (el HUD se
+    // desincroniza de las vidas reales). Con esto todos comparten la misma.
+    public static PlayerBase Instance
+    {
+        get
+        {
+            if (_instance == null)
+                _instance = FindFirstObjectByType<PlayerBase>();
+
+            if (_instance == null && Application.isPlaying)
+            {
+                GameObject holder = new GameObject("PlayerBase");
+                _instance = holder.AddComponent<PlayerBase>();
+                Debug.Log("PlayerBase: no habia ninguno en la escena, se creo uno.", _instance);
+            }
+
+            return _instance;
+        }
+    }
 
     public int Lives
     {

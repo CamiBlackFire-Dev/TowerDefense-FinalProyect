@@ -30,11 +30,14 @@ public class EnemySpawner : MonoBehaviour
 
     private float _timer;
     private int _spawned;
+    private int _aliveCount;
     private bool _running;
     private int _waveNumber;
 
     // Avisos para la interfaz: el HUD se sincroniza con estos.
     public event Action WaveStarted;
+    // Se dispara solo cuando ya no queda nadie vivo de la oleada (todos
+    // muertos o escapados), no apenas cuando terminan de salir.
     public event Action WaveFinished;
 
     // Numero de la ultima oleada arrancada (1, 2, 3...).
@@ -43,7 +46,9 @@ public class EnemySpawner : MonoBehaviour
         get { return _waveNumber; }
     }
 
-    // True mientras la oleada esta sacando enemigos.
+    // True mientras la oleada sigue en curso: quedan enemigos por salir
+    // o enemigos vivos de esta tanda. La siguiente oleada no puede
+    // arrancar (el boton del HUD sigue oculto) hasta que esto sea false.
     public bool IsRunning
     {
         get { return _running; }
@@ -53,6 +58,12 @@ public class EnemySpawner : MonoBehaviour
     public int SpawnedCount
     {
         get { return _spawned; }
+    }
+
+    // Enemigos de esta oleada que siguen vivos (ni muertos ni escapados).
+    public int AliveCount
+    {
+        get { return _aliveCount; }
     }
 
     private void Start()
@@ -74,15 +85,10 @@ public class EnemySpawner : MonoBehaviour
         if (economy == null)
             economy = FindFirstObjectByType<EconomyManager>();
 
+        // PlayerBase.Instance resuelve o crea el mismo PlayerBase que usa
+        // el HUD, para que ambos escuchen siempre la misma instancia.
         if (playerBase == null)
-            playerBase = FindFirstObjectByType<PlayerBase>();
-
-        // Si nadie puso las vidas del jugador, se crean aqui mismo.
-        if (playerBase == null)
-        {
-            playerBase = gameObject.AddComponent<PlayerBase>();
-            Debug.Log("EnemySpawner: no habia PlayerBase en la escena, se creo uno.", this);
-        }
+            playerBase = PlayerBase.Instance;
     }
 
     // Empieza una oleada nueva desde cero.
@@ -97,6 +103,7 @@ public class EnemySpawner : MonoBehaviour
         }
 
         _spawned = 0;
+        _aliveCount = 0;
         _timer = startDelay;
         _running = true;
         _waveNumber++;
@@ -120,15 +127,24 @@ public class EnemySpawner : MonoBehaviour
         if (!_running || !Application.isPlaying)
             return;
 
-        _timer -= Time.deltaTime;
-        if (_timer > 0f)
-            return;
+        bool doneSpawning = enemiesPerWave > 0 && _spawned >= enemiesPerWave;
 
-        _timer = spawnInterval;
-        SpawnEnemy();
+        // Mientras falten enemigos por sacar, el reloj de spawn manda.
+        if (!doneSpawning)
+        {
+            _timer -= Time.deltaTime;
+            if (_timer > 0f)
+                return;
 
-        // Oleada completa: se avisa para que la interfaz muestre el boton.
-        if (enemiesPerWave > 0 && _spawned >= enemiesPerWave)
+            _timer = spawnInterval;
+            SpawnEnemy();
+            doneSpawning = enemiesPerWave > 0 && _spawned >= enemiesPerWave;
+        }
+
+        // Oleada completa solo cuando ya salieron todos y ademas no queda
+        // ninguno vivo (muerto o escapado). Hasta entonces no se avisa al
+        // HUD, asi que el boton de la siguiente oleada sigue oculto.
+        if (doneSpawning && _aliveCount <= 0)
         {
             _running = false;
             if (WaveFinished != null)
@@ -181,6 +197,7 @@ public class EnemySpawner : MonoBehaviour
         GameObject enemy = Instantiate(prefab, waypoints[0].position, waypoints[0].rotation);
         enemy.name = "Enemy " + _spawned.ToString("00");
         _spawned++;
+        _aliveCount++;
 
         // Recorrido: el enemigo sigue los waypoints que armo PathBuilder.
         TestEnemyMovement movement = enemy.GetComponent<TestEnemyMovement>();
@@ -196,6 +213,7 @@ public class EnemySpawner : MonoBehaviour
             health = enemy.AddComponent<EnemyHealth>();
 
         health.Setup(enemyHealth, enemyReward, economy);
+        health.Died += HandleEnemyDied;
 
         return enemy;
     }
@@ -208,6 +226,14 @@ public class EnemySpawner : MonoBehaviour
         if (playerBase != null)
             playerBase.TakeDamage(damagePerEnemy);
 
+        _aliveCount = Mathf.Max(0, _aliveCount - 1);
         Destroy(movement.gameObject);
+    }
+
+    // Una torre elimino al enemigo: ya no cuenta como vivo para la oleada.
+    private void HandleEnemyDied(EnemyHealth health)
+    {
+        health.Died -= HandleEnemyDied;
+        _aliveCount = Mathf.Max(0, _aliveCount - 1);
     }
 }

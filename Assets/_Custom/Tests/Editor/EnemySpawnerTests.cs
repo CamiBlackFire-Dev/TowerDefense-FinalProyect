@@ -75,6 +75,44 @@ public class EnemySpawnerTests
         Assert.IsFalse(spawner.IsRunning);
     }
 
+    // Cada enemigo que sale suma al contador de vivos de la oleada.
+    [Test]
+    public void SpawnEnemy_SubeElContadorDeVivos()
+    {
+        EnemySpawner spawner = CrearSpawner();
+
+        spawner.SpawnEnemy();
+        spawner.SpawnEnemy();
+
+        Assert.AreEqual(2, spawner.AliveCount);
+    }
+
+    // Al morir, el enemigo deja de contar como vivo (la oleada lo puede dar
+    // por eliminado en vez de solo "salido").
+    [Test]
+    public void EnemyMuere_BajaElContadorDeVivos()
+    {
+        EnemySpawner spawner = CrearSpawner();
+        GameObject enemigo = spawner.SpawnEnemy();
+        spawner.SpawnEnemy();
+
+        enemigo.GetComponent<EnemyHealth>().TakeDamage(9999f);
+
+        Assert.AreEqual(1, spawner.AliveCount);
+    }
+
+    // Arrancar una oleada nueva reinicia el contador de vivos de la anterior.
+    [Test]
+    public void StartWave_ReiniciaElContadorDeVivos()
+    {
+        EnemySpawner spawner = CrearSpawner();
+        spawner.SpawnEnemy();
+
+        spawner.StartWave();
+
+        Assert.AreEqual(0, spawner.AliveCount);
+    }
+
     // Arma un spawner de prueba con camino y un enemigo falso.
     private EnemySpawner CrearSpawner()
     {

@@ -104,6 +104,43 @@ public class PathBuilderTests
         Assert.AreEqual(2, enElLadoDerecho);
     }
 
+    // En modo Manual el camino usa tal cual los puntos que se le asignen,
+    // en el mismo orden (para integrarlo con un mapa hecho a mano).
+    [Test]
+    public void ModoManual_UsaLosWaypointsAsignados()
+    {
+        PathBuilder builder = CrearBuilder();
+        builder.mode = PathMode.Manual;
+        Transform a = CrearPunto("A");
+        Transform b = CrearPunto("B");
+        builder.manualWaypoints = new Transform[] { a, b };
+
+        builder.Rebuild();
+
+        Transform[] waypoints = builder.Path.GetWaypoints();
+        Assert.AreEqual(2, waypoints.Length);
+        Assert.AreSame(a, waypoints[0]);
+        Assert.AreSame(b, waypoints[1]);
+    }
+
+    // Un hueco en el camino manual no rompe nada (solo se avisa por consola).
+    [Test]
+    public void ModoManual_ConHuecoNoRompe()
+    {
+        PathBuilder builder = CrearBuilder();
+        builder.mode = PathMode.Manual;
+        builder.manualWaypoints = new Transform[] { CrearPunto("A"), null };
+
+        Assert.DoesNotThrow(() => builder.Rebuild());
+    }
+
+    private Transform CrearPunto(string nombre)
+    {
+        GameObject punto = new GameObject(nombre);
+        punto.transform.SetParent(_object.transform);
+        return punto.transform;
+    }
+
     private PathBuilder CrearBuilder()
     {
         _object = new GameObject("Path Test");

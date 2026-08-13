@@ -20,6 +20,10 @@ public class EnemyHealth : MonoBehaviour
     private float _currentHealth;
     private bool _ready;
 
+    // Aviso para el spawner: la oleada no se da por terminada hasta que
+    // todos los enemigos mueren o escapan.
+    public event System.Action<EnemyHealth> Died;
+
     public float CurrentHealth
     {
         get
@@ -68,6 +72,9 @@ public class EnemyHealth : MonoBehaviour
 
         if (_economy != null)
             _economy.AddCurrency(reward);
+
+        if (Died != null)
+            Died(this);
 
         if (deathEffect != null)
             Instantiate(deathEffect, transform.position, Quaternion.identity);

@@ -96,6 +96,42 @@ public class BoardManagerTests
         Assert.AreEqual(1, torre.Level);
     }
 
+    // Con una oleada en curso el tablero no se puede mover.
+    [Test]
+    public void Move_ConOleadaEnCurso_NoMueveLasTorres()
+    {
+        BoardManager board = CrearBoard();
+        board.PlaceTower(0, 0, 1);
+        board.PlaceTower(1, 0, 1);
+
+        EnemySpawner spawner = _boardObject.AddComponent<EnemySpawner>();
+        SetPrivateField(spawner, "_running", true);
+        board.spawner = spawner;
+
+        MoveResult result = board.Move(GridDirection.Left);
+
+        Assert.IsFalse(result.Changed);
+        Tower torre;
+        Assert.IsTrue(board.TryGetTower(0, 0, out torre));
+        Assert.AreEqual(1, torre.Level);
+        Assert.IsTrue(board.TryGetTower(1, 0, out torre));
+    }
+
+    // Entre oleadas (spawner asignado pero detenido) el movimiento funciona normal.
+    [Test]
+    public void Move_SinOleadaEnCurso_SiMueveLasTorres()
+    {
+        BoardManager board = CrearBoard();
+        board.PlaceTower(0, 0, 1);
+        board.PlaceTower(1, 0, 1);
+        board.spawner = _boardObject.AddComponent<EnemySpawner>();
+
+        MoveResult result = board.Move(GridDirection.Left);
+
+        Assert.IsTrue(result.Changed);
+        Assert.AreEqual(2, board.Grid.GetLevel(0, 0));
+    }
+
     // Cambiar una casilla desde el inspector actualiza el modelo y la vista.
     [Test]
     public void SetEditorLevel_ActualizaModeloYVista()

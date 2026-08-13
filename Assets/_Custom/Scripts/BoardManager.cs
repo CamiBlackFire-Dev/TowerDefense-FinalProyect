@@ -51,6 +51,11 @@ public class BoardManager : MonoBehaviour
     [Header("Input")]
     public InputController inputController;
 
+    [Header("Oleadas")]
+    // Se busca solo en la escena si se deja vacio. Mientras spawner.IsRunning
+    // sea true el tablero queda bloqueado: solo se puede reordenar entre oleadas.
+    public EnemySpawner spawner;
+
     // El Ground actual tiene la cara superior aproximadamente en y = 0.5.
     private const float BoardBaseY = 0.5f;
 
@@ -121,6 +126,9 @@ public class BoardManager : MonoBehaviour
 
         if (moveCurve == null)
             moveCurve = DefaultMoveCurve();
+
+        if (spawner == null && Application.isPlaying)
+            spawner = FindFirstObjectByType<EnemySpawner>();
 
         if (!HasCompleteVisualView())
             RebuildBoardView();
@@ -197,6 +205,12 @@ public class BoardManager : MonoBehaviour
     public MoveResult Move(GridDirection direction)
     {
         EnsureInitialized();
+
+        // Con una oleada en curso no se puede reordenar el tablero: el
+        // movimiento se ignora por completo (no se encola ni se recuerda).
+        if (spawner != null && spawner.IsRunning)
+            return new MoveResult(false, 0,
+                new List<TowerMoveEvent>(), new List<TowerMergeEvent>());
 
         // Con la animacion activa se encola y se devuelve un resultado vacio.
         if (_isAnimating)

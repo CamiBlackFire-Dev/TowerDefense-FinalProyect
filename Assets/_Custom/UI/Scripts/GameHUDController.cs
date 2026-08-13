@@ -70,7 +70,9 @@ namespace Custom.UI
         public AudioClip waveAnnouncerSound;
 
         [Header("Debug")]
-        // Teclas de prueba V, D, C, F y Espacio. Escape (pausa) nunca se desactiva.
+        // Teclas de prueba V, C, F y Espacio. Escape (pausa) nunca se desactiva.
+        // La derrota no tiene tecla de prueba: solo la dispara PlayerBase.Defeated
+        // al llegar a 0 vidas (ademas D ya se usa para mover torres a la derecha).
         public bool debugKeys = true;
 
         private int _currentCurrency = 0;
@@ -204,7 +206,7 @@ namespace Custom.UI
             if (economy == null)
                 economy = FindFirstObjectByType<EconomyManager>();
             if (playerBase == null)
-                playerBase = FindFirstObjectByType<PlayerBase>();
+                playerBase = PlayerBase.Instance;
             if (towerShop == null)
                 towerShop = FindFirstObjectByType<TowerShop>();
 
@@ -320,11 +322,6 @@ namespace Custom.UI
             {
                 if (_victoryOverlay != null && _victoryOverlay.style.display == DisplayStyle.Flex) { _victoryOverlay.style.display = DisplayStyle.None; Time.timeScale = 1f; }
                 else ShowVictoryScreen(false);
-            }
-            if (keyboard.dKey.wasPressedThisFrame)
-            {
-                if (_defeatOverlay != null && _defeatOverlay.style.display == DisplayStyle.Flex) { _defeatOverlay.style.display = DisplayStyle.None; Time.timeScale = 1f; }
-                else ShowDefeatScreen();
             }
             if (keyboard.cKey.wasPressedThisFrame)
             {
