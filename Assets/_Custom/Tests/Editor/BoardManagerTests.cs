@@ -250,6 +250,34 @@ public class BoardManagerTests
         Assert.AreEqual(Color.blue.b, color.b, 0.01f);
     }
 
+    // Toda torre que crea el tablero puede disparar.
+    [Test]
+    public void PlaceTower_LaTorreQuedaListaParaAtacar()
+    {
+        BoardManager board = CrearBoard();
+
+        board.PlaceTower(0, 0, 1);
+
+        Tower torre;
+        Assert.IsTrue(board.TryGetTower(0, 0, out torre));
+        Assert.IsNotNull(torre.GetComponent<TowerAttack>());
+        Assert.IsNotNull(torre.GetComponent<TowerTargetDetector>());
+    }
+
+    // Con el ataque apagado las torres quedan solo decorativas.
+    [Test]
+    public void PlaceTower_SinCombate_NoAgregaElAtaque()
+    {
+        BoardManager board = CrearBoard();
+        board.towersAttack = false;
+
+        board.PlaceTower(0, 0, 1);
+
+        Tower torre;
+        Assert.IsTrue(board.TryGetTower(0, 0, out torre));
+        Assert.IsNull(torre.GetComponent<TowerAttack>());
+    }
+
     // Renderer de una casilla concreta del tablero.
     private Renderer CasillaRenderer(BoardManager board, int x, int y)
     {

@@ -57,14 +57,23 @@ namespace Custom.UI
         private bool _isPaused = false;
         private bool _optionsFromPause = false;
 
+        [Header("Referencias")]
+        // Las cuatro se buscan solas en la escena si se dejan vacias.
+        public EnemySpawner spawner;   // quien lanza las oleadas
+        public EconomyManager economy; // dinero que se muestra arriba
+        public PlayerBase playerBase;  // vidas del jugador (barra de vida y derrota)
+        public TowerShop towerShop;    // compra de torres desde el boton del HUD
+
         [Header("Audio")]
         public AudioClip hoverSound;
         public AudioClip clickSound;
         public AudioClip waveAnnouncerSound;
 
+        [Header("Debug")]
+        // Teclas de prueba V, D, C, F y Espacio. Escape (pausa) nunca se desactiva.
+        public bool debugKeys = true;
+
         private int _currentCurrency = 0;
-        private EconomyManager _economyManager;
-        private TowerShop _towerShop;
         #endregion
 
         #region Unity Lifecycle
@@ -111,6 +120,11 @@ namespace Custom.UI
             _creditsOverlay = root.Q<VisualElement>("CreditsOverlay");
             _githubButton = root.Q<Button>("GithubButton");
             _closeCreditsButton = root.Q<Button>("CloseCreditsButton");
+
+            _ability1 = root.Q<Button>("Ability1");
+            _ability2 = root.Q<Button>("Ability2");
+            _ability3 = root.Q<Button>("Ability3");
+            _ability4 = root.Q<Button>("Ability4");
 
             if (_optionsButton != null)
             {
@@ -161,15 +175,10 @@ namespace Custom.UI
             if (_githubButton != null) { _githubButton.clicked += OnGithubClicked; _githubButton.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
             if (_closeCreditsButton != null) { _closeCreditsButton.clicked += OnQuitMenuClicked; _closeCreditsButton.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
 
-            _ability1 = root.Q<Button>("Ability1");
-            _ability2 = root.Q<Button>("Ability2");
-            _ability3 = root.Q<Button>("Ability3");
-            _ability4 = root.Q<Button>("Ability4");
-
-            if (_ability1 != null) { _ability1.clicked += () => TryUnlockAbility(_ability1, 100); _ability1.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
-            if (_ability2 != null) { _ability2.clicked += () => TryUnlockAbility(_ability2, 200); _ability2.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
-            if (_ability3 != null) { _ability3.clicked += () => TryUnlockAbility(_ability3, 300); _ability3.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
-            if (_ability4 != null) { _ability4.clicked += () => TryUnlockAbility(_ability4, 400); _ability4.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
+            if (_ability1 != null) { _ability1.clicked += OnAbility1Clicked; _ability1.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
+            if (_ability2 != null) { _ability2.clicked += OnAbility2Clicked; _ability2.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
+            if (_ability3 != null) { _ability3.clicked += OnAbility3Clicked; _ability3.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
+            if (_ability4 != null) { _ability4.clicked += OnAbility4Clicked; _ability4.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
 
             if (AudioManager.Instance != null)
             {
@@ -190,19 +199,41 @@ namespace Custom.UI
                 }
             }
 
+            if (spawner == null)
+                spawner = FindFirstObjectByType<EnemySpawner>();
+            if (economy == null)
+                economy = FindFirstObjectByType<EconomyManager>();
+            if (playerBase == null)
+                playerBase = FindFirstObjectByType<PlayerBase>();
+            if (towerShop == null)
+                towerShop = FindFirstObjectByType<TowerShop>();
 
-            _economyManager = Object.FindFirstObjectByType<EconomyManager>();
-            if (_economyManager != null)
+            // La oleada avisa al HUD cuando arranca y cuando termina.
+            if (spawner != null)
             {
-                _economyManager.MoneyChanged += UpdateCurrency;
-                UpdateCurrency(_economyManager.Money);
+                spawner.WaveStarted += OnWaveStarted;
+                spawner.WaveFinished += OnWaveFinished;
+                SetWaveActive(spawner.IsRunning);
+            }
+
+            // El dinero se actualiza solo cuando cambia.
+            if (economy != null)
+            {
+                economy.MoneyChanged += OnMoneyChanged;
+                UpdateCurrency(economy.Money);
             }
             else
             {
                 UpdateCurrency(0);
             }
 
-            _towerShop = Object.FindFirstObjectByType<TowerShop>();
+            // Las vidas alimentan la barra de vida y la pantalla de derrota.
+            if (playerBase != null)
+            {
+                playerBase.LivesChanged += OnLivesChanged;
+                playerBase.Defeated += OnPlayerDefeated;
+                UpdateHealth(playerBase.Lives, playerBase.maxLives);
+            }
         }
 
         private void OnDisable()
@@ -252,43 +283,69 @@ namespace Custom.UI
             if (_githubButton != null) { _githubButton.clicked -= OnGithubClicked; _githubButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover); }
             if (_closeCreditsButton != null) { _closeCreditsButton.clicked -= OnQuitMenuClicked; _closeCreditsButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover); }
 
-            if (_economyManager != null)
+            if (_ability1 != null) { _ability1.clicked -= OnAbility1Clicked; _ability1.UnregisterCallback<PointerEnterEvent>(OnButtonHover); }
+            if (_ability2 != null) { _ability2.clicked -= OnAbility2Clicked; _ability2.UnregisterCallback<PointerEnterEvent>(OnButtonHover); }
+            if (_ability3 != null) { _ability3.clicked -= OnAbility3Clicked; _ability3.UnregisterCallback<PointerEnterEvent>(OnButtonHover); }
+            if (_ability4 != null) { _ability4.clicked -= OnAbility4Clicked; _ability4.UnregisterCallback<PointerEnterEvent>(OnButtonHover); }
+
+            if (spawner != null)
             {
-                _economyManager.MoneyChanged -= UpdateCurrency;
+                spawner.WaveStarted -= OnWaveStarted;
+                spawner.WaveFinished -= OnWaveFinished;
+            }
+
+            if (economy != null)
+                economy.MoneyChanged -= OnMoneyChanged;
+
+            if (playerBase != null)
+            {
+                playerBase.LivesChanged -= OnLivesChanged;
+                playerBase.Defeated -= OnPlayerDefeated;
             }
         }
 
         private void Update()
         {
-            if (UnityEngine.InputSystem.Keyboard.current != null)
+            var keyboard = UnityEngine.InputSystem.Keyboard.current;
+            if (keyboard == null) return;
+
+            if (keyboard.escapeKey.wasPressedThisFrame)
             {
-                if (UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame)
-                {
-                    HandleEscapePressed();
-                }
+                HandleEscapePressed();
+            }
 
-                if (UnityEngine.InputSystem.Keyboard.current.vKey.wasPressedThisFrame)
-                {
-                    if (_victoryOverlay != null && _victoryOverlay.style.display == DisplayStyle.Flex) { _victoryOverlay.style.display = DisplayStyle.None; Time.timeScale = 1f; }
-                    else ShowVictoryScreen(false);
-                }
-                if (UnityEngine.InputSystem.Keyboard.current.dKey.wasPressedThisFrame)
-                {
-                    if (_defeatOverlay != null && _defeatOverlay.style.display == DisplayStyle.Flex) { _defeatOverlay.style.display = DisplayStyle.None; Time.timeScale = 1f; }
-                    else ShowDefeatScreen();
-                }
-                if (UnityEngine.InputSystem.Keyboard.current.cKey.wasPressedThisFrame)
-                {
-                    if (_creditsOverlay != null && _creditsOverlay.style.display == DisplayStyle.Flex) { _creditsOverlay.style.display = DisplayStyle.None; }
-                    else ShowCreditsScreen();
-                }
-                if (UnityEngine.InputSystem.Keyboard.current.fKey.wasPressedThisFrame)
-                {
-                    if (_gameCompleteOverlay != null && _gameCompleteOverlay.style.display == DisplayStyle.Flex) { _gameCompleteOverlay.style.display = DisplayStyle.None; Time.timeScale = 1f; }
-                    else ShowVictoryScreen(true);
-                }
+            if (!debugKeys) return;
 
-                if (UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame)
+            if (keyboard.vKey.wasPressedThisFrame)
+            {
+                if (_victoryOverlay != null && _victoryOverlay.style.display == DisplayStyle.Flex) { _victoryOverlay.style.display = DisplayStyle.None; Time.timeScale = 1f; }
+                else ShowVictoryScreen(false);
+            }
+            if (keyboard.dKey.wasPressedThisFrame)
+            {
+                if (_defeatOverlay != null && _defeatOverlay.style.display == DisplayStyle.Flex) { _defeatOverlay.style.display = DisplayStyle.None; Time.timeScale = 1f; }
+                else ShowDefeatScreen();
+            }
+            if (keyboard.cKey.wasPressedThisFrame)
+            {
+                if (_creditsOverlay != null && _creditsOverlay.style.display == DisplayStyle.Flex) { _creditsOverlay.style.display = DisplayStyle.None; }
+                else ShowCreditsScreen();
+            }
+            if (keyboard.fKey.wasPressedThisFrame)
+            {
+                if (_gameCompleteOverlay != null && _gameCompleteOverlay.style.display == DisplayStyle.Flex) { _gameCompleteOverlay.style.display = DisplayStyle.None; Time.timeScale = 1f; }
+                else ShowVictoryScreen(true);
+            }
+
+            if (keyboard.spaceKey.wasPressedThisFrame)
+            {
+                // Con spawner en escena arranca la oleada de verdad;
+                // sin el (escena de pruebas de UI) solo se muestra el cartel.
+                if (spawner != null)
+                {
+                    OnStartWaveClicked();
+                }
+                else
                 {
                     UpdateWave(UnityEngine.Random.Range(2, 10));
                     SetWaveActive(true);
@@ -323,7 +380,7 @@ namespace Custom.UI
             }
             if (_healthBarFill != null)
             {
-                float percentage = Mathf.Clamp01((float)currentHealth / maxHealth);
+                float percentage = Mathf.Clamp01((float)currentHealth / Mathf.Max(1, maxHealth));
                 _healthBarFill.style.width = Length.Percent(percentage * 100f);
 
                 if (percentage > 0.6f)
@@ -427,13 +484,15 @@ namespace Custom.UI
 
         private void TryUnlockAbility(Button abilityButton, int cost)
         {
+            if (abilityButton == null) return;
+
             if (!abilityButton.ClassListContains("locked"))
             {
                 Debug.Log($"Activando habilidad: {abilityButton.name}");
                 return;
             }
 
-            if (_economyManager != null && _economyManager.TrySpend(cost))
+            if (economy != null && economy.TrySpend(cost))
             {
                 PlayClickSound();
                 abilityButton.RemoveFromClassList("locked");
@@ -450,22 +509,64 @@ namespace Custom.UI
         private void OnStartWaveClicked()
         {
             PlayClickSound();
-            Debug.Log("Iniciando Oleada por click...");
+
+            if (spawner == null)
+            {
+                Debug.LogWarning("GameHUD: falta el EnemySpawner, el boton no puede arrancar la oleada.", this);
+                return;
+            }
+
+            spawner.StartWave();
+        }
+
+        // La oleada arranco: se muestra el numero y se oculta el boton.
+        private void OnWaveStarted()
+        {
             SetWaveActive(true);
+            UpdateWave(spawner.WaveNumber);
+        }
+
+        // La oleada termino: vuelve a aparecer el boton para la siguiente.
+        private void OnWaveFinished()
+        {
+            SetWaveActive(false);
+        }
+
+        // El dinero cambio: se refresca el numero de arriba.
+        private void OnMoneyChanged(int money)
+        {
+            UpdateCurrency(money);
+        }
+
+        // Se escapo un enemigo: se refresca la barra de vida.
+        private void OnLivesChanged(int lives)
+        {
+            UpdateHealth(lives, playerBase != null ? playerBase.maxLives : lives);
+        }
+
+        // Se acabaron las vidas: aparece la pantalla de derrota.
+        private void OnPlayerDefeated()
+        {
+            ShowDefeatScreen();
         }
 
         private void OnBuyTowerClicked()
         {
             PlayClickSound();
-            if (_towerShop != null)
+            if (towerShop != null)
             {
-                _towerShop.TryBuyTower();
+                towerShop.TryBuyTower();
             }
             else
             {
-                Debug.LogWarning("TowerShop no encontrado en la escena. La torre no se comprará.");
+                Debug.LogWarning("TowerShop no encontrado en la escena. La torre no se comprara.", this);
             }
         }
+
+        private void OnAbility1Clicked() { TryUnlockAbility(_ability1, 100); }
+        private void OnAbility2Clicked() { TryUnlockAbility(_ability2, 200); }
+        private void OnAbility3Clicked() { TryUnlockAbility(_ability3, 300); }
+        private void OnAbility4Clicked() { TryUnlockAbility(_ability4, 400); }
 
         private void OnButtonHover(PointerEnterEvent evt)
         {

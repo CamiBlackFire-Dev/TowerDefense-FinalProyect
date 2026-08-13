@@ -10,11 +10,23 @@ public class TestEnemyMovement : MonoBehaviour
     private Transform[] waypoints;
     private int currentWaypoint = 0;
 
+    // Aviso de que el enemigo llego al final del recorrido.
+    public event System.Action<TestEnemyMovement> Finished;
+
     private void Start()
     {
-        waypoints = path.GetWaypoints();
+        if (path != null)
+            waypoints = path.GetWaypoints();
 
         originalSpeed = movementSpeed;
+    }
+
+    // El spawner le pasa el camino recien creado el enemigo.
+    public void SetPath(Path newPath)
+    {
+        path = newPath;
+        waypoints = path != null ? path.GetWaypoints() : null;
+        currentWaypoint = 0;
     }
 
     private void Update()
@@ -36,6 +48,9 @@ public class TestEnemyMovement : MonoBehaviour
             {
                 Debug.Log("El enemigo llegó al final del Path");
                 enabled = false;
+
+                if (Finished != null)
+                    Finished(this);
             }
         }
     }
