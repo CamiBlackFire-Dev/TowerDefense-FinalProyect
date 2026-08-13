@@ -835,6 +835,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: daa4f783e41d8f441b5bb54847de101a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestEnemyMovement
+--- !u!4 &1046435594 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5355833529458471204, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+  m_PrefabInstance: {fileID: 822177111281965797}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1113832837
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -892,6 +897,28 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c0b549c38bc8f4e4aadcae15da5a6c5a, type: 3}
+--- !u!114 &1129431221 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 404908654652985550, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+  m_PrefabInstance: {fileID: 822177111281965797}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca650313c3d31254cad02a6e163e756e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RepulsionAbility
+--- !u!114 &1129431222 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2052637101901642473, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+  m_PrefabInstance: {fileID: 822177111281965797}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8671139e34eaf7443829aeb300c2c113, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RepairAbility
 --- !u!1001 &1434153429
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1553,10 +1580,54 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 404908654652985550, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+      propertyPath: path
+      value: 
+      objectReference: {fileID: 728691972}
+    - target: {fileID: 404908654652985550, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+      propertyPath: repulsionRadius
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 404908654652985550, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+      propertyPath: enemyLayer.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1940899719961363424, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+      propertyPath: slowDuration
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1940899719961363424, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
       propertyPath: testEnemyMovement
       value: 
       objectReference: {fileID: 998290490}
+    - target: {fileID: 2052637101901642473, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+      propertyPath: raycastDistance
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2052637101901642473, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+      propertyPath: repairDropPoint
+      value: 
+      objectReference: {fileID: 1046435594}
+    - target: {fileID: 2052637101901642473, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+      propertyPath: towerLayer.m_Bits
+      value: 128
+      objectReference: {fileID: 0}
+    - target: {fileID: 2879019062133002484, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+      propertyPath: droneDuration
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 4892036108174957672, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+      propertyPath: explosionDuration
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6112188526337871902, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+      propertyPath: repairAbility
+      value: 
+      objectReference: {fileID: 1129431222}
+    - target: {fileID: 6112188526337871902, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
+      propertyPath: repulsionAbility
+      value: 
+      objectReference: {fileID: 1129431221}
     - target: {fileID: 6238840084556432389, guid: f126a35a7e3d3424e8fa599eaea71085, type: 3}
       propertyPath: m_LocalPosition.x
       value: 2.26197

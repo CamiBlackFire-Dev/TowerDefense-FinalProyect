@@ -3,34 +3,32 @@ using UnityEngine;
 
 public class TestEnemyMovement : MonoBehaviour
 {
+    [Header("Movement")]
     [SerializeField] private float movementSpeed = 2f;
     [SerializeField] private Path path;
-    private Coroutine slowCoroutine;
-    private float originalSpeed;
     private Transform[] waypoints;
     private int currentWaypoint = 0;
 
-    // Aviso de que el enemigo llego al final del recorrido.
-    public event System.Action<TestEnemyMovement> Finished;
+    [Header("EMP")]
+    private Coroutine slowCoroutine;
+    private float originalSpeed;
+
+    [Header("Repulsion")]
+    private Coroutine reverseCoroutine;
+    private bool isReversing;
 
     private void Start()
     {
-        if (path != null)
-            waypoints = path.GetWaypoints();
-
+        waypoints = path.GetWaypoints();
+        
         originalSpeed = movementSpeed;
-    }
-
-    // El spawner le pasa el camino recien creado el enemigo.
-    public void SetPath(Path newPath)
-    {
-        path = newPath;
-        waypoints = path != null ? path.GetWaypoints() : null;
-        currentWaypoint = 0;
     }
 
     private void Update()
     {
+        if (isReversing)
+            return;
+
         if (waypoints == null || waypoints.Length == 0)
             return;
 
@@ -48,13 +46,11 @@ public class TestEnemyMovement : MonoBehaviour
             {
                 Debug.Log("El enemigo llegó al final del Path");
                 enabled = false;
-
-                if (Finished != null)
-                    Finished(this);
             }
         }
     }
 
+    // EMP Ability
     public void ApplySlow(float multiplier, float duration)
     {
         if (slowCoroutine != null)
@@ -74,5 +70,46 @@ public class TestEnemyMovement : MonoBehaviour
         movementSpeed = originalSpeed;
 
         slowCoroutine = null;
+    }
+
+    // Repulsion Ability
+    public void ReversePath(float duration)
+    {
+        if (reverseCoroutine != null)
+        {
+            StopCoroutine(reverseCoroutine);
+        }
+
+        reverseCoroutine = StartCoroutine(ReversePathCoroutine(duration));
+    }
+
+    private IEnumerator ReversePathCoroutine(float duration)
+    {
+        isReversing = true;
+
+        float timer = 0f;
+
+        while (timer < duration)
+        {
+            if (currentWaypoint <= 0)
+                break;
+
+            Transform previousWaypoint = waypoints[currentWaypoint - 1];
+
+            transform.position = Vector3.MoveTowards(transform.position, previousWaypoint.position, movementSpeed * Time.deltaTime);
+
+            if (Vector3.Distance(transform.position, previousWaypoint.position) <= 0.1f)
+            {
+                currentWaypoint--;
+            }
+
+            timer += Time.deltaTime;
+
+            yield return null;
+        }
+
+        isReversing = false;
+
+        reverseCoroutine = null;
     }
 }
