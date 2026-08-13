@@ -8,8 +8,14 @@
                 <ui:VisualElement class="currency-icon" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
                 <ui:Label text="0" name="CurrencyText" class="currency-text"/>
             </ui:VisualElement>
-            <ui:VisualElement class="wave-container">
-                <ui:Label text="OLEADA 1" name="WaveText" class="wave-text"/>
+            <ui:VisualElement class="center-container">
+                <ui:VisualElement class="health-bar-container">
+                    <ui:VisualElement name="HealthBarFill" class="health-bar-fill" style="width: 100%;"/>
+                    <ui:Label text="20/20" name="HealthText" class="health-bar-text"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="wave-container">
+                    <ui:Label text="OLEADA 1" name="WaveText" class="wave-text"/>
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:Button name="OptionsButton" text="" class="options-btn-small" style="border-left-color: rgb(241, 196, 15); border-right-color: rgb(241, 196, 15); border-top-color: rgb(241, 196, 15); border-bottom-color: rgb(241, 196, 15);"/>
         </ui:VisualElement>
@@ -17,18 +23,46 @@
         <ui:VisualElement class="bottom-bar" style="height: 115px;">
             <ui:VisualElement style="flex: 1; flex-basis: 0; min-width: 300px;"/>
             <ui:VisualElement class="abilities-container">
-                <ui:VisualElement class="ability-slot">
+                <ui:Button name="Ability1" class="ability-slot locked">
                     <ui:Label text="1" class="ability-hotkey"/>
-                </ui:VisualElement>
-                <ui:VisualElement class="ability-slot">
+                    <ui:VisualElement class="lock-overlay">
+                        <ui:Label text="🔒" class="lock-icon"/>
+                        <ui:VisualElement style="flex-direction: row; align-items: center;">
+                            <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
+                            <ui:Label text="100" class="lock-price"/>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:Button>
+                <ui:Button name="Ability2" class="ability-slot locked">
                     <ui:Label text="2" class="ability-hotkey"/>
-                </ui:VisualElement>
-                <ui:VisualElement class="ability-slot">
+                    <ui:VisualElement class="lock-overlay">
+                        <ui:Label text="🔒" class="lock-icon"/>
+                        <ui:VisualElement style="flex-direction: row; align-items: center;">
+                            <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
+                            <ui:Label text="200" class="lock-price"/>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:Button>
+                <ui:Button name="Ability3" class="ability-slot locked">
                     <ui:Label text="3" class="ability-hotkey"/>
-                </ui:VisualElement>
-                <ui:VisualElement class="ability-slot" style="margin-right: 0;">
+                    <ui:VisualElement class="lock-overlay">
+                        <ui:Label text="🔒" class="lock-icon"/>
+                        <ui:VisualElement style="flex-direction: row; align-items: center;">
+                            <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
+                            <ui:Label text="300" class="lock-price"/>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:Button>
+                <ui:Button name="Ability4" class="ability-slot locked" style="margin-right: 0;">
                     <ui:Label text="4" class="ability-hotkey"/>
-                </ui:VisualElement>
+                    <ui:VisualElement class="lock-overlay">
+                        <ui:Label text="🔒" class="lock-icon"/>
+                        <ui:VisualElement style="flex-direction: row; align-items: center;">
+                            <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
+                            <ui:Label text="400" class="lock-price"/>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:Button>
             </ui:VisualElement>
             <ui:VisualElement style="flex: 1; flex-basis: 0; min-width: 300px; align-items: flex-end; justify-content: center;">
                 <ui:Button name="BuyTowerButton" class="unity-button buy-tower-btn" style="display: flex;">
@@ -42,7 +76,7 @@
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="OptionsOverlay" class="options-overlay" style="display: none;">
-        <ui:VisualElement class="options-panel" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Backgrounds/FondoPanelOpciones.jpg?fileID=2800000&amp;guid=c4e09637cf73e1148bb20844f06456c5&amp;type=3#FondoPanelOpciones&quot;); display: flex;">
+        <ui:VisualElement class="options-panel" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Backgrounds/Fondo2.png?fileID=2800000&amp;guid=72b6550b8e6bcd44b8e6e066f339e28e&amp;type=3#Fondo2&quot;); display: flex;">
             <ui:Label text="OPCIONES" class="title-text"/>
             <ui:VisualElement class="slider-container">
                 <ui:Label text="Volumen Maestro" class="slider-label"/>
@@ -57,6 +91,49 @@
                 <ui:Slider name="SFXVolumeSlider" high-value="1" low-value="0"/>
             </ui:VisualElement>
             <ui:Button text="VOLVER" name="BackButton" class="unity-button" style="margin-top: 50px;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="PauseOverlay" class="options-overlay" style="display: none;">
+        <ui:VisualElement class="options-panel" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Backgrounds/Fondo2.png?fileID=2800000&amp;guid=72b6550b8e6bcd44b8e6e066f339e28e&amp;type=3#Fondo2&quot;);">
+            <ui:Label text="PAUSA" class="title-text"/>
+            <ui:Button text="REANUDAR" name="ResumeButton" class="unity-button" style="margin-top: 30px; align-self: center;"/>
+            <ui:Button text="OPCIONES" name="PauseOptionsButton" class="unity-button" style="margin-top: 20px; align-self: center;"/>
+            <ui:Button text="SALIR" name="QuitMenuButton" class="unity-button" style="margin-top: 20px; align-self: center; border-bottom-color: rgb(192, 57, 43); border-top-color: rgb(192, 57, 43); border-left-color: rgb(192, 57, 43); border-right-color: rgb(192, 57, 43);"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="VictoryOverlay" class="options-overlay" style="display: none; padding-bottom: 250px;">
+        <ui:VisualElement class="banner-image" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Paneles/Victoria.png?fileID=2800000&amp;guid=a34c01b54aef54643b316926639cd8ed&amp;type=3#Victoria&quot;);"/>
+        <ui:VisualElement class="options-panel mini-action-box" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Panel/Button%20Frame.png?fileID=2800000&amp;guid=a9ae898ead53012428b3e87a32c971a5&amp;type=3#Button Frame&quot;);">
+            <ui:Button text="MENÚ PRINCIPAL" name="VictoryMenuButton" class="unity-button panel-btn-menu"/>
+            <ui:Button text="SIGUIENTE NIVEL" name="NextLevelButton" class="unity-button panel-btn-next"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="DefeatOverlay" class="options-overlay" style="display: none; background-color: rgba(60, 0, 0, 0.7); padding-bottom: 250px;">
+        <ui:VisualElement class="banner-image" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Paneles/Derrota.png?fileID=2800000&amp;guid=fa8cfbb5aed8def4daf11644e9ab811b&amp;type=3#Derrota&quot;);"/>
+        <ui:VisualElement class="options-panel mini-action-box" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Panel/Button%20Frame.png?fileID=2800000&amp;guid=a9ae898ead53012428b3e87a32c971a5&amp;type=3#Button Frame&quot;);">
+            <ui:Button text="MENÚ PRINCIPAL" name="DefeatMenuButton" class="unity-button panel-btn-menu"/>
+            <ui:Button text="REINTENTAR" name="RetryButton" class="unity-button panel-btn-next"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="GameCompleteOverlay" class="options-overlay" style="display: none; padding-bottom: 250px;">
+        <ui:VisualElement class="banner-image" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Paneles/Felicitaciones.png?fileID=2800000&amp;guid=91bfbab0f8f059544ada34ae73fe96be&amp;type=3#Felicitaciones&quot;);"/>
+        <ui:VisualElement class="options-panel mini-action-box" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Panel/Button%20Frame.png?fileID=2800000&amp;guid=a9ae898ead53012428b3e87a32c971a5&amp;type=3#Button Frame&quot;);">
+            <ui:Button text="MENÚ PRINCIPAL" name="GameCompleteMenuButton" class="unity-button panel-btn-menu"/>
+            <ui:Button text="VER CRÉDITOS" name="ViewCreditsButton" class="unity-button panel-btn-next"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="CreditsOverlay" class="options-overlay" style="display: none; padding-bottom: 250px;">
+        <ui:VisualElement class="banner-image" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Paneles/Creditos.png?fileID=2800000&amp;guid=016a86a3d3e6d064b8c1f2de749ab667&amp;type=3#Creditos&quot;); height: 250px;"/>
+        <ui:VisualElement class="options-panel" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Panel/Button%20Frame.png?fileID=2800000&amp;guid=a9ae898ead53012428b3e87a32c971a5&amp;type=3#Button Frame&quot;); padding-top: 150px; padding-bottom: 30px; background-size: 100% 100%; height: 755px; margin-top: -80px;">
+            <ui:Label text="Huertas Saavedra Jean Paul Esteban" class="credit-text" style="-unity-font-style: bold;"/>
+            <ui:Label text="Figueroa Trujillo Dayan Camilo" class="credit-text"/>
+            <ui:Label text="Hernández Carreño Johan Esteban" class="credit-text"/>
+            <ui:Label text="Moreno Acevedo Camilo Andres" class="credit-text"/>
+            <ui:Label text="Mogollon Salcedo Eduardo de Jesus" class="credit-text"/>
+            <ui:VisualElement style="flex-direction: row; justify-content: center; margin-top: -15px;">
+                <ui:Button text="GITHUB DEL PROYECTO" name="GithubButton" class="unity-button panel-btn-next" style="width: 550px; font-size: 40px;"/>
+                <ui:Button text="CERRAR" name="CloseCreditsButton" class="unity-button panel-btn-menu" style="width: 250px; font-size: 40px;"/>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
