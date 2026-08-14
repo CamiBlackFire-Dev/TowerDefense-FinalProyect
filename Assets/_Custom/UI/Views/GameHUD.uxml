@@ -16,6 +16,7 @@
                 <ui:VisualElement class="wave-container">
                     <ui:Label text="OLEADA 1" name="WaveText" class="wave-text"/>
                 </ui:VisualElement>
+                <ui:Label text="¡Prepara tus torres para la batalla!" name="WaveSubtitleText" class="wave-subtitle-text" style="-unity-font-style: bold; font-size: 40px; color: rgb(255, 235, 0); -unity-text-outline-width: 1px; -unity-text-outline-color: rgb(0, 0, 0);"/>
             </ui:VisualElement>
             <ui:Button name="OptionsButton" text="" class="options-btn-small" style="border-left-color: rgb(241, 196, 15); border-right-color: rgb(241, 196, 15); border-top-color: rgb(241, 196, 15); border-bottom-color: rgb(241, 196, 15);"/>
         </ui:VisualElement>
@@ -32,7 +33,7 @@
                             <ui:Label text="100" class="lock-price"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="Ability1CooldownOverlay" class="cooldown-overlay" picking-mode="Ignore"/>
+                    <ui:VisualElement name="Ability1CooldownOverlay" picking-mode="Ignore" class="cooldown-overlay"/>
                     <ui:Label text="" name="Ability1UsesLabel" class="uses-label"/>
                 </ui:Button>
                 <ui:Button name="Ability2" class="ability-slot locked">
@@ -44,7 +45,7 @@
                             <ui:Label text="200" class="lock-price"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="Ability2CooldownOverlay" class="cooldown-overlay" picking-mode="Ignore"/>
+                    <ui:VisualElement name="Ability2CooldownOverlay" picking-mode="Ignore" class="cooldown-overlay"/>
                     <ui:Label text="" name="Ability2UsesLabel" class="uses-label"/>
                 </ui:Button>
                 <ui:Button name="Ability3" class="ability-slot locked">
@@ -56,7 +57,7 @@
                             <ui:Label text="300" class="lock-price"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="Ability3CooldownOverlay" class="cooldown-overlay" picking-mode="Ignore"/>
+                    <ui:VisualElement name="Ability3CooldownOverlay" picking-mode="Ignore" class="cooldown-overlay"/>
                     <ui:Label text="" name="Ability3UsesLabel" class="uses-label"/>
                 </ui:Button>
                 <ui:Button name="Ability4" class="ability-slot locked" style="margin-right: 0;">
@@ -68,7 +69,7 @@
                             <ui:Label text="400" class="lock-price"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="Ability4CooldownOverlay" class="cooldown-overlay" picking-mode="Ignore"/>
+                    <ui:VisualElement name="Ability4CooldownOverlay" picking-mode="Ignore" class="cooldown-overlay"/>
                     <ui:Label text="" name="Ability4UsesLabel" class="uses-label"/>
                 </ui:Button>
             </ui:VisualElement>
@@ -76,6 +77,9 @@
                 <ui:Button name="BuyTowerButton" class="unity-button buy-tower-btn" style="display: flex;">
                     <ui:Label text="COMPRAR TORRE" class="buy-tower-title"/>
                     <ui:Label text="(50 ORO)" class="buy-tower-price"/>
+                    <ui:VisualElement picking-mode="Ignore" class="lock-overlay" style="bottom: 0; right: 0; width: 203px; left: 23px; top: 34px; height: 105px; border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-bottom-left-radius: 15px; border-top-width: 10px; border-right-width: 10px; border-bottom-width: 10px; border-left-width: 10px;">
+                        <ui:Label text="🔒" picking-mode="Ignore" class="lock-icon" style="display: flex;"/>
+                    </ui:VisualElement>
                 </ui:Button>
             </ui:VisualElement>
         </ui:VisualElement>

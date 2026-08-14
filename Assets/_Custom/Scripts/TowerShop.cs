@@ -7,10 +7,15 @@ public class TowerShop : MonoBehaviour
     [SerializeField] private BoardManager board;
     [SerializeField] private EconomyManager economy;
     [SerializeField] private InputController inputController;
+    [SerializeField] private EnemySpawner spawner;
     [SerializeField] private int towerCost = 50;
+
+    public int TowerCost => towerCost;
 
     private void OnEnable()
     {
+        if (spawner == null)
+            spawner = FindFirstObjectByType<EnemySpawner>();
         SubscribeToInput();
     }
 
@@ -24,6 +29,9 @@ public class TowerShop : MonoBehaviour
     public bool TryBuyTower()
     {
         if (board == null || economy == null)
+            return false;
+
+        if (spawner != null && spawner.IsRunning)
             return false;
 
         // Si no hay celdas libres no se gasta dinero.

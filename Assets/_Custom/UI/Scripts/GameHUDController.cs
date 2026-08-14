@@ -37,6 +37,7 @@ namespace Custom.UI
         private Label _healthText;
         private VisualElement _healthBarFill;
         private Label _waveText;
+        private Label _waveSubtitleText;
         private Button _optionsButton;
         private Button _startWaveButton;
         private Button _buyTowerButton;
@@ -148,6 +149,7 @@ namespace Custom.UI
             _healthText = root.Q<Label>("HealthText");
             _healthBarFill = root.Q<VisualElement>("HealthBarFill");
             _waveText = root.Q<Label>("WaveText");
+            _waveSubtitleText = root.Q<Label>("WaveSubtitleText");
             _optionsButton = root.Q<Button>("OptionsButton");
             _startWaveButton = root.Q<Button>("StartWaveButton");
             _buyTowerButton = root.Q<Button>("BuyTowerButton");
@@ -468,6 +470,7 @@ namespace Custom.UI
             {
                 _currencyText.text = _currentCurrency.ToString();
             }
+            RefreshBuyTowerButtonState();
         }
 
         public void UpdateHealth(int currentHealth, int maxHealth)
@@ -511,6 +514,27 @@ namespace Custom.UI
             {
                 _startWaveButton.style.display = isActive ? DisplayStyle.None : DisplayStyle.Flex;
             }
+            if (_waveSubtitleText != null)
+            {
+                if (isActive)
+                    _waveSubtitleText.AddToClassList("fade-out");
+                else
+                    _waveSubtitleText.RemoveFromClassList("fade-out");
+            }
+            RefreshBuyTowerButtonState();
+        }
+
+        private void RefreshBuyTowerButtonState()
+        {
+            if (_buyTowerButton == null) return;
+            
+            bool inWave = spawner != null && spawner.IsRunning;
+            bool canAfford = towerShop != null && _currentCurrency >= towerShop.TowerCost;
+            
+            if (inWave || !canAfford)
+                _buyTowerButton.AddToClassList("locked");
+            else
+                _buyTowerButton.RemoveFromClassList("locked");
         }
 
         public void ShowWaveAnnouncer(int waveNumber)
