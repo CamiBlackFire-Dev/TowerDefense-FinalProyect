@@ -32,6 +32,13 @@ namespace Custom.UI
         public AudioClip clickSound;
         #endregion
 
+        [Header("Flujo de escenas")]
+        // De aca sale la escena a la que entra el boton Jugar. Se edita mas
+        // comodo desde la ventana Tower Defense > Escenas. Si se deja vacio
+        // se usa FallbackGameplayScene para no dejar el boton roto.
+        public GameFlowConfig gameFlow;
+        private const string FallbackGameplayScene = "0_Main";
+
         #region Unity Lifecycle
         private void OnEnable()
         {
@@ -147,7 +154,15 @@ namespace Custom.UI
         private void OnPlayClicked()
         {
             PlayClickSound();
-            SceneManager.LoadScene("0_Main");
+
+            string sceneName = gameFlow != null && !string.IsNullOrEmpty(gameFlow.gameplayScene)
+                ? gameFlow.gameplayScene
+                : FallbackGameplayScene;
+
+            if (gameFlow == null)
+                Debug.LogWarning("MainMenuController: no hay GameFlowConfig asignado, se usa " + FallbackGameplayScene + " por defecto.", this);
+
+            SceneManager.LoadScene(sceneName);
         }
 
         private void OnOptionsClicked()

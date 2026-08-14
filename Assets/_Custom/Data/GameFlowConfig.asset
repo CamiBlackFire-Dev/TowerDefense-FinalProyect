@@ -9,12 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0084711604678a640a7e0303b0d34121, type: 3}
-  m_Name: TowerLevel1
-  m_EditorClassIdentifier: Assembly-CSharp::TowerDefense.TowerData
-  level: 1
-  damage: 5
-  range: 5
-  attackRate: 1
-  maxHealth: 20
-  visualPrefab: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 39ebb7303f8a9ed42a9cca953024f48f, type: 3}
+  m_Name: GameFlowConfig
+  m_EditorClassIdentifier: Assembly-CSharp::GameFlowConfig
+  mainMenuScene: Main Menu
+  gameplayScene: LevelPrueba

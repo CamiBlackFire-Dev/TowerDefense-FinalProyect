@@ -77,6 +77,11 @@ public class BoardManager : MonoBehaviour
     // sea true el tablero queda bloqueado: solo se puede reordenar entre oleadas.
     public EnemySpawner spawner;
 
+    [Header("Desbloqueo temporal")]
+    // Cuanto dura el desbloqueo del powerup que permite editar el tablero
+    // aunque haya una oleada en curso (ver UnlockTemporarily).
+    public float temporaryUnlockDuration = 30f;
+
     // El Ground actual tiene la cara superior aproximadamente en y = 0.5.
     private const float BoardBaseY = 0.5f;
 
@@ -86,6 +91,29 @@ public class BoardManager : MonoBehaviour
     private bool _isRebuilding;
     private bool _isAnimating;
     private Vector3[,] _anchorLocalPositions;
+    private float _temporaryUnlockTimer;
+    private bool _wasRunning;
+    private bool _wasLocked;
+
+    // Avisa cada vez que el tablero pasa de bloqueado a desbloqueado o al
+    // reves (por una oleada empezando/terminando, o por el desbloqueo
+    // temporal empezando/venciendo). El feedback visual del tablero
+    // (BoardLockFeedback) escucha esto en vez de mirar spawner.IsRunning
+    // por su cuenta, para no duplicar la logica de cuando esta bloqueado.
+    public event Action<bool> LockStateChanged;
+
+    // True si el tablero no se puede reordenar ahora mismo: hay una oleada
+    // en curso y no esta activo el desbloqueo temporal del powerup.
+    public bool IsLocked
+    {
+        get { return spawner != null && spawner.IsRunning && _temporaryUnlockTimer <= 0f; }
+    }
+
+    // Segundos que quedan del desbloqueo temporal (0 si no esta activo).
+    public float TemporaryUnlockRemaining
+    {
+        get { return _temporaryUnlockTimer; }
+    }
 
     private readonly Dictionary<(int x, int y), GameObject> _cells =
         new Dictionary<(int x, int y), GameObject>();
@@ -134,6 +162,47 @@ public class BoardManager : MonoBehaviour
     {
         EnsureInitialized();
         SubscribeToInput();
+    }
+
+    private void Update()
+    {
+        if (!Application.isPlaying)
+            return;
+
+        // Una oleada nueva empezando limpia el desbloqueo temporal de la
+        // anterior: no se arrastra de una oleada a la siguiente.
+        bool running = spawner != null && spawner.IsRunning;
+        if (running && !_wasRunning)
+            _temporaryUnlockTimer = 0f;
+        _wasRunning = running;
+
+        if (_temporaryUnlockTimer > 0f)
+        {
+            _temporaryUnlockTimer -= Time.deltaTime;
+            if (_temporaryUnlockTimer < 0f)
+                _temporaryUnlockTimer = 0f;
+        }
+
+        NotifyLockStateIfChanged();
+    }
+
+    // El powerup del HUD llama esto para poder reordenar el tablero aunque
+    // la oleada siga en curso, durante temporaryUnlockDuration segundos.
+    public void UnlockTemporarily()
+    {
+        _temporaryUnlockTimer = Mathf.Max(_temporaryUnlockTimer, temporaryUnlockDuration);
+        NotifyLockStateIfChanged();
+    }
+
+    private void NotifyLockStateIfChanged()
+    {
+        bool locked = IsLocked;
+        if (locked == _wasLocked)
+            return;
+
+        _wasLocked = locked;
+        if (LockStateChanged != null)
+            LockStateChanged(locked);
     }
 
     private void OnDisable()
@@ -327,9 +396,10 @@ public class BoardManager : MonoBehaviour
     {
         EnsureInitialized();
 
-        // Con una oleada en curso no se puede reordenar el tablero: el
-        // movimiento se ignora por completo (no se encola ni se recuerda).
-        if (spawner != null && spawner.IsRunning)
+        // Con una oleada en curso (y sin el desbloqueo temporal activo) no
+        // se puede reordenar el tablero: el movimiento se ignora por
+        // completo (no se encola ni se recuerda).
+        if (IsLocked)
             return new MoveResult(false, 0,
                 new List<TowerMoveEvent>(), new List<TowerMergeEvent>());
 
@@ -401,6 +471,53 @@ public class BoardManager : MonoBehaviour
         attack.catalog = towerCatalog;
         attack.projectilePrefab = projectilePrefab;
         attack.popupPrefab = damagePopup;
+    }
+
+    // Le da vida a la torre (base para que en el futuro los enemigos puedan
+    // atacarlas). A diferencia del ataque, esto no depende de towersAttack:
+    // la vida es un dato propio de la torre, no de si dispara sola.
+    private void ApplyTowerHealth(Tower tower)
+    {
+        TowerHealth health = tower.GetComponent<TowerHealth>();
+        if (health == null)
+            health = tower.gameObject.AddComponent<TowerHealth>();
+
+        health.catalog = towerCatalog;
+
+        // Se saca y se vuelve a poner para no quedar escuchando dos veces
+        // si esta torre ya tenia el componente (por ejemplo al refrescar el
+        // tablero en el editor).
+        health.Depleted -= HandleTowerDepleted;
+        health.Depleted += HandleTowerDepleted;
+    }
+
+    // La vida de una torre llego a 0: si tiene mas de un nivel, baja uno y
+    // recupera la vida llena de ese nivel; si ya estaba en el nivel 1, la
+    // casilla queda vacia como si nunca hubiera habido una torre ahi.
+    private void HandleTowerDepleted(TowerHealth health)
+    {
+        Tower tower = health.GetComponent<Tower>();
+        if (tower == null)
+            return;
+
+        (int x, int y)? key = FindTowerCoordinates(tower);
+        if (!key.HasValue)
+            return;
+
+        int newLevel = tower.Level - 1;
+        if (newLevel <= 0)
+        {
+            _grid.SetLevel(key.Value.x, key.Value.y, 0);
+            DestroyTowerVisual(tower);
+            return;
+        }
+
+        _grid.SetLevel(key.Value.x, key.Value.y, newLevel);
+        tower.SetModel(TowerModelForLevel(newLevel));
+        ApplyTowerColors(tower);
+        tower.SetLevel(newLevel);
+        tower.PositionOnCell(TowerPosition(key.Value.x, key.Value.y));
+        health.ForceRefreshStats();
     }
 
     // Procesa en orden el movimiento actual y todos los encolados.
@@ -699,6 +816,7 @@ public class BoardManager : MonoBehaviour
                 tower.SetModel(TowerModelForLevel(level));
                 ApplyTowerColors(tower);
                 ApplyTowerAttack(tower);
+                ApplyTowerHealth(tower);
                 tower.SetLevel(level);
                 tower.PositionOnCell(TowerPosition(x, y));
                 return;
@@ -732,6 +850,7 @@ public class BoardManager : MonoBehaviour
         towerScript.SetModel(TowerModelForLevel(level));
         ApplyTowerColors(towerScript);
         ApplyTowerAttack(towerScript);
+        ApplyTowerHealth(towerScript);
         towerScript.SetLevel(level);
         towerScript.PositionOnCell(TowerPosition(x, y));
 
@@ -756,20 +875,23 @@ public class BoardManager : MonoBehaviour
         if (tower == null)
             return;
 
-        // Se busca la clave que apunta a esta torre.
-        (int x, int y)? key = null;
-        foreach (var pair in _towers)
-        {
-            if (pair.Value == tower.gameObject)
-            {
-                key = pair.Key;
-                break;
-            }
-        }
-
+        (int x, int y)? key = FindTowerCoordinates(tower);
         if (key.HasValue)
             _towers.Remove(key.Value);
         DestroyObject(tower.gameObject);
+    }
+
+    // Busca en que casilla esta una torre recorriendo el diccionario
+    // (no al reves porque _towers esta indexado por casilla, no por torre).
+    private (int x, int y)? FindTowerCoordinates(Tower tower)
+    {
+        foreach (var pair in _towers)
+        {
+            if (pair.Value == tower.gameObject)
+                return pair.Key;
+        }
+
+        return null;
     }
 
     private void ClearContainer(Transform container)

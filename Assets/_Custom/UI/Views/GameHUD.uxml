@@ -37,6 +37,7 @@
                 </ui:Button>
                 <ui:Button name="Ability2" class="ability-slot locked">
                     <ui:Label text="2" class="ability-hotkey"/>
+                    <ui:Label text="🔓" class="ability-icon-emoji" picking-mode="Ignore"/>
                     <ui:VisualElement class="lock-overlay">
                         <ui:Label text="🔒" class="lock-icon"/>
                         <ui:VisualElement style="flex-direction: row; align-items: center;">

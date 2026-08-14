@@ -122,6 +122,16 @@ public class TowerAttack : MonoBehaviour
         _detector.SetDetectionRange(range);
     }
 
+    // Vuelve a leer el catalogo aunque el nivel no haya cambiado.
+    // RefreshStats se salta el trabajo mientras la torre siga en el mismo
+    // nivel; esto lo fuerza para que un cambio de balance se vea al momento
+    // en las torres que ya estan puestas (lo usa la ventana de rangos).
+    public void ForceRefreshStats()
+    {
+        _appliedLevel = -1;
+        RefreshStats();
+    }
+
     private void EnsureSetup()
     {
         if (_detector == null)
