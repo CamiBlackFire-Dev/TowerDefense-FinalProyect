@@ -1,9 +1,33 @@
+using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 
 namespace Custom.UI
 {
+    public enum PowerUpUsageLimitMode
+    {
+        Unlimited,
+        PerMatch,
+        PerWave
+    }
+
+    // Configuracion de un powerup (cooldown + limite de usos opcional).
+    // Se edita entera desde el Inspector: para otro powerup, o para cambiar
+    // como se recarga este, solo hay que tocar estos valores, no el codigo.
+    [System.Serializable]
+    public class PowerUpCooldownConfig
+    {
+        [Tooltip("Segundos de cooldown despues de usarse. 0 = sin cooldown.")]
+        public float cooldownSeconds = 5f;
+
+        [Tooltip("Unlimited: sin tope. PerMatch: un total fijo para toda la partida. PerWave: se recarga al empezar cada oleada.")]
+        public PowerUpUsageLimitMode usageLimitMode = PowerUpUsageLimitMode.Unlimited;
+
+        [Tooltip("Usos disponibles cuando el modo no es Unlimited (por ejemplo 3 usos por partida).")]
+        public int maxUses = 3;
+    }
+
     [RequireComponent(typeof(UIDocument))]
     public class GameHUDController : MonoBehaviour
     {
@@ -63,6 +87,41 @@ namespace Custom.UI
         public EconomyManager economy; // dinero que se muestra arriba
         public PlayerBase playerBase;  // vidas del jugador (barra de vida y derrota)
         public TowerShop towerShop;    // compra de torres desde el boton del HUD
+        public BombDragAbility bombAbility; // arrastre de la bomba desde la ranura 1
+
+        // True mientras se mantiene presionada la ranura 1 (ya desbloqueada).
+        private bool _ability1Dragging;
+
+        [Header("Cooldown y usos de habilidades")]
+        // Cada ranura tiene su propio cooldown y, si se quiere, un limite de
+        // usos (fijo por partida o recargable cada oleada). Todo editable
+        // aca: para cambiar el powerup de una ranura o su forma de recarga
+        // no hace falta tocar codigo.
+        public PowerUpCooldownConfig ability1Cooldown = new PowerUpCooldownConfig { cooldownSeconds = 6f };
+        public PowerUpCooldownConfig ability2Cooldown = new PowerUpCooldownConfig { cooldownSeconds = 5f };
+        public PowerUpCooldownConfig ability3Cooldown = new PowerUpCooldownConfig { cooldownSeconds = 5f };
+        public PowerUpCooldownConfig ability4Cooldown = new PowerUpCooldownConfig { cooldownSeconds = 5f };
+        // Color del "reloj" que cubre el icono mientras esta en cooldown.
+        public Color cooldownWipeColor = new Color(0f, 0f, 0f, 0.65f);
+
+        // Estado en vivo de cada ranura (boton + overlay + cooldown/usos
+        // restantes). Se arma una vez en OnEnable a partir de los campos de
+        // arriba y de los elementos del UXML.
+        private AbilitySlot _slotAbility1;
+        private AbilitySlot _slotAbility2;
+        private AbilitySlot _slotAbility3;
+        private AbilitySlot _slotAbility4;
+
+        private class AbilitySlot
+        {
+            public Button Button;
+            public VisualElement CooldownOverlay;
+            public Label UsesLabel;
+            public PowerUpCooldownConfig Config;
+            public float RemainingCooldown;
+            public int UsesRemaining;
+            public Action<MeshGenerationContext> DrawCallback;
+        }
 
         [Header("Audio")]
         public AudioClip hoverSound;
@@ -128,6 +187,11 @@ namespace Custom.UI
             _ability3 = root.Q<Button>("Ability3");
             _ability4 = root.Q<Button>("Ability4");
 
+            _slotAbility1 = BuildAbilitySlot(_ability1, root.Q<VisualElement>("Ability1CooldownOverlay"), root.Q<Label>("Ability1UsesLabel"), ability1Cooldown);
+            _slotAbility2 = BuildAbilitySlot(_ability2, root.Q<VisualElement>("Ability2CooldownOverlay"), root.Q<Label>("Ability2UsesLabel"), ability2Cooldown);
+            _slotAbility3 = BuildAbilitySlot(_ability3, root.Q<VisualElement>("Ability3CooldownOverlay"), root.Q<Label>("Ability3UsesLabel"), ability3Cooldown);
+            _slotAbility4 = BuildAbilitySlot(_ability4, root.Q<VisualElement>("Ability4CooldownOverlay"), root.Q<Label>("Ability4UsesLabel"), ability4Cooldown);
+
             if (_optionsButton != null)
             {
                 _optionsButton.clicked += OnOptionsClicked;
@@ -177,7 +241,19 @@ namespace Custom.UI
             if (_githubButton != null) { _githubButton.clicked += OnGithubClicked; _githubButton.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
             if (_closeCreditsButton != null) { _closeCreditsButton.clicked += OnQuitMenuClicked; _closeCreditsButton.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
 
-            if (_ability1 != null) { _ability1.clicked += OnAbility1Clicked; _ability1.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
+            if (_ability1 != null)
+            {
+                // El desbloqueo usa el mismo clicked probado que las otras
+                // ranuras. El arrastre se registra en fase de captura
+                // (TrickleDown): el Clickable interno del Button ya consume
+                // el PointerDown en fase de burbuja para armar su propio
+                // clicked, asi que si nos registramos igual que el resto
+                // (burbuja) nuestro callback nunca llega a verlo.
+                _ability1.clicked += OnAbility1Clicked;
+                _ability1.RegisterCallback<PointerDownEvent>(OnAbility1PointerDown, TrickleDown.TrickleDown);
+                _ability1.RegisterCallback<PointerUpEvent>(OnAbility1PointerUp, TrickleDown.TrickleDown);
+                _ability1.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
             if (_ability2 != null) { _ability2.clicked += OnAbility2Clicked; _ability2.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
             if (_ability3 != null) { _ability3.clicked += OnAbility3Clicked; _ability3.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
             if (_ability4 != null) { _ability4.clicked += OnAbility4Clicked; _ability4.RegisterCallback<PointerEnterEvent>(OnButtonHover); }
@@ -209,6 +285,8 @@ namespace Custom.UI
                 playerBase = PlayerBase.Instance;
             if (towerShop == null)
                 towerShop = FindFirstObjectByType<TowerShop>();
+            if (bombAbility == null)
+                bombAbility = FindFirstObjectByType<BombDragAbility>();
 
             // La oleada avisa al HUD cuando arranca y cuando termina.
             if (spawner != null)
@@ -285,10 +363,21 @@ namespace Custom.UI
             if (_githubButton != null) { _githubButton.clicked -= OnGithubClicked; _githubButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover); }
             if (_closeCreditsButton != null) { _closeCreditsButton.clicked -= OnQuitMenuClicked; _closeCreditsButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover); }
 
-            if (_ability1 != null) { _ability1.clicked -= OnAbility1Clicked; _ability1.UnregisterCallback<PointerEnterEvent>(OnButtonHover); }
+            if (_ability1 != null)
+            {
+                _ability1.clicked -= OnAbility1Clicked;
+                _ability1.UnregisterCallback<PointerDownEvent>(OnAbility1PointerDown, TrickleDown.TrickleDown);
+                _ability1.UnregisterCallback<PointerUpEvent>(OnAbility1PointerUp, TrickleDown.TrickleDown);
+                _ability1.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
             if (_ability2 != null) { _ability2.clicked -= OnAbility2Clicked; _ability2.UnregisterCallback<PointerEnterEvent>(OnButtonHover); }
             if (_ability3 != null) { _ability3.clicked -= OnAbility3Clicked; _ability3.UnregisterCallback<PointerEnterEvent>(OnButtonHover); }
             if (_ability4 != null) { _ability4.clicked -= OnAbility4Clicked; _ability4.UnregisterCallback<PointerEnterEvent>(OnButtonHover); }
+
+            UnregisterAbilitySlot(_slotAbility1);
+            UnregisterAbilitySlot(_slotAbility2);
+            UnregisterAbilitySlot(_slotAbility3);
+            UnregisterAbilitySlot(_slotAbility4);
 
             if (spawner != null)
             {
@@ -308,6 +397,18 @@ namespace Custom.UI
 
         private void Update()
         {
+            // Mientras se sostiene la ranura de la bomba, la posicion del
+            // mouse/dedo se sigue leyendo aunque no llegue un evento nuevo
+            // (Pointer.current sirve igual para mouse que para touch).
+            if (_ability1Dragging && bombAbility != null)
+            {
+                var pointer = UnityEngine.InputSystem.Pointer.current;
+                if (pointer != null)
+                    bombAbility.UpdateDrag(pointer.position.ReadValue());
+            }
+
+            TickAbilityCooldowns();
+
             var keyboard = UnityEngine.InputSystem.Keyboard.current;
             if (keyboard == null) return;
 
@@ -500,6 +601,184 @@ namespace Custom.UI
                 Debug.LogWarning($"Oro insuficiente para desbloquear {abilityButton.name} ({cost} necesarios).");
             }
         }
+
+        // Para las ranuras sin arrastre (2, 3 y 4): si esta bloqueada intenta
+        // desbloquearla como siempre; si ya esta desbloqueada, el click es el
+        // "uso" y pasa por el cooldown/limite de usos de la ranura.
+        private void TryUnlockOrUseAbility(AbilitySlot slot, int cost)
+        {
+            if (slot == null || slot.Button == null) return;
+
+            if (slot.Button.ClassListContains("locked"))
+            {
+                TryUnlockAbility(slot.Button, cost);
+                return;
+            }
+
+            TryUseAbility(slot);
+        }
+
+        // Chequeo de solo lectura: cooldown en 0 y, si el modo no es
+        // Unlimited, todavia quedan usos. No consume nada por si solo.
+        private bool CanUseAbility(AbilitySlot slot)
+        {
+            if (slot == null || slot.Config == null)
+                return false;
+
+            if (slot.RemainingCooldown > 0f)
+            {
+                Debug.Log($"{slot.Button.name} en cooldown ({slot.RemainingCooldown:0.0}s restantes).");
+                return false;
+            }
+
+            if (slot.Config.usageLimitMode != PowerUpUsageLimitMode.Unlimited && slot.UsesRemaining <= 0)
+            {
+                Debug.Log($"{slot.Button.name} sin usos restantes.");
+                return false;
+            }
+
+            return true;
+        }
+
+        // Arranca el cooldown y descuenta un uso (si aplica). Se llama solo
+        // cuando la habilidad realmente se uso (por ejemplo la bomba ya cayo
+        // en un punto valido), no solo por intentarlo.
+        private void ConsumeAbility(AbilitySlot slot)
+        {
+            if (slot == null || slot.Config == null) return;
+
+            slot.RemainingCooldown = slot.Config.cooldownSeconds;
+            if (slot.Config.usageLimitMode != PowerUpUsageLimitMode.Unlimited)
+                slot.UsesRemaining = Mathf.Max(0, slot.UsesRemaining - 1);
+
+            RefreshSlotVisual(slot);
+        }
+
+        // Version "todo en uno" para ranuras sin arrastre: chequea, consume
+        // y deja el log de activacion de siempre.
+        private bool TryUseAbility(AbilitySlot slot)
+        {
+            if (!CanUseAbility(slot))
+                return false;
+
+            ConsumeAbility(slot);
+            Debug.Log($"Activando habilidad: {slot.Button.name}");
+            return true;
+        }
+
+        private void ResetPerWaveUses(AbilitySlot slot)
+        {
+            if (slot == null || slot.Config == null || slot.Config.usageLimitMode != PowerUpUsageLimitMode.PerWave)
+                return;
+
+            slot.UsesRemaining = slot.Config.maxUses;
+            RefreshSlotVisual(slot);
+        }
+
+        // Arma el estado en vivo de una ranura a partir de su boton y de los
+        // elementos de overlay/label que ya existen en el UXML, y engancha
+        // el dibujo del "reloj" de cooldown sobre el icono.
+        private AbilitySlot BuildAbilitySlot(Button button, VisualElement cooldownOverlay, Label usesLabel, PowerUpCooldownConfig config)
+        {
+            var slot = new AbilitySlot
+            {
+                Button = button,
+                CooldownOverlay = cooldownOverlay,
+                UsesLabel = usesLabel,
+                Config = config,
+                RemainingCooldown = 0f,
+                UsesRemaining = config != null && config.usageLimitMode != PowerUpUsageLimitMode.Unlimited ? config.maxUses : -1
+            };
+
+            if (cooldownOverlay != null)
+            {
+                slot.DrawCallback = context => DrawCooldownWipe(context, slot);
+                cooldownOverlay.generateVisualContent += slot.DrawCallback;
+            }
+
+            RefreshSlotVisual(slot);
+            return slot;
+        }
+
+        private void UnregisterAbilitySlot(AbilitySlot slot)
+        {
+            if (slot == null || slot.CooldownOverlay == null || slot.DrawCallback == null)
+                return;
+
+            slot.CooldownOverlay.generateVisualContent -= slot.DrawCallback;
+        }
+
+        // Recorre las 4 ranuras cada frame y solo redibuja las que siguen en
+        // cooldown (las que ya estan listas no cuestan nada).
+        private void TickAbilityCooldowns()
+        {
+            TickSlot(_slotAbility1);
+            TickSlot(_slotAbility2);
+            TickSlot(_slotAbility3);
+            TickSlot(_slotAbility4);
+        }
+
+        private void TickSlot(AbilitySlot slot)
+        {
+            if (slot == null || slot.RemainingCooldown <= 0f)
+                return;
+
+            slot.RemainingCooldown = Mathf.Max(0f, slot.RemainingCooldown - Time.deltaTime);
+            RefreshSlotVisual(slot);
+        }
+
+        // Actualiza el numero de usos restantes (si el modo lo usa) y pide
+        // que se redibuje el overlay de cooldown de la ranura.
+        private void RefreshSlotVisual(AbilitySlot slot)
+        {
+            if (slot == null) return;
+
+            if (slot.UsesLabel != null && slot.Config != null)
+            {
+                bool limited = slot.Config.usageLimitMode != PowerUpUsageLimitMode.Unlimited;
+                slot.UsesLabel.style.display = limited ? DisplayStyle.Flex : DisplayStyle.None;
+                if (limited)
+                    slot.UsesLabel.text = slot.UsesRemaining.ToString();
+            }
+
+            if (slot.CooldownOverlay != null)
+                slot.CooldownOverlay.MarkDirtyRepaint();
+        }
+
+        // Dibuja el "reloj" de cooldown: una cuna que cubre 360 grados justo
+        // al usarse y se va cerrando en sentido horario hasta desaparecer
+        // cuando la habilidad vuelve a estar lista. Si no quedan usos (modo
+        // limitado) se queda cubierta del todo hasta la siguiente recarga.
+        private void DrawCooldownWipe(MeshGenerationContext context, AbilitySlot slot)
+        {
+            if (slot.Config == null) return;
+
+            Rect rect = slot.CooldownOverlay.contentRect;
+            if (rect.width <= 0f || rect.height <= 0f)
+                return;
+
+            bool outOfUses = slot.Config.usageLimitMode != PowerUpUsageLimitMode.Unlimited && slot.UsesRemaining <= 0;
+            float fraction = slot.Config.cooldownSeconds > 0f
+                ? Mathf.Clamp01(slot.RemainingCooldown / slot.Config.cooldownSeconds)
+                : 0f;
+
+            if (!outOfUses && fraction <= 0f)
+                return;
+
+            float sweep = outOfUses ? 360f : fraction * 360f;
+            Vector2 center = new Vector2(rect.width * 0.5f, rect.height * 0.5f);
+            // Radio de sobra para que la cuna tape hasta las esquinas del
+            // boton cuadrado; el propio boton recorta lo que sobre (overflow: hidden).
+            float radius = Mathf.Sqrt(rect.width * rect.width + rect.height * rect.height) * 0.5f + 4f;
+
+            Painter2D painter = context.painter2D;
+            painter.fillColor = cooldownWipeColor;
+            painter.BeginPath();
+            painter.MoveTo(center);
+            painter.Arc(center, radius, Angle.Degrees(-90f), Angle.Degrees(-90f + sweep), ArcDirection.Clockwise);
+            painter.LineTo(center);
+            painter.Fill();
+        }
         #endregion
 
         #region UI Callbacks
@@ -521,6 +800,10 @@ namespace Custom.UI
         {
             SetWaveActive(true);
             UpdateWave(spawner.WaveNumber);
+            ResetPerWaveUses(_slotAbility1);
+            ResetPerWaveUses(_slotAbility2);
+            ResetPerWaveUses(_slotAbility3);
+            ResetPerWaveUses(_slotAbility4);
         }
 
         // La oleada termino: vuelve a aparecer el boton para la siguiente.
@@ -560,10 +843,54 @@ namespace Custom.UI
             }
         }
 
+        // Ranura 1 (bomba): el desbloqueo es un click normal, igual que las
+        // otras tres ranuras.
         private void OnAbility1Clicked() { TryUnlockAbility(_ability1, 100); }
-        private void OnAbility2Clicked() { TryUnlockAbility(_ability2, 200); }
-        private void OnAbility3Clicked() { TryUnlockAbility(_ability3, 300); }
-        private void OnAbility4Clicked() { TryUnlockAbility(_ability4, 400); }
+
+        // Ya desbloqueada, sostener arrastra la bomba; soltar la deja caer
+        // donde este el mouse/dedo en ese momento. Mientras siga bloqueada
+        // no hace nada aqui: el desbloqueo lo maneja OnAbility1Clicked.
+        private void OnAbility1PointerDown(PointerDownEvent evt)
+        {
+            if (_ability1.ClassListContains("locked"))
+                return;
+
+            if (bombAbility == null)
+            {
+                Debug.LogWarning("GameHUD: falta BombDragAbility en la escena, la ranura 1 no puede arrastrar nada.", this);
+                return;
+            }
+
+            // Si esta en cooldown o sin usos ni siquiera se deja empezar a
+            // arrastrar (CanUseAbility solo mira, no consume nada).
+            if (!CanUseAbility(_slotAbility1))
+                return;
+
+            PlayClickSound();
+            _ability1Dragging = true;
+            _ability1.CapturePointer(evt.pointerId);
+            bombAbility.BeginDrag();
+        }
+
+        private void OnAbility1PointerUp(PointerUpEvent evt)
+        {
+            if (!_ability1Dragging)
+                return;
+
+            _ability1Dragging = false;
+            if (_ability1.HasPointerCapture(evt.pointerId))
+                _ability1.ReleasePointer(evt.pointerId);
+
+            GameObject dropped = bombAbility.EndDrag();
+            // Solo se consume cooldown/uso si la bomba de verdad cayo en un
+            // punto valido (soltar fuera del tablero no cuenta como uso).
+            if (dropped != null)
+                ConsumeAbility(_slotAbility1);
+        }
+
+        private void OnAbility2Clicked() { TryUnlockOrUseAbility(_slotAbility2, 200); }
+        private void OnAbility3Clicked() { TryUnlockOrUseAbility(_slotAbility3, 300); }
+        private void OnAbility4Clicked() { TryUnlockOrUseAbility(_slotAbility4, 400); }
 
         private void OnButtonHover(PointerEnterEvent evt)
         {

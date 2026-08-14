@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using DamageNumbersPro;
 
 // Saca enemigos por el inicio del camino cada cierto tiempo.
 // A cada enemigo le pasa el camino, su vida y quien le paga al jugador,
@@ -14,6 +15,8 @@ public class EnemySpawner : MonoBehaviour
     public PathBuilder pathBuilder; // camino que van a recorrer
     public EconomyManager economy;  // paga al jugador cuando mueren
     public PlayerBase playerBase;   // pierde vidas si un enemigo llega al final
+    // Numero flotante de oro al morir (opcional). Ej: Assets/_Custom/Prefabs/VFX/GoldNumber.prefab
+    public DamageNumber goldPopupPrefab;
 
     [Header("Dano al escaparse")]
     public int damagePerEnemy = 1;  // vidas que quita cada enemigo que llega al final
@@ -39,6 +42,10 @@ public class EnemySpawner : MonoBehaviour
     // Se dispara solo cuando ya no queda nadie vivo de la oleada (todos
     // muertos o escapados), no apenas cuando terminan de salir.
     public event Action WaveFinished;
+    // Un enemigo llego al final del camino (le pego a la base). Lo usa el
+    // feedback visual del castillo, separado de PlayerBase.LivesChanged
+    // para no depender de que "perder vidas" siempre signifique esto.
+    public event Action EnemyReachedEnd;
 
     // Numero de la ultima oleada arrancada (1, 2, 3...).
     public int WaveNumber
@@ -212,7 +219,7 @@ public class EnemySpawner : MonoBehaviour
         if (health == null)
             health = enemy.AddComponent<EnemyHealth>();
 
-        health.Setup(enemyHealth, enemyReward, economy);
+        health.Setup(enemyHealth, enemyReward, economy, goldPopupPrefab);
         health.Died += HandleEnemyDied;
 
         return enemy;
@@ -225,6 +232,9 @@ public class EnemySpawner : MonoBehaviour
 
         if (playerBase != null)
             playerBase.TakeDamage(damagePerEnemy);
+
+        if (EnemyReachedEnd != null)
+            EnemyReachedEnd();
 
         _aliveCount = Mathf.Max(0, _aliveCount - 1);
         Destroy(movement.gameObject);

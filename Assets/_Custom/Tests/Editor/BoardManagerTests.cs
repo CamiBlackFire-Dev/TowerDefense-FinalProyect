@@ -132,6 +132,60 @@ public class BoardManagerTests
         Assert.AreEqual(2, board.Grid.GetLevel(0, 0));
     }
 
+    // En modo Anchored el ancho y el alto salen de agrupar los marcadores
+    // por X y por Z, sin importar en que orden se hayan asignado.
+    [Test]
+    public void ModoAnchored_DeduceElTamanoDesdeLosMarcadores()
+    {
+        BoardManager board = CrearBoard();
+        board.mode = BoardMode.Anchored;
+        board.anchoredCells = CrearMarcadores(4, 3, 2.5f);
+
+        board.RebuildBoardView();
+
+        Assert.AreEqual(4, board.GridWidth);
+        Assert.AreEqual(3, board.GridHeight);
+    }
+
+    // En modo Anchored la torre se coloca exactamente sobre el marcador,
+    // no sobre la formula procedural centrada en el origen.
+    [Test]
+    public void ModoAnchored_LaTorreQuedaSobreElMarcador()
+    {
+        BoardManager board = CrearBoard();
+        board.mode = BoardMode.Anchored;
+        board.anchoredCells = CrearMarcadores(4, 3, 2.5f);
+        board.RebuildBoardView();
+
+        board.PlaceTower(1, 2, 1);
+
+        Tower torre;
+        Assert.IsTrue(board.TryGetTower(1, 2, out torre));
+        Vector3 esperado = board.CellToWorld(1, 2);
+        Assert.AreEqual(esperado.x, torre.transform.localPosition.x, 0.01f);
+        Assert.AreEqual(esperado.z, torre.transform.localPosition.z, 0.01f);
+    }
+
+    // Crea marcadores en una grilla width x height, espaciados uniformemente,
+    // en el mismo GameObject del tablero (misma referencia de espacio local
+    // que usa BuildAnchorGrid).
+    private Transform[] CrearMarcadores(int width, int height, float spacing)
+    {
+        var markers = new Transform[width * height];
+        int i = 0;
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                GameObject marker = new GameObject("Marker " + x + "," + y);
+                marker.transform.SetParent(_boardObject.transform, false);
+                marker.transform.localPosition = new Vector3(x * spacing, 0f, y * spacing);
+                markers[i++] = marker.transform;
+            }
+        }
+        return markers;
+    }
+
     // Cambiar una casilla desde el inspector actualiza el modelo y la vista.
     [Test]
     public void SetEditorLevel_ActualizaModeloYVista()

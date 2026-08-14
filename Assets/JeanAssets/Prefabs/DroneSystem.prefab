@@ -228,6 +228,7 @@ MonoBehaviour:
   abilityCooldown: 5
   cooldownTimer: 0
   maxCharges: 2
+  currentCharges: 0
   bombAbility: {fileID: 4892036108174957672}
   empAbility: {fileID: 1940899719961363424}
   repairAbility: {fileID: 0}
@@ -247,6 +248,11 @@ MonoBehaviour:
   bombDropPoint: {fileID: 8244348262585990782}
   explosionRadius: 10
   explosionDuration: 2
+  explosionDamage: 50
+  explosionVisualMaterial: {fileID: 2100000, guid: 1d9b2734b7f6cba4da37386142b0ffae, type: 2}
+  explosionVisualDuration: 0.4
+  boomTextPrefab: {fileID: 7734502003, guid: eb43d6ef277c69040a41823157cce048, type: 3}
+  boomTextHeightOffset: 1
   raycastDistance: 8
   floorLayer:
     serializedVersion: 2

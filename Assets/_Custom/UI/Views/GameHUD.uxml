@@ -23,7 +23,7 @@
         <ui:VisualElement class="bottom-bar" style="height: 115px;">
             <ui:VisualElement style="flex: 1; flex-basis: 0; min-width: 300px;"/>
             <ui:VisualElement class="abilities-container">
-                <ui:Button name="Ability1" class="ability-slot locked">
+                <ui:Button name="Ability1" class="ability-slot locked" style="background-image: url(&quot;project://database/Assets/_Custom/Models/PowerUps/Bomb/BombaIcono.png?fileID=2800000&amp;guid=7c0517bb66c43d44191132a2ea3d1da4&amp;type=3#BombaIcono&quot;); background-size: 70% 70%; -unity-background-scale-mode: scale-to-fit;">
                     <ui:Label text="1" class="ability-hotkey"/>
                     <ui:VisualElement class="lock-overlay">
                         <ui:Label text="🔒" class="lock-icon"/>
@@ -32,6 +32,8 @@
                             <ui:Label text="100" class="lock-price"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
+                    <ui:VisualElement name="Ability1CooldownOverlay" class="cooldown-overlay" picking-mode="Ignore"/>
+                    <ui:Label text="" name="Ability1UsesLabel" class="uses-label"/>
                 </ui:Button>
                 <ui:Button name="Ability2" class="ability-slot locked">
                     <ui:Label text="2" class="ability-hotkey"/>
@@ -42,6 +44,8 @@
                             <ui:Label text="200" class="lock-price"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
+                    <ui:VisualElement name="Ability2CooldownOverlay" class="cooldown-overlay" picking-mode="Ignore"/>
+                    <ui:Label text="" name="Ability2UsesLabel" class="uses-label"/>
                 </ui:Button>
                 <ui:Button name="Ability3" class="ability-slot locked">
                     <ui:Label text="3" class="ability-hotkey"/>
@@ -52,6 +56,8 @@
                             <ui:Label text="300" class="lock-price"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
+                    <ui:VisualElement name="Ability3CooldownOverlay" class="cooldown-overlay" picking-mode="Ignore"/>
+                    <ui:Label text="" name="Ability3UsesLabel" class="uses-label"/>
                 </ui:Button>
                 <ui:Button name="Ability4" class="ability-slot locked" style="margin-right: 0;">
                     <ui:Label text="4" class="ability-hotkey"/>
@@ -62,6 +68,8 @@
                             <ui:Label text="400" class="lock-price"/>
                         </ui:VisualElement>
                     </ui:VisualElement>
+                    <ui:VisualElement name="Ability4CooldownOverlay" class="cooldown-overlay" picking-mode="Ignore"/>
+                    <ui:Label text="" name="Ability4UsesLabel" class="uses-label"/>
                 </ui:Button>
             </ui:VisualElement>
             <ui:VisualElement style="flex: 1; flex-basis: 0; min-width: 300px; align-items: flex-end; justify-content: center;">

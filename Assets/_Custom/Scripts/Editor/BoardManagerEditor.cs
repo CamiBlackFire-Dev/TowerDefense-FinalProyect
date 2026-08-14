@@ -18,14 +18,14 @@ public class BoardManagerEditor : Editor
             Rebuild(board, "Cambiar ajustes del tablero");
 
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Tablero 4x4", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Tablero " + board.GridWidth + "x" + board.GridHeight, EditorStyles.boldLabel);
         EditorGUILayout.HelpBox("0 deja la casilla vacia. Los valores mayores representan el nivel de la torre.", MessageType.Info);
 
         EditorGUI.BeginDisabledGroup(Application.isPlaying);
-        for (int y = 0; y < board.GridSize; y++)
+        for (int y = 0; y < board.GridHeight; y++)
         {
             EditorGUILayout.BeginHorizontal();
-            for (int x = 0; x < board.GridSize; x++)
+            for (int x = 0; x < board.GridWidth; x++)
             {
                 int currentLevel = board.GetEditorLevel(x, y);
                 int newLevel = EditorGUILayout.IntField(currentLevel, GUILayout.Width(42));

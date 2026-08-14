@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using DamageNumbersPro;
 
 public class BombAbility : MonoBehaviour
 {
@@ -7,7 +8,19 @@ public class BombAbility : MonoBehaviour
     [SerializeField] private Transform bombDropPoint;
     [SerializeField] private float explosionRadius = 10f;
     [SerializeField] private float explosionDuration = 1f;
-    
+    [SerializeField] private float explosionDamage = 50f;
+
+    [Header("Explosion visual")]
+    // Disco que crece hasta explosionRadius y se desvanece, para que se
+    // vea el area exacta que cubre la explosion. Sin material asignado
+    // no se dibuja nada (el dano y la deteccion siguen funcionando igual).
+    [SerializeField] private Material explosionVisualMaterial;
+    [SerializeField] private float explosionVisualDuration = 0.4f;
+    // Texto "Boom" flotante (Damage Numbers Pro). Opcional: sin prefab
+    // asignado no aparece nada, el resto de la explosion sigue igual.
+    [SerializeField] private DamageNumber boomTextPrefab;
+    [SerializeField] private float boomTextHeightOffset = 1f;
+
     [Header("Raycast")]
     [SerializeField] private float raycastDistance = 10f;
     [SerializeField] private LayerMask floorLayer;
@@ -52,15 +65,35 @@ public class BombAbility : MonoBehaviour
         }
     }
 
+    // Dispara la explosion en una posicion ya conocida, sin pasar por el
+    // raycast hacia abajo de DropBomb. Sirve para otros sistemas que ya
+    // saben donde cae la bomba (por ejemplo el arrastre desde la ranura
+    // de habilidades, que calcula el punto de caida por su cuenta).
+    public void ExplodeAt(Vector3 position)
+    {
+        explosionPosition = position;
+        hasExplosionPosition = true;
+        explosionTimer = explosionDuration;
+
+        DetectEnemies(position);
+    }
+
     private void DetectEnemies(Vector3 explosionPosition)
     {
+        ExplosionVisual.Spawn(explosionPosition, explosionRadius, explosionVisualMaterial, explosionVisualDuration);
+
+        if (boomTextPrefab != null)
+            boomTextPrefab.Spawn(explosionPosition + Vector3.up * boomTextHeightOffset);
+
         Collider[] enemies = Physics.OverlapSphere(explosionPosition, explosionRadius, enemyLayer);
 
         Debug.Log($"Enemigos afectados: {enemies.Length}");
 
         foreach (Collider enemy in enemies)
         {
-            // Aquí comunicaremos que el enemigo fue afectado
+            EnemyHealth health = enemy.GetComponentInParent<EnemyHealth>();
+            if (health != null)
+                health.TakeDamage(explosionDamage);
         }
     }
 

@@ -18,24 +18,39 @@ public sealed class BoardGrid
     public const int DefaultSize = 4;
 
     // Guardamos los niveles en un solo array para simplificar.
-    // La casilla (x, y) vive en la posicion y * Size + x.
+    // La casilla (x, y) vive en la posicion y * Width + x.
     private readonly int[] _levels;
 
-    public int Size { get; }
+    public int Width { get; }
+    public int Height { get; }
 
-    public BoardGrid(int size = DefaultSize)
+    // Alias para tableros cuadrados (Width == Height). Se mantiene porque
+    // los tests y BoardManager ya lo usaban antes de que existiera Height.
+    public int Size
     {
-        if (size <= 0)
-            throw new ArgumentOutOfRangeException(nameof(size));
-        Size = size;
-        _levels = new int[size * size];
+        get { return Width; }
+    }
+
+    public BoardGrid(int size = DefaultSize) : this(size, size)
+    {
+    }
+
+    public BoardGrid(int width, int height)
+    {
+        if (width <= 0)
+            throw new ArgumentOutOfRangeException(nameof(width));
+        if (height <= 0)
+            throw new ArgumentOutOfRangeException(nameof(height));
+        Width = width;
+        Height = height;
+        _levels = new int[width * height];
     }
 
     // Devuelve el nivel de la casilla (x, y).
     public int GetLevel(int x, int y)
     {
         ValidateCoords(x, y);
-        return _levels[y * Size + x];
+        return _levels[y * Width + x];
     }
 
     // Fija el nivel de la casilla (x, y). Un nivel negativo se trata como vacio.
@@ -44,7 +59,7 @@ public sealed class BoardGrid
         ValidateCoords(x, y);
         if (level < 0)
             level = 0;
-        _levels[y * Size + x] = level;
+        _levels[y * Width + x] = level;
     }
 
     // Indica si la casilla (x, y) esta vacia.
@@ -68,11 +83,11 @@ public sealed class BoardGrid
     public List<(int x, int y)> GetFreeCells()
     {
         var free = new List<(int x, int y)>();
-        for (int y = 0; y < Size; y++)
+        for (int y = 0; y < Height; y++)
         {
-            for (int x = 0; x < Size; x++)
+            for (int x = 0; x < Width; x++)
             {
-                if (_levels[y * Size + x] == 0)
+                if (_levels[y * Width + x] == 0)
                     free.Add((x, y));
             }
         }
@@ -82,16 +97,22 @@ public sealed class BoardGrid
     // Ejecuta un movimiento completo estilo 2048 y devuelve si hubo cambios.
     // Ademas devuelve los eventos de movimiento y fusion para poder animar.
     // Procesamos el tablero fila por fila o columna por columna, siempre
-    // desde el borde hacia el que se mueven las torres.
+    // desde el borde hacia el que se mueven las torres. Left/Right procesan
+    // filas (una linea por cada Height, largo Width); Up/Down procesan
+    // columnas (una linea por cada Width, largo Height). Con un tablero
+    // cuadrado esto se reduce exactamente al comportamiento de siempre.
     public MoveResult Move(GridDirection direction)
     {
         bool changed = false;
         int totalMerges = 0;
-        int[] line = new int[Size];
+        bool horizontal = direction == GridDirection.Left || direction == GridDirection.Right;
+        int lineCount = horizontal ? Height : Width;
+        int lineLength = horizontal ? Width : Height;
+        int[] line = new int[lineLength];
         var moves = new List<TowerMoveEvent>();
         var merges = new List<TowerMergeEvent>();
 
-        for (int a = 0; a < Size; a++)
+        for (int a = 0; a < lineCount; a++)
         {
             ExtractLine(direction, a, line);
             totalMerges += ProcessLine(direction, a, line, moves, merges);
@@ -105,22 +126,22 @@ public sealed class BoardGrid
     // Copia una fila o columna al buffer, con el borde del movimiento al inicio.
     private void ExtractLine(GridDirection direction, int a, int[] buffer)
     {
-        for (int b = 0; b < Size; b++)
+        for (int b = 0; b < buffer.Length; b++)
         {
             int cell;
             switch (direction)
             {
                 case GridDirection.Left:
-                    cell = _levels[a * Size + b];
+                    cell = _levels[a * Width + b];
                     break;
                 case GridDirection.Right:
-                    cell = _levels[a * Size + (Size - 1 - b)];
+                    cell = _levels[a * Width + (Width - 1 - b)];
                     break;
                 case GridDirection.Up:
-                    cell = _levels[(Size - 1 - b) * Size + a];
+                    cell = _levels[(Height - 1 - b) * Width + a];
                     break;
                 default:
-                    cell = _levels[b * Size + a];
+                    cell = _levels[b * Width + a];
                     break;
             }
             buffer[b] = cell;
@@ -132,7 +153,7 @@ public sealed class BoardGrid
     private bool WriteBack(GridDirection direction, int a, int[] buffer)
     {
         bool changed = false;
-        for (int b = 0; b < Size; b++)
+        for (int b = 0; b < buffer.Length; b++)
         {
             int x, y;
             switch (direction)
@@ -142,12 +163,12 @@ public sealed class BoardGrid
                     y = a;
                     break;
                 case GridDirection.Right:
-                    x = Size - 1 - b;
+                    x = Width - 1 - b;
                     y = a;
                     break;
                 case GridDirection.Up:
                     x = a;
-                    y = Size - 1 - b;
+                    y = Height - 1 - b;
                     break;
                 default:
                     x = a;
@@ -162,7 +183,7 @@ public sealed class BoardGrid
     // Escribe un valor en una casilla y devuelve true si realmente cambio.
     private bool SetQuiet(int x, int y, int value)
     {
-        int index = y * Size + x;
+        int index = y * Width + x;
         if (_levels[index] == value)
             return false;
         _levels[index] = value;
@@ -244,12 +265,12 @@ public sealed class BoardGrid
                 y = a;
                 break;
             case GridDirection.Right:
-                x = Size - 1 - b;
+                x = Width - 1 - b;
                 y = a;
                 break;
             case GridDirection.Up:
                 x = a;
-                y = Size - 1 - b;
+                y = Height - 1 - b;
                 break;
             default:
                 x = a;
@@ -260,9 +281,9 @@ public sealed class BoardGrid
 
     private void ValidateCoords(int x, int y)
     {
-        if (x < 0 || x >= Size || y < 0 || y >= Size)
+        if (x < 0 || x >= Width || y < 0 || y >= Height)
             throw new ArgumentOutOfRangeException(
-                "(" + x + "," + y + ") esta fuera de la cuadricula " + Size + "x" + Size);
+                "(" + x + "," + y + ") esta fuera de la cuadricula " + Width + "x" + Height);
     }
 }
 

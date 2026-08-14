@@ -1,4 +1,5 @@
 using UnityEngine;
+using DamageNumbersPro;
 
 // Vida de un enemigo. Las torres le quitan vida con TakeDamage.
 // Al morir paga al jugador y se quita de la escena.
@@ -17,6 +18,7 @@ public class EnemyHealth : MonoBehaviour
     public bool showHealthBar = true;    // barra flotante sobre el enemigo
 
     private EconomyManager _economy;
+    private DamageNumber _goldPopupPrefab; // numero flotante de oro ganado (opcional)
     private float _currentHealth;
     private bool _ready;
 
@@ -45,11 +47,12 @@ public class EnemyHealth : MonoBehaviour
     }
 
     // El spawner define la vida y el pago de la oleada.
-    public void Setup(float health, int money, EconomyManager economy)
+    public void Setup(float health, int money, EconomyManager economy, DamageNumber goldPopupPrefab = null)
     {
         maxHealth = Mathf.Max(1f, health);
         reward = Mathf.Max(0, money);
         _economy = economy;
+        _goldPopupPrefab = goldPopupPrefab;
         _currentHealth = maxHealth;
         _ready = true;
     }
@@ -71,7 +74,12 @@ public class EnemyHealth : MonoBehaviour
         _currentHealth = 0f;
 
         if (_economy != null)
+        {
             _economy.AddCurrency(reward);
+
+            if (_goldPopupPrefab != null && reward > 0)
+                _goldPopupPrefab.Spawn(transform.position, reward);
+        }
 
         if (Died != null)
             Died(this);

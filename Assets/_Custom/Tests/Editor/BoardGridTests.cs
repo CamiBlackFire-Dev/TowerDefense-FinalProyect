@@ -382,6 +382,49 @@ public class BoardGridTests
         Assert.IsFalse(grid.Move(GridDirection.Down).Changed);
     }
 
+    // Un tablero no cuadrado (4 columnas x 3 filas) guarda Width y Height por separado.
+    [Test]
+    public void RectangularGrid_WidthAndHeight_SonIndependientes()
+    {
+        var grid = new BoardGrid(4, 3);
+
+        Assert.AreEqual(4, grid.Width);
+        Assert.AreEqual(3, grid.Height);
+        Assert.AreEqual(12, grid.GetFreeCells().Count);
+    }
+
+    // Mover a la izquierda en un tablero rectangular procesa cada fila con
+    // el ancho correcto (no el alto), aunque no sean iguales.
+    [Test]
+    public void RectangularGrid_MoveLeft_ComprimeCadaFilaConElAncho()
+    {
+        var grid = new BoardGrid(4, 3);
+        grid.SetLevel(2, 1, 1);
+        grid.SetLevel(3, 1, 1);
+
+        MoveResult result = grid.Move(GridDirection.Left);
+
+        Assert.IsTrue(result.Changed);
+        Assert.AreEqual(2, grid.GetLevel(0, 1));
+        Assert.AreEqual(0, grid.GetLevel(1, 1));
+    }
+
+    // Mover hacia arriba en un tablero rectangular procesa cada columna con
+    // el alto correcto (no el ancho). "Arriba" combina contra y = Height-1.
+    [Test]
+    public void RectangularGrid_MoveUp_ComprimeCadaColumnaConElAlto()
+    {
+        var grid = new BoardGrid(4, 3);
+        grid.SetLevel(1, 0, 1);
+        grid.SetLevel(1, 1, 1);
+
+        MoveResult result = grid.Move(GridDirection.Up);
+
+        Assert.IsTrue(result.Changed);
+        Assert.AreEqual(2, grid.GetLevel(1, 2));
+        Assert.AreEqual(0, grid.GetLevel(1, 0));
+    }
+
     // Arma un tablero desde un texto facil de leer.
     // Formato: "1,1,0,0|0,0,0,0|0,0,0,0|0,0,0,0" (una fila por linea).
     private static BoardGrid FromString(string descripcion)

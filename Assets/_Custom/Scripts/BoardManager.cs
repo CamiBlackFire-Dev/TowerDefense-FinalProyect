@@ -5,14 +5,35 @@ using System.Text;
 using UnityEngine;
 using DamageNumbersPro;
 
+// Como se ubican las casillas del tablero. Procedural: BoardManager genera
+// sus propios cubos centrados en el origen (comportamiento de siempre).
+// Anchored: usa Transforms ya puestos en la escena (por ejemplo bases
+// redondas de un mapa hecho a mano) como posicion de cada casilla.
+public enum BoardMode
+{
+    Procedural,
+    Anchored
+}
+
 // Conecta BoardGrid con los objetos visibles de la escena.
 // ExecuteAlways permite ver y editar el tablero sin entrar en Play Mode.
 [ExecuteAlways]
 public class BoardManager : MonoBehaviour
 {
+    [Header("Modo")]
+    public BoardMode mode = BoardMode.Procedural;
+
     [Header("Tablero")]
     [TextArea(2, 5)]
     public string initialBoard = "";        // niveles iniciales, filas separadas por |
+    public int boardWidth = BoardGrid.DefaultSize;
+    public int boardHeight = BoardGrid.DefaultSize;
+
+    [Header("Casillas ancladas")]
+    // Solo en modo Anchored. El orden no importa: el ancho y el alto del
+    // tablero se deducen solos agrupando estos Transforms por X y por Z
+    // (posicion local respecto de este mismo GameObject).
+    public Transform[] anchoredCells;
 
     [Header("Visuales")]
     public float cellSize = 2f;             // distancia entre los centros de dos casillas
@@ -64,6 +85,7 @@ public class BoardManager : MonoBehaviour
     private Transform _towerContainer;
     private bool _isRebuilding;
     private bool _isAnimating;
+    private Vector3[,] _anchorLocalPositions;
 
     private readonly Dictionary<(int x, int y), GameObject> _cells =
         new Dictionary<(int x, int y), GameObject>();
@@ -80,9 +102,14 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    public int GridSize
+    public int GridWidth
     {
-        get { return BoardGrid.DefaultSize; }
+        get { return boardWidth; }
+    }
+
+    public int GridHeight
+    {
+        get { return boardHeight; }
     }
 
     // Cantidad de movimientos encolados esperando su turno.
@@ -120,6 +147,9 @@ public class BoardManager : MonoBehaviour
         if (_grid != null && _cellContainer != null && _towerContainer != null)
             return;
 
+        if (mode == BoardMode.Anchored)
+            BuildAnchorGrid();
+
         _grid = ParseBoard(initialBoard);
         EnsureContainers();
         CacheExistingVisuals();
@@ -136,11 +166,96 @@ public class BoardManager : MonoBehaviour
             UpdateTowers();
     }
 
+    // Agrupa anchoredCells por X y por Z (con tolerancia) para deducir el
+    // ancho y el alto del tablero sin que el orden del array importe.
+    private void BuildAnchorGrid()
+    {
+        var valid = new List<Transform>();
+        if (anchoredCells != null)
+        {
+            foreach (Transform t in anchoredCells)
+                if (t != null)
+                    valid.Add(t);
+        }
+
+        if (valid.Count == 0)
+        {
+            Debug.LogWarning("BoardManager: modo Anchored sin celdas en anchoredCells.", this);
+            boardWidth = 0;
+            boardHeight = 0;
+            _anchorLocalPositions = new Vector3[0, 0];
+            return;
+        }
+
+        List<float> columnsX = DistinctSorted(valid, t => t.localPosition.x);
+        List<float> rowsZ = DistinctSorted(valid, t => t.localPosition.z);
+
+        boardWidth = columnsX.Count;
+        boardHeight = rowsZ.Count;
+        _anchorLocalPositions = new Vector3[boardWidth, boardHeight];
+
+        foreach (Transform t in valid)
+        {
+            int x = ClosestIndex(columnsX, t.localPosition.x);
+            int y = ClosestIndex(rowsZ, t.localPosition.z);
+            _anchorLocalPositions[x, y] = t.localPosition;
+        }
+    }
+
+    // Junta valores parecidos (misma columna o fila) y los deja de menor a mayor.
+    private static List<float> DistinctSorted(List<Transform> items, Func<Transform, float> selector)
+    {
+        const float tolerance = 0.5f;
+        var values = new List<float>();
+        foreach (Transform t in items)
+        {
+            float value = selector(t);
+            bool found = false;
+            for (int i = 0; i < values.Count; i++)
+            {
+                if (Mathf.Abs(values[i] - value) < tolerance)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                values.Add(value);
+        }
+        values.Sort();
+        return values;
+    }
+
+    // Indice del valor mas cercano dentro de una lista ya ordenada.
+    private static int ClosestIndex(List<float> sortedValues, float value)
+    {
+        int bestIndex = 0;
+        float bestDistance = float.MaxValue;
+        for (int i = 0; i < sortedValues.Count; i++)
+        {
+            float distance = Mathf.Abs(sortedValues[i] - value);
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestIndex = i;
+            }
+        }
+        return bestIndex;
+    }
+
     // Convierte una casilla a una posicion local dentro de Board.
+    // En modo Anchored devuelve la posicion del Transform que le toca.
     public Vector3 CellToWorld(int x, int y)
     {
-        float worldX = (x - 1.5f) * cellSize;
-        float worldZ = (y - 1.5f) * cellSize;
+        if (mode == BoardMode.Anchored)
+        {
+            if (_anchorLocalPositions == null || x < 0 || x >= boardWidth || y < 0 || y >= boardHeight)
+                return Vector3.zero;
+            return _anchorLocalPositions[x, y];
+        }
+
+        float worldX = (x - (boardWidth - 1) / 2f) * cellSize;
+        float worldZ = (y - (boardHeight - 1) / 2f) * cellSize;
         return new Vector3(worldX, 0f, worldZ);
     }
 
@@ -168,6 +283,9 @@ public class BoardManager : MonoBehaviour
         _isRebuilding = true;
         try
         {
+            if (mode == BoardMode.Anchored)
+                BuildAnchorGrid();
+
             _grid = ParseBoard(initialBoard);
             EnsureContainers();
             ClearContainer(_cellContainer);
@@ -175,7 +293,10 @@ public class BoardManager : MonoBehaviour
             _cells.Clear();
             _towers.Clear();
 
-            CreateCells();
+            // En modo Anchored las casillas ya existen en la escena (las puso
+            // el mapa a mano): no se generan cubos propios, solo las torres.
+            if (mode == BoardMode.Procedural)
+                CreateCells();
             CreateTowersFromGrid();
         }
         finally
@@ -464,13 +585,15 @@ public class BoardManager : MonoBehaviour
 
     private bool HasCompleteVisualView()
     {
-        if (_cells.Count != GridSize * GridSize)
+        // En modo Anchored no hay cubos propios que contar: las casillas
+        // las puso el mapa a mano, asi que _cells se queda vacio a proposito.
+        if (mode == BoardMode.Procedural && _cells.Count != GridWidth * GridHeight)
             return false;
 
         int occupiedCells = 0;
-        for (int x = 0; x < GridSize; x++)
+        for (int x = 0; x < GridWidth; x++)
         {
-            for (int y = 0; y < GridSize; y++)
+            for (int y = 0; y < GridHeight; y++)
             {
                 if (_grid.GetLevel(x, y) <= 0)
                     continue;
@@ -486,9 +609,9 @@ public class BoardManager : MonoBehaviour
 
     private void CreateCells()
     {
-        for (int x = 0; x < GridSize; x++)
+        for (int x = 0; x < GridWidth; x++)
         {
-            for (int y = 0; y < GridSize; y++)
+            for (int y = 0; y < GridHeight; y++)
                 _cells[(x, y)] = CreateCell(x, y);
         }
     }
@@ -540,9 +663,9 @@ public class BoardManager : MonoBehaviour
 
     private void CreateTowersFromGrid()
     {
-        for (int x = 0; x < GridSize; x++)
+        for (int x = 0; x < GridWidth; x++)
         {
-            for (int y = 0; y < GridSize; y++)
+            for (int y = 0; y < GridHeight; y++)
             {
                 int level = _grid.GetLevel(x, y);
                 if (level > 0)
@@ -553,9 +676,9 @@ public class BoardManager : MonoBehaviour
 
     private void UpdateTowers()
     {
-        for (int x = 0; x < GridSize; x++)
+        for (int x = 0; x < GridWidth; x++)
         {
-            for (int y = 0; y < GridSize; y++)
+            for (int y = 0; y < GridHeight; y++)
             {
                 int level = _grid.GetLevel(x, y);
                 if (level <= 0)
@@ -671,24 +794,27 @@ public class BoardManager : MonoBehaviour
 
     // Posicion ancla de una casilla: el piso donde descansan los modelos.
     // La altura del modelo la aporta TowerVisual a traves de Tower.
+    // En modo Anchored se usa la altura tal cual del marcador (ya puesto a
+    // mano sobre el mapa), sin sumarle el grosor de un cubo que no existe.
     private Vector3 TowerPosition(int x, int y)
     {
         Vector3 position = CellToWorld(x, y);
-        position.y = BoardBaseY + cellThickness;
+        if (mode == BoardMode.Procedural)
+            position.y = BoardBaseY + cellThickness;
         return position;
     }
 
     private BoardGrid ParseBoard(string description)
     {
-        BoardGrid grid = new BoardGrid();
+        BoardGrid grid = new BoardGrid(Mathf.Max(1, boardWidth), Mathf.Max(1, boardHeight));
         if (string.IsNullOrWhiteSpace(description))
             return grid;
 
         string[] rows = description.Split('|');
-        for (int y = 0; y < rows.Length && y < GridSize; y++)
+        for (int y = 0; y < rows.Length && y < GridHeight; y++)
         {
             string[] cells = rows[y].Split(',');
-            for (int x = 0; x < cells.Length && x < GridSize; x++)
+            for (int x = 0; x < cells.Length && x < GridWidth; x++)
             {
                 int level;
                 if (int.TryParse(cells[x], out level))
@@ -702,12 +828,12 @@ public class BoardManager : MonoBehaviour
     private string SerializeBoard(BoardGrid grid)
     {
         StringBuilder result = new StringBuilder();
-        for (int y = 0; y < GridSize; y++)
+        for (int y = 0; y < GridHeight; y++)
         {
             if (y > 0)
                 result.Append('|');
 
-            for (int x = 0; x < GridSize; x++)
+            for (int x = 0; x < GridWidth; x++)
             {
                 if (x > 0)
                     result.Append(',');
