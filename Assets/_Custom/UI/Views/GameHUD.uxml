@@ -10,7 +10,7 @@
                     <ui:Label text="0" name="CurrencyText" class="currency-text"/>
                 </ui:VisualElement>
                 <ui:VisualElement class="speed-wrapper">
-                    <ui:Label text="VELOCIDAD" class="speed-label"/>
+                    <ui:Label text="VELOCIDAD" class="speed-label" style="font-size: 25px; margin-top: -5px; margin-bottom: -5px;"/>
                     <ui:VisualElement class="speed-controls-container">
                         <ui:Button name="Speed1xButton" text="1X" class="speed-btn"/>
                         <ui:Button name="Speed2xButton" text="2X" class="speed-btn"/>
