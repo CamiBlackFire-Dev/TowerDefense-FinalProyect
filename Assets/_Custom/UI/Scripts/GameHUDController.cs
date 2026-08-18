@@ -527,10 +527,10 @@ namespace Custom.UI
         private void RefreshBuyTowerButtonState()
         {
             if (_buyTowerButton == null) return;
-            
+
             bool inWave = spawner != null && spawner.IsRunning;
             bool canAfford = towerShop != null && _currentCurrency >= towerShop.TowerCost;
-            
+
             if (inWave || !canAfford)
                 _buyTowerButton.AddToClassList("locked");
             else

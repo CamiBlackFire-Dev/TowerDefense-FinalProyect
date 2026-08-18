@@ -4,9 +4,18 @@
     <Style src="project://database/Assets/_Custom/UI/Styles/GameHUD.uss?fileID=7433441132597879392&amp;guid=3a01055e8addfa449a85750b996d09e3&amp;type=3#GameHUD"/>
     <ui:VisualElement name="HUDContainer" class="hud-container">
         <ui:VisualElement class="top-bar">
-            <ui:VisualElement class="currency-container">
-                <ui:VisualElement class="currency-icon" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
-                <ui:Label text="0" name="CurrencyText" class="currency-text"/>
+            <ui:VisualElement class="top-left-container" style="flex-direction: row; align-items: center;">
+                <ui:VisualElement class="currency-container">
+                    <ui:VisualElement class="currency-icon" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
+                    <ui:Label text="0" name="CurrencyText" class="currency-text"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="speed-wrapper">
+                    <ui:Label text="VELOCIDAD" class="speed-label"/>
+                    <ui:VisualElement class="speed-controls-container">
+                        <ui:Button name="Speed1xButton" text="1X" class="speed-btn"/>
+                        <ui:Button name="Speed2xButton" text="2X" class="speed-btn"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement class="center-container">
                 <ui:VisualElement class="health-bar-container">
