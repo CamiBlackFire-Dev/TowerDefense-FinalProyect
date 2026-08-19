@@ -89,6 +89,7 @@ namespace Custom.UI
         public PlayerBase playerBase;  // vidas del jugador (barra de vida y derrota)
         public TowerShop towerShop;    // compra de torres desde el boton del HUD
         public BombDragAbility bombAbility; // arrastre de la bomba desde la ranura 1
+        public BoardManager boardManager;   // desbloqueo temporal del tablero, ranura 2
 
         // True mientras se mantiene presionada la ranura 1 (ya desbloqueada).
         private bool _ability1Dragging;
@@ -99,7 +100,15 @@ namespace Custom.UI
         // aca: para cambiar el powerup de una ranura o su forma de recarga
         // no hace falta tocar codigo.
         public PowerUpCooldownConfig ability1Cooldown = new PowerUpCooldownConfig { cooldownSeconds = 6f };
-        public PowerUpCooldownConfig ability2Cooldown = new PowerUpCooldownConfig { cooldownSeconds = 5f };
+        // Ranura 2 (desbloqueo del tablero): una vez por oleada, con un
+        // cooldown igual a la duracion del desbloqueo para que no se pueda
+        // reactivar antes de que termine el anterior.
+        public PowerUpCooldownConfig ability2Cooldown = new PowerUpCooldownConfig
+        {
+            cooldownSeconds = 30f,
+            usageLimitMode = PowerUpUsageLimitMode.PerWave,
+            maxUses = 1
+        };
         public PowerUpCooldownConfig ability3Cooldown = new PowerUpCooldownConfig { cooldownSeconds = 5f };
         public PowerUpCooldownConfig ability4Cooldown = new PowerUpCooldownConfig { cooldownSeconds = 5f };
         // Color del "reloj" que cubre el icono mientras esta en cooldown.
@@ -289,6 +298,8 @@ namespace Custom.UI
                 towerShop = FindFirstObjectByType<TowerShop>();
             if (bombAbility == null)
                 bombAbility = FindFirstObjectByType<BombDragAbility>();
+            if (boardManager == null)
+                boardManager = FindFirstObjectByType<BoardManager>();
 
             // La oleada avisa al HUD cuando arranca y cuando termina.
             if (spawner != null)
@@ -423,7 +434,7 @@ namespace Custom.UI
 
             if (keyboard.vKey.wasPressedThisFrame)
             {
-                if (_victoryOverlay != null && _victoryOverlay.style.display == DisplayStyle.Flex) { _victoryOverlay.style.display = DisplayStyle.None; Time.timeScale = 1f; }
+                if (_victoryOverlay != null && _victoryOverlay.style.display == DisplayStyle.Flex) { _victoryOverlay.style.display = DisplayStyle.None; GameSpeedController.ApplyCurrentSpeed(); }
                 else ShowVictoryScreen(false);
             }
             if (keyboard.cKey.wasPressedThisFrame)
@@ -433,7 +444,7 @@ namespace Custom.UI
             }
             if (keyboard.fKey.wasPressedThisFrame)
             {
-                if (_gameCompleteOverlay != null && _gameCompleteOverlay.style.display == DisplayStyle.Flex) { _gameCompleteOverlay.style.display = DisplayStyle.None; Time.timeScale = 1f; }
+                if (_gameCompleteOverlay != null && _gameCompleteOverlay.style.display == DisplayStyle.Flex) { _gameCompleteOverlay.style.display = DisplayStyle.None; GameSpeedController.ApplyCurrentSpeed(); }
                 else ShowVictoryScreen(true);
             }
 
@@ -596,7 +607,10 @@ namespace Custom.UI
         private void TogglePause(bool pause)
         {
             _isPaused = pause;
-            Time.timeScale = _isPaused ? 0f : 1f;
+            if (_isPaused)
+                Time.timeScale = 0f;
+            else
+                GameSpeedController.ApplyCurrentSpeed(); // vuelve a la velocidad que tenia antes de pausar, no siempre 1x
 
             if (_pauseOverlay != null)
             {
@@ -629,17 +643,20 @@ namespace Custom.UI
         // Para las ranuras sin arrastre (2, 3 y 4): si esta bloqueada intenta
         // desbloquearla como siempre; si ya esta desbloqueada, el click es el
         // "uso" y pasa por el cooldown/limite de usos de la ranura.
-        private void TryUnlockOrUseAbility(AbilitySlot slot, int cost)
+        // Devuelve true solo si de verdad se uso (no si solo se desbloqueo o
+        // si estaba en cooldown/sin usos), para que quien la llama sepa si
+        // debe disparar el efecto real de la habilidad.
+        private bool TryUnlockOrUseAbility(AbilitySlot slot, int cost)
         {
-            if (slot == null || slot.Button == null) return;
+            if (slot == null || slot.Button == null) return false;
 
             if (slot.Button.ClassListContains("locked"))
             {
                 TryUnlockAbility(slot.Button, cost);
-                return;
+                return false;
             }
 
-            TryUseAbility(slot);
+            return TryUseAbility(slot);
         }
 
         // Chequeo de solo lectura: cooldown en 0 y, si el modo no es
@@ -912,7 +929,18 @@ namespace Custom.UI
                 ConsumeAbility(_slotAbility1);
         }
 
-        private void OnAbility2Clicked() { TryUnlockOrUseAbility(_slotAbility2, 200); }
+        // Ranura 2: desbloquea el tablero para poder reordenar torres aunque
+        // haya una oleada en curso, por temporaryUnlockDuration segundos.
+        private void OnAbility2Clicked()
+        {
+            if (!TryUnlockOrUseAbility(_slotAbility2, 200))
+                return;
+
+            if (boardManager != null)
+                boardManager.UnlockTemporarily();
+            else
+                Debug.LogWarning("GameHUD: falta BoardManager en la escena, la ranura 2 no puede desbloquear el tablero.", this);
+        }
         private void OnAbility3Clicked() { TryUnlockOrUseAbility(_slotAbility3, 300); }
         private void OnAbility4Clicked() { TryUnlockOrUseAbility(_slotAbility4, 400); }
 
@@ -964,14 +992,14 @@ namespace Custom.UI
         private void OnQuitMenuClicked()
         {
             PlayClickSound();
-            Time.timeScale = 1f;
+            GameSpeedController.SetSpeed(GameSpeedController.DefaultSpeed); // el menu siempre arranca a velocidad normal
             SceneManager.LoadScene("Main Menu");
         }
 
         private void OnNextLevelClicked()
         {
             PlayClickSound();
-            Time.timeScale = 1f;
+            GameSpeedController.SetSpeed(GameSpeedController.DefaultSpeed);
             Debug.Log("Cargando el siguiente nivel...");
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
@@ -979,7 +1007,7 @@ namespace Custom.UI
         private void OnRetryClicked()
         {
             PlayClickSound();
-            Time.timeScale = 1f;
+            GameSpeedController.SetSpeed(GameSpeedController.DefaultSpeed);
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 

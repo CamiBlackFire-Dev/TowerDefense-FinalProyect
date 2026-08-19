@@ -132,6 +132,69 @@ public class BoardManagerTests
         Assert.AreEqual(2, board.Grid.GetLevel(0, 0));
     }
 
+    // Sin oleada en curso el tablero no esta bloqueado.
+    [Test]
+    public void IsLocked_SinOleada_NoEstaBloqueado()
+    {
+        BoardManager board = CrearBoard();
+        board.spawner = _boardObject.AddComponent<EnemySpawner>();
+
+        Assert.IsFalse(board.IsLocked);
+    }
+
+    // Con una oleada en curso el tablero esta bloqueado.
+    [Test]
+    public void IsLocked_ConOleadaEnCurso_EstaBloqueado()
+    {
+        BoardManager board = CrearBoard();
+        EnemySpawner spawner = _boardObject.AddComponent<EnemySpawner>();
+        SetPrivateField(spawner, "_running", true);
+        board.spawner = spawner;
+
+        Assert.IsTrue(board.IsLocked);
+    }
+
+    // El powerup de desbloqueo temporal deja mover el tablero aunque la
+    // oleada siga en curso.
+    [Test]
+    public void UnlockTemporarily_ConOleadaEnCurso_SiMueveLasTorres()
+    {
+        BoardManager board = CrearBoard();
+        board.PlaceTower(0, 0, 1);
+        board.PlaceTower(1, 0, 1);
+
+        EnemySpawner spawner = _boardObject.AddComponent<EnemySpawner>();
+        SetPrivateField(spawner, "_running", true);
+        board.spawner = spawner;
+
+        board.UnlockTemporarily();
+        MoveResult result = board.Move(GridDirection.Left);
+
+        Assert.IsFalse(board.IsLocked);
+        Assert.IsTrue(result.Changed);
+        Assert.AreEqual(2, board.Grid.GetLevel(0, 0));
+    }
+
+    // LockStateChanged avisa cuando el tablero pasa a bloqueado (lo dispara
+    // Update en el juego real; aca se llama al metodo privado directo,
+    // igual que el resto de pruebas de editor no esperan a Update).
+    [Test]
+    public void LockStateChanged_AvisaAlBloquearse()
+    {
+        BoardManager board = CrearBoard();
+        EnemySpawner spawner = _boardObject.AddComponent<EnemySpawner>();
+        SetPrivateField(spawner, "_running", true);
+        board.spawner = spawner;
+
+        bool? avisado = null;
+        board.LockStateChanged += locked => avisado = locked;
+
+        InvokePrivateMethod(board, "NotifyLockStateIfChanged");
+
+        Assert.IsTrue(avisado.HasValue);
+        Assert.IsTrue(avisado.Value);
+    }
+
     // En modo Anchored el ancho y el alto salen de agrupar los marcadores
     // por X y por Z, sin importar en que orden se hayan asignado.
     [Test]
@@ -368,6 +431,59 @@ public class BoardManagerTests
         Assert.IsNull(torre.GetComponent<TowerAttack>());
     }
 
+    // Toda torre tiene vida, incluso con el ataque apagado: es un dato
+    // propio de la torre, no depende de si dispara sola.
+    [Test]
+    public void PlaceTower_LaTorreQuedaConVida()
+    {
+        BoardManager board = CrearBoard();
+        board.towersAttack = false;
+
+        board.PlaceTower(0, 0, 1);
+
+        Tower torre;
+        Assert.IsTrue(board.TryGetTower(0, 0, out torre));
+        TowerHealth vida = torre.GetComponent<TowerHealth>();
+        Assert.IsNotNull(vida);
+        Assert.IsTrue(vida.IsAlive);
+    }
+
+    // Al quedarse sin vida, una torre de nivel 2 baja a nivel 1 con la vida
+    // llena en vez de desaparecer de una.
+    [Test]
+    public void TowerHealth_AlAgotarse_BajaUnNivel()
+    {
+        BoardManager board = CrearBoard();
+        board.PlaceTower(1, 1, 2);
+        Tower torre;
+        board.TryGetTower(1, 1, out torre);
+        TowerHealth vida = torre.GetComponent<TowerHealth>();
+
+        vida.TakeDamage(9999f);
+
+        Assert.AreEqual(1, board.Grid.GetLevel(1, 1));
+        Assert.IsTrue(board.TryGetTower(1, 1, out torre));
+        Assert.AreEqual(1, torre.Level);
+        Assert.IsTrue(torre.GetComponent<TowerHealth>().IsAlive);
+    }
+
+    // Una torre de nivel 1 que se queda sin vida si desaparece del todo:
+    // ya no hay a donde bajar, la casilla queda vacia.
+    [Test]
+    public void TowerHealth_AlAgotarse_EnNivel1_QuitaLaTorre()
+    {
+        BoardManager board = CrearBoard();
+        board.PlaceTower(2, 2, 1);
+        Tower torre;
+        board.TryGetTower(2, 2, out torre);
+        TowerHealth vida = torre.GetComponent<TowerHealth>();
+
+        vida.TakeDamage(9999f);
+
+        Assert.AreEqual(0, board.Grid.GetLevel(2, 2));
+        Assert.IsFalse(board.TryGetTower(2, 2, out torre));
+    }
+
     // Renderer de una casilla concreta del tablero.
     private Renderer CasillaRenderer(BoardManager board, int x, int y)
     {
@@ -397,6 +513,15 @@ public class BoardManagerTests
         System.Reflection.FieldInfo field = target.GetType().GetField(fieldName,
             System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         field.SetValue(target, value);
+    }
+
+    // Llama un metodo privado desde la prueba (por ejemplo el que normalmente
+    // dispara Update, para no depender de que Update corra en modo editor).
+    private static void InvokePrivateMethod(object target, string methodName)
+    {
+        System.Reflection.MethodInfo method = target.GetType().GetMethod(methodName,
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        method.Invoke(target, null);
     }
 
     // Crea un BoardManager de prueba con un tablero vacio.

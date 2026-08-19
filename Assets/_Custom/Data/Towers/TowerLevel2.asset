@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: TowerLevel2
   m_EditorClassIdentifier: Assembly-CSharp::TowerDefense.TowerData
   level: 2
-  damage: 12
+  damage: 7
   range: 5
   attackRate: 1.2
+  maxHealth: 35
   visualPrefab: {fileID: 0}

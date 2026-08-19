@@ -473,6 +473,7 @@ MonoBehaviour:
   menuMusic: {fileID: 8300000, guid: 7e7560864d51a724eac5dce3ba95b643, type: 3}
   hoverSound: {fileID: 8300000, guid: 21b8e6442491e294bbf7e06a0cc5c99e, type: 3}
   clickSound: {fileID: 8300000, guid: 323630857d9b9314ca940e1ee46dcff0, type: 3}
+  gameFlow: {fileID: 11400000, guid: e5c8d12d4aa65284e83777bce081ca71, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -29,7 +29,9 @@ public static class EnemyAnimatorBuilder
     // avatar y sus animaciones no sirven para retargeting humanoide).
     private const string ReferenceAvatarModel = "Skeleton_Warrior";
 
-    [MenuItem("Tower Defense/Crear animator de enemigos")]
+    // Sin boton de menu por ahora (se quito a pedido). Se puede volver a
+    // exponer agregando [MenuItem("Tower Defense/Crear animator de enemigos")]
+    // aca arriba cuando haga falta.
     public static void CreateFromMenu()
     {
         AnimatorController controller = EnsureController();

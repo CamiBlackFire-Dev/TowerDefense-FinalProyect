@@ -11,7 +11,9 @@ public static class EnemyPrefabBuilder
     private const string ModelsFolder = "Assets/_Custom/Models/Enemies";
     private const string PrefabsFolder = "Assets/_Custom/Prefabs/Enemies";
 
-    [MenuItem("Tower Defense/Crear prefabs de enemigos")]
+    // Sin boton de menu por ahora (se quito a pedido). Se puede volver a
+    // exponer agregando [MenuItem("Tower Defense/Crear prefabs de enemigos")]
+    // aca arriba cuando haga falta.
     public static void CreateEnemyPrefabs()
     {
         List<GameObject> models = FindEnemyModels();

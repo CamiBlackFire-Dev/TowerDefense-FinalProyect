@@ -10,5 +10,6 @@ public class TowerData : ScriptableObject
     public float damage = 5f;        // dano por disparo
     public float range = 4f;         // alcance del ataque
     public float attackRate = 1f;    // disparos por segundo
+    public float maxHealth = 20f;    // vida de la torre en este nivel
     public GameObject visualPrefab;  // prefab opcional para este nivel
 }

@@ -1820,6 +1820,96 @@ Transform:
   m_Children: []
   m_Father: {fileID: 866335610}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &648019909
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 648019910}
+  - component: {fileID: 648019912}
+  - component: {fileID: 648019911}
+  m_Layer: 0
+  m_Name: Visual
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &648019910
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 648019909}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.75, y: 0.75, z: 0.75}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1881548516}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &648019911
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 648019909}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: -6538903991835684241, guid: 9141abd5ee121914a9fc68effe93013a, type: 3}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &648019912
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 648019909}
+  m_Mesh: {fileID: 583054924686340119, guid: 9141abd5ee121914a9fc68effe93013a, type: 3}
 --- !u!1001 &664962655
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1966,6 +2056,7 @@ GameObject:
   m_Component:
   - component: {fileID: 751125478}
   - component: {fileID: 751125479}
+  - component: {fileID: 751125480}
   m_Layer: 0
   m_Name: Tablero
   m_TagString: Untagged
@@ -2015,7 +2106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoardManager
   mode: 1
-  initialBoard: 
+  initialBoard: 0,0,0,0|0,0,0,0|1,0,0,0
   boardWidth: 4
   boardHeight: 3
   anchoredCells:
@@ -2093,6 +2184,23 @@ MonoBehaviour:
   maxBufferedMoves: 8
   inputController: {fileID: 1260824858}
   spawner: {fileID: 0}
+  temporaryUnlockDuration: 30
+--- !u!114 &751125480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 751125477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3cc747047ab5a745adc88f904ceda2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BoardLockFeedback
+  board: {fileID: 751125479}
+  lockedColor: {r: 1, g: 0.35, b: 0.1, a: 1}
+  transitionDuration: 0.4
+  punchScale: 0.03
 --- !u!1 &792201490
 GameObject:
   m_ObjectHideFlags: 0
@@ -3836,7 +3944,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1881548516}
   m_Father: {fileID: 751125478}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1390381020
@@ -4094,6 +4203,7 @@ MonoBehaviour:
   playerBase: {fileID: 0}
   towerShop: {fileID: 0}
   bombAbility: {fileID: 151880561}
+  boardManager: {fileID: 0}
   ability1Cooldown:
     cooldownSeconds: 6
     usageLimitMode: 0
@@ -4885,6 +4995,168 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7936834669806457470, guid: 4adae8232505e0e45b64cc3b61e9d9e1, type: 3}
   m_PrefabInstance: {fileID: 1879408719}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1881548515
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1881548516}
+  - component: {fileID: 1881548520}
+  - component: {fileID: 1881548519}
+  - component: {fileID: 1881548518}
+  - component: {fileID: 1881548517}
+  - component: {fileID: 1881548521}
+  m_Layer: 0
+  m_Name: Tower 0,2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1881548516
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881548515}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -7.5320373, y: 0, z: 5.54}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 648019910}
+  m_Father: {fileID: 1323661495}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1881548517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881548515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1b27d61d6642a34d893781af9863e0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerAttack
+  catalog: {fileID: 11400000, guid: 5803adb5b45d66147a2358fe6eb528c3, type: 2}
+  damage: 5
+  range: 5
+  attackRate: 1
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  projectilePrefab: {fileID: 4570541557667802443, guid: fd26bfe326f4783428bcf130c003beab, type: 3}
+  projectileSpeed: 10
+  muzzleHeight: 1.2
+  impactEffect: {fileID: 0}
+  popupPrefab: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
+--- !u!114 &1881548518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881548515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0274347599f27b4082b12bf51d5cfd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerTargetDetector
+  detectionRange: 5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 8
+--- !u!114 &1881548519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881548515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4f35ca113e6c7a408ed49e0567c3c9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerVisual
+  visualRoot: {fileID: 648019910}
+  modelPrefab: {fileID: 7934571930885516776, guid: a990ee188f097314fa7eace0645e766d, type: 3}
+  baseOffsetY: 0
+  baseScale: 0.75
+  scalePerLevel: 0.25
+  modelBaseScale: {x: 1, y: 1, z: 1}
+  spawnDuration: 0.18
+  spawnStartScale: 0.1
+  spawnCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.6
+      value: 1.15
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  mergePulsePerLevel:
+  - 0.1
+  - 0.16
+  - 0.24
+  - 0.32
+--- !u!114 &1881548520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881548515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 736d807956dc74945902b104d185c7f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tower
+  level: 1
+--- !u!114 &1881548521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1881548515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e706ae7d19694ba4486c612a18aa5237, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerHealth
+  catalog: {fileID: 11400000, guid: 5803adb5b45d66147a2358fe6eb528c3, type: 2}
+  maxHealth: 20
 --- !u!1001 &1922246321
 PrefabInstance:
   m_ObjectHideFlags: 0

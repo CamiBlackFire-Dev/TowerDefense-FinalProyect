@@ -109,26 +109,23 @@ public class EnemyHealthBar : MonoBehaviour
         return quad.transform;
     }
 
+    // Los materiales salen de Resources (no de Shader.Find + new Material):
+    // un material creado en tiempo de ejecucion sin que ningun asset lo
+    // referencie no sobrevive el recorte de shaders de un build (pasaba en
+    // WebGL: se veian bien en el editor y desaparecian en el build). Todo
+    // lo que este dentro de una carpeta Resources se empaqueta siempre,
+    // shaders incluidos.
     private static Material GetBackgroundMaterial()
     {
         if (_backgroundMaterial == null)
-            _backgroundMaterial = CreateBarMaterial(new Color(0.08f, 0.08f, 0.1f, 0.85f));
+            _backgroundMaterial = Resources.Load<Material>("HealthBarBackground");
         return _backgroundMaterial;
     }
 
     private static Material GetFillMaterial()
     {
         if (_fillMaterial == null)
-            _fillMaterial = CreateBarMaterial(Color.white);
+            _fillMaterial = Resources.Load<Material>("HealthBarFill");
         return _fillMaterial;
-    }
-
-    // Material sin luces para que la barra se vea siempre bien.
-    private static Material CreateBarMaterial(Color color)
-    {
-        Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
-        Material material = new Material(shader != null ? shader : Shader.Find("Unlit/Color"));
-        material.color = color;
-        return material;
     }
 }
