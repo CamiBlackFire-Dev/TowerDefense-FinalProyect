@@ -98,12 +98,12 @@ public class DroneAbilityController : MonoBehaviour
 
                 break;
 
-            case Ability.EMP:
+            /*case Ability.EMP:
 
                 if (empAbility != null)
                     empAbility.ActivateEMP();
 
-                break;
+                break;*/
 
             case Ability.Repair:
 
@@ -112,12 +112,12 @@ public class DroneAbilityController : MonoBehaviour
 
                 break;
 
-            case Ability.Repulsion:
+            /*case Ability.Repulsion:
 
                 if (repulsionAbility != null)
                     repulsionAbility.ActivateRepulsion();
 
-                break;
+                break;*/
         }
     }
 
@@ -138,13 +138,13 @@ public class DroneAbilityController : MonoBehaviour
         if (bombAbility != null)
             bombAbility.SetGizmoVisible(currentAbility == Ability.Bomb);
 
-        if (empAbility != null)
-            empAbility.SetGizmoVisible(currentAbility == Ability.EMP);
+        /*if (empAbility != null)
+            empAbility.SetGizmoVisible(currentAbility == Ability.EMP);*/
 
         if (repairAbility != null)
             repairAbility.SetGizmoVisible(currentAbility == Ability.Repair);
 
-        if (repulsionAbility != null)
-            repulsionAbility.SetGizmoVisible(currentAbility == Ability.Repulsion);
+        /*if (repulsionAbility != null)
+            repulsionAbility.SetGizmoVisible(currentAbility == Ability.Repulsion);*/
     }
 }

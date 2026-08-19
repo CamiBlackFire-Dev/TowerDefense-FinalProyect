@@ -46,15 +46,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 38ab3cdc3b49a6e428853efe80194005, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   permanent: 0
   lifetime: 2
   unscaledTime: 0
   enable3DGame: 1
   faceCameraView: 1
   lookAtCamera: 0
-  renderThroughWalls: 1
+  renderThroughWalls: 0
   consistentScreenSize: 1
   distanceScalingSettings:
     baseDistance: 15
@@ -101,7 +101,7 @@ MonoBehaviour:
     suffixDecimalChar: .
     suffixHideZeros: 0
   enableLeftText: 0
-  leftText:
+  leftText: 
   leftTextSettings:
     bold: 0
     italic: 0
@@ -133,7 +133,7 @@ MonoBehaviour:
     characterSpacing: 0
     size: -1.4
   enableTopText: 0
-  topText:
+  topText: 
   topTextSettings:
     bold: 0
     italic: 0
@@ -149,7 +149,7 @@ MonoBehaviour:
     characterSpacing: 0
     size: 0
   enableBottomText: 0
-  bottomText:
+  bottomText: 
   bottomTextSettings:
     bold: 0
     italic: 0
@@ -460,7 +460,7 @@ MonoBehaviour:
   disableOnSceneLoad: 1
   limitActiveInstances: 0
   maxActiveInstances: 50
-  editorLastFont: Gold
+  editorLastFont: Gold3D
   position: {x: 0, y: 0, z: 0}
 --- !u!210 &7734501004
 SortingGroup:
@@ -508,6 +508,14 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7734501002}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &7734501013
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7734501005}
+  m_Mesh: {fileID: 0}
 --- !u!23 &7734501012
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -557,14 +565,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &7734501013
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7734501005}
-  m_Mesh: {fileID: 0}
 --- !u!1 &7734501006
 GameObject:
   m_ObjectHideFlags: 0
@@ -661,8 +661,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
