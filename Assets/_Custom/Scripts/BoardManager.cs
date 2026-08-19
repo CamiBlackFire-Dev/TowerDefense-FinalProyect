@@ -59,6 +59,9 @@ public class BoardManager : MonoBehaviour
 
     [Header("Combate")]
     public bool towersAttack = true;    // las torres disparan solas a los enemigos
+    // Tamano del collider que hace visible a la torre para los enemigos
+    // que disparan. Solo sirve para que la detecten, no bloquea nada.
+    public float towerTargetRadius = 0.5f;
     public TowerCatalog towerCatalog;   // dano, alcance y cadencia de cada nivel
     public GameObject projectilePrefab; // bala visible de las torres (bola de canon)
     public DamageNumber damagePopup;    // numero de dano al pegar (Damage Numbers Pro)
@@ -491,6 +494,27 @@ public class BoardManager : MonoBehaviour
         health.Depleted += HandleTowerDepleted;
     }
 
+    // Deja la torre en la capa "Tower" y con un collider, que es como la
+    // encuentran los enemigos que disparan (EnemyTargetDetector usa un
+    // OverlapSphere sobre esa capa). Sin esto las torres son invisibles
+    // para ellos: el modelo por si solo no trae collider.
+    // El collider es solo para que la detecten; nada empuja a la torre,
+    // asi que no hace falta Rigidbody.
+    private void ApplyTowerTargetable(Tower tower)
+    {
+        int towerLayer = LayerMask.NameToLayer("Tower");
+        if (towerLayer >= 0)
+            tower.gameObject.layer = towerLayer;
+
+        SphereCollider collider = tower.GetComponent<SphereCollider>();
+        if (collider == null)
+            collider = tower.gameObject.AddComponent<SphereCollider>();
+
+        collider.isTrigger = true;
+        collider.radius = towerTargetRadius;
+        collider.center = new Vector3(0f, towerTargetRadius, 0f);
+    }
+
     // La vida de una torre llego a 0: si tiene mas de un nivel, baja uno y
     // recupera la vida llena de ese nivel; si ya estaba en el nivel 1, la
     // casilla queda vacia como si nunca hubiera habido una torre ahi.
@@ -817,6 +841,7 @@ public class BoardManager : MonoBehaviour
                 ApplyTowerColors(tower);
                 ApplyTowerAttack(tower);
                 ApplyTowerHealth(tower);
+                ApplyTowerTargetable(tower);
                 tower.SetLevel(level);
                 tower.PositionOnCell(TowerPosition(x, y));
                 return;
@@ -851,6 +876,7 @@ public class BoardManager : MonoBehaviour
         ApplyTowerColors(towerScript);
         ApplyTowerAttack(towerScript);
         ApplyTowerHealth(towerScript);
+        ApplyTowerTargetable(towerScript);
         towerScript.SetLevel(level);
         towerScript.PositionOnCell(TowerPosition(x, y));
 

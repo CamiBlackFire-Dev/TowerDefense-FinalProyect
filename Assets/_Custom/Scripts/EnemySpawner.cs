@@ -31,6 +31,22 @@ public class EnemySpawner : MonoBehaviour
     public float enemyHealth = 20f;
     public int enemyReward = 10;
 
+    [Header("Enemigos que disparan")]
+    // Que parte de los enemigos sale armada: 0 = ninguno, 1 = todos.
+    // Los que disparan NO se detienen, siguen caminando hacia el castillo
+    // y van tirandole a las torres que les quedan a tiro.
+    [Range(0f, 1f)] public float shooterChance = 0.35f;
+    // Alcance del enemigo, en las mismas unidades que el de las torres
+    // (las torres van de 4 a 7 segun el nivel).
+    public float shooterRange = 5f;
+    public float shooterDamage = 4f;
+    public float shooterAttackRate = 0.5f;  // disparos por segundo
+    // Bala visible. Sin prefab el dano es instantaneo.
+    public GameObject shooterProjectilePrefab;
+    public float shooterProjectileSpeed = 8f;
+    public DamageNumber shooterPopupPrefab;  // numero de dano sobre la torre
+    public GameObject shooterImpactEffect;
+
     private float _timer;
     private int _spawned;
     private int _aliveCount;
@@ -222,7 +238,53 @@ public class EnemySpawner : MonoBehaviour
         health.Setup(enemyHealth, enemyReward, economy, goldPopupPrefab);
         health.Died += HandleEnemyDied;
 
+        ConfigureShooter(enemy);
+
         return enemy;
+    }
+
+    // Decide si este enemigo sale armado y, si le toca, le deja listo el
+    // ataque a torres. El movimiento no se toca: los que disparan siguen
+    // avanzando igual, solo que van tirandole a lo que tengan a tiro.
+    private void ConfigureShooter(GameObject enemy)
+    {
+        EnemyAttack attack = enemy.GetComponent<EnemyAttack>();
+        EnemyTargetDetector detector = enemy.GetComponent<EnemyTargetDetector>();
+
+        // A este no le toco disparar. Algunos prefabs ya traen el ataque
+        // puesto, asi que se apaga en vez de borrarlo (EnemyAttack pide un
+        // EnemyTargetDetector, y quitarlos en el orden equivocado da error).
+        if (UnityEngine.Random.value >= shooterChance)
+        {
+            if (attack != null)
+                attack.enabled = false;
+            if (detector != null)
+                detector.enabled = false;
+            return;
+        }
+
+        // Al agregar EnemyAttack, Unity trae solo el EnemyTargetDetector
+        // que pide con RequireComponent.
+        if (attack == null)
+            attack = enemy.AddComponent<EnemyAttack>();
+        attack.enabled = true;
+
+        if (detector == null)
+            detector = enemy.GetComponent<EnemyTargetDetector>();
+
+        if (detector != null)
+        {
+            detector.enabled = true;
+            detector.SetDetectionRange(shooterRange);
+
+            int towerLayer = LayerMask.NameToLayer("Tower");
+            if (towerLayer >= 0)
+                detector.SetTowerLayer(1 << towerLayer);
+        }
+
+        attack.Setup(shooterDamage, shooterAttackRate,
+            shooterProjectilePrefab, shooterProjectileSpeed,
+            shooterPopupPrefab, shooterImpactEffect);
     }
 
     // Cuando un enemigo llega al final le quita vidas al jugador y desaparece.

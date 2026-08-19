@@ -15,6 +15,9 @@ public class TowerHealth : MonoBehaviour
     [Header("Valores por defecto")]
     public float maxHealth = 20f;
 
+    [Header("Barra de vida")]
+    public bool showHealthBar = true;    // barra flotante sobre la torre
+
     private Tower _tower;
     private float _currentHealth;
     private bool _ready;
@@ -42,6 +45,19 @@ public class TowerHealth : MonoBehaviour
     private void OnEnable()
     {
         EnsureReady();
+        EnsureHealthBar();
+    }
+
+    // La barra es un componente aparte que solo se crea en Play Mode: fuera
+    // de el BoardManager arma y rehace torres todo el tiempo (ExecuteAlways)
+    // y no tiene sentido llenarlas de barras en el editor.
+    private void EnsureHealthBar()
+    {
+        if (!showHealthBar || !Application.isPlaying)
+            return;
+
+        if (GetComponent<TowerHealthBar>() == null)
+            gameObject.AddComponent<TowerHealthBar>();
     }
 
     private void Update()

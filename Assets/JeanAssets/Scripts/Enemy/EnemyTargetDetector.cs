@@ -50,14 +50,10 @@ public class EnemyTargetDetector : MonoBehaviour
         }
 
         currentTarget = closestTower;
-
-        if (currentTarget != null)
-        {
-            Debug.Log(
-                $"{gameObject.name} detectó: {currentTarget.name}"
-            );
-        }
     }
+
+    // Alcance actual, para poder dibujarlo o mostrarlo desde fuera.
+    public float DetectionRange => detectionRange;
 
     private void OnDrawGizmosSelected()
     {
