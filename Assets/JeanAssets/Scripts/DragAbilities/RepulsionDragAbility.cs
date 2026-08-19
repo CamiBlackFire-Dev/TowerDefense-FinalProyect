@@ -12,11 +12,11 @@ public class RepulsionDragAbility : MonoBehaviour, IDragAbility
 
     [Header("Visual Effect")]
     [SerializeField] private GameObject effectPrefab;
+    [SerializeField] private float effectDuration = 3f;
 
     [Header("Throw")]
     [SerializeField] private float throwHeight = 2f;
     [SerializeField] private float fallDuration = 0.5f;
-    [SerializeField] private float effectDuration = 3f;
 
     [Header("Map")]
     [SerializeField] private LayerMask mapLayer;
@@ -56,9 +56,11 @@ public class RepulsionDragAbility : MonoBehaviour, IDragAbility
         }
 
         isDragging = true;
+
         hasValidTarget = false;
 
         repulsion.SetActive(true);
+
         indicator.SetActive(false);
 
         blinkTimer = 0f;
@@ -71,31 +73,22 @@ public class RepulsionDragAbility : MonoBehaviour, IDragAbility
 
         Ray ray = mainCamera.ScreenPointToRay(screenPosition);
 
-        if (Physics.Raycast(
-            ray,
-            out RaycastHit hit,
-            raycastDistance,
-            mapLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, raycastDistance, mapLayer))
         {
             hasValidTarget = true;
 
             targetPosition = hit.point;
 
-            // La esfera sigue al dedo
-            repulsion.transform.position =
-                targetPosition + Vector3.up * throwHeight;
+            repulsion.transform.position = targetPosition + Vector3.up * throwHeight;
 
-            // Mostrar indicador
             indicator.SetActive(true);
 
-            indicator.transform.position =
-                targetPosition + Vector3.up * indicatorHeight;
+            indicator.transform.position = targetPosition + Vector3.up * indicatorHeight;
 
             UpdateIndicatorBlink();
         }
         else
         {
-            // Fuera del mapa
             hasValidTarget = false;
 
             indicator.SetActive(false);
@@ -111,7 +104,6 @@ public class RepulsionDragAbility : MonoBehaviour, IDragAbility
 
         indicator.SetActive(false);
 
-        // Soltó fuera del mapa
         if (!hasValidTarget)
         {
             repulsion.SetActive(false);
@@ -127,6 +119,7 @@ public class RepulsionDragAbility : MonoBehaviour, IDragAbility
     public void CancelDrag()
     {
         isDragging = false;
+
         hasValidTarget = false;
 
         if (repulsion != null)
@@ -146,41 +139,27 @@ public class RepulsionDragAbility : MonoBehaviour, IDragAbility
         {
             timer += Time.deltaTime;
 
-            float progress =
-                Mathf.Clamp01(timer / fallDuration);
+            float progress = Mathf.Clamp01(timer / fallDuration);
 
-            repulsion.transform.position =
-                Vector3.Lerp(
-                    startPosition,
-                    targetPosition,
-                    progress
-                );
+            repulsion.transform.position = Vector3.Lerp(startPosition, targetPosition, progress);
 
             yield return null;
         }
 
-        // La bola llegó al suelo
         repulsion.transform.position = targetPosition;
 
-        // Activar la repulsión
         if (repulsionAbility != null)
         {
             repulsionAbility.ActivateRepulsion(targetPosition);
         }
 
-        // Mostrar efecto visual
         if (effectPrefab != null)
         {
-            GameObject effect = Instantiate(
-                effectPrefab,
-                targetPosition,
-                Quaternion.identity
-            );
+            GameObject effect = Instantiate(effectPrefab, targetPosition, Quaternion.identity);
 
             Destroy(effect, effectDuration);
         }
 
-        // Ocultar la bola
         repulsion.SetActive(false);
     }
 
@@ -192,32 +171,23 @@ public class RepulsionDragAbility : MonoBehaviour, IDragAbility
         {
             blinkTimer = 0f;
 
-            indicatorRenderer.enabled =
-                !indicatorRenderer.enabled;
+            indicatorRenderer.enabled = !indicatorRenderer.enabled;
         }
     }
 
     private void CreateIndicator()
     {
-        indicator =
-            GameObject.CreatePrimitive(
-                PrimitiveType.Quad
-            );
+        indicator = GameObject.CreatePrimitive(PrimitiveType.Quad);
 
         indicator.name = "Repulsion Indicator";
 
-        Destroy(
-            indicator.GetComponent<Collider>()
-        );
+        Destroy(indicator.GetComponent<Collider>());
 
-        indicator.transform.rotation =
-            Quaternion.Euler(90f, 0f, 0f);
+        indicator.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
 
-        indicator.transform.localScale =
-            Vector3.one * indicatorSize;
+        indicator.transform.localScale = Vector3.one * indicatorSize;
 
-        indicatorRenderer =
-            indicator.GetComponent<Renderer>();
+        indicatorRenderer = indicator.GetComponent<Renderer>();
 
         if (indicatorMaterial != null)
         {

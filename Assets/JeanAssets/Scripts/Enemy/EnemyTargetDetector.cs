@@ -26,25 +26,20 @@ public class EnemyTargetDetector : MonoBehaviour
 
     private void FindClosestTower()
     {
-        Collider[] towers = Physics.OverlapSphere(
-            transform.position,
-            detectionRange,
-            towerLayer
-        );
+        Collider[] towers = Physics.OverlapSphere(transform.position, detectionRange, towerLayer);
 
         Transform closestTower = null;
+
         float closestDistance = Mathf.Infinity;
 
         foreach (Collider tower in towers)
         {
-            float distance = Vector3.Distance(
-                transform.position,
-                tower.transform.position
-            );
+            float distance = Vector3.Distance(transform.position, tower.transform.position);
 
             if (distance < closestDistance)
             {
                 closestDistance = distance;
+
                 closestTower = tower.transform;
             }
         }
