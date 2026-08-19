@@ -595,6 +595,83 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8582451509887590953, guid: f8c0297a8d99e2747baeb5697c8ecb66, type: 3}
   m_PrefabInstance: {fileID: 101263683}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &124821607
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 124821608}
+  - component: {fileID: 124821610}
+  - component: {fileID: 124821609}
+  m_Layer: 0
+  m_Name: RepulsionDragAbility
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &124821608
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124821607}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1425753322}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &124821609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124821607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e64881d337164941870703cce48adbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RepulsionDragAbility
+  repulsionAbility: {fileID: 124821610}
+  repulsionPrefab: {fileID: 2039108583650060249, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+  effectPrefab: {fileID: 6476705285018846829, guid: 5d476669689df3d4aa4dfe91a12ea8ad, type: 3}
+  throwHeight: 2
+  fallDuration: 0.4
+  effectDuration: 2.5
+  mapLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  raycastDistance: 200
+  indicatorMaterial: {fileID: 2100000, guid: 1d9b2734b7f6cba4da37386142b0ffae, type: 2}
+  indicatorSize: 3
+  indicatorHeight: 0.05
+  blinkSpeed: 0.15
+--- !u!114 &124821610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124821607}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca650313c3d31254cad02a6e163e756e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RepulsionAbility
+  repulsionRadius: 6
+  repulsionDuration: 2.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  path: {fileID: 56868380}
 --- !u!1 &151880560
 GameObject:
   m_ObjectHideFlags: 0
@@ -1342,6 +1419,59 @@ MonoBehaviour:
   enemiesPerWave: 8
   enemyHealth: 20
   enemyReward: 10
+--- !u!1 &464760619
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 464760621}
+  - component: {fileID: 464760620}
+  m_Layer: 8
+  m_Name: AbilityGround
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &464760620
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464760619}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 120, y: 0.1, z: 120}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!4 &464760621
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464760619}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.42, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &466526416
 GameObject:
   m_ObjectHideFlags: 0
@@ -2477,6 +2607,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9f3d075a89c70b343864d41e3929a3b5, type: 3}
   m_PrefabInstance: {fileID: 834299928}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &859066078
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 859066079}
+  - component: {fileID: 859066080}
+  m_Layer: 0
+  m_Name: RepairDragAbility
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &859066079
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 859066078}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1425753322}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &859066080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 859066078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9eaafdbd04651b40bda6ea558a2aad5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RepairDragAbility
+  barrelPrefab: {fileID: 8434672052455401329, guid: 1b8b83ebd4dcb924b906b28d3e156c9d, type: 3}
+  repairEffectPrefab: {fileID: 8434672052455401329, guid: 1b8b83ebd4dcb924b906b28d3e156c9d, type: 3}
+  repairDuration: 0.8
+  repairAmount: 25
+  repairRadius: 20
+  boardLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  raycastDistance: 200
+  indicatorMaterial: {fileID: 2100000, guid: 69ab6c5da6c7b354d87d572836172e37, type: 2}
+  indicatorSize: 3
+  indicatorHeight: 0.05
+  blinkSpeed: 0.15
 --- !u!1 &866335609
 GameObject:
   m_ObjectHideFlags: 0
@@ -3778,6 +3965,7 @@ MonoBehaviour:
   board: {fileID: 751125479}
   economy: {fileID: 1085780038}
   inputController: {fileID: 1260824858}
+  spawner: {fileID: 0}
   towerCost: 50
 --- !u!1 &1316596472
 GameObject:
@@ -4166,6 +4354,9 @@ Transform:
   - {fileID: 448451413}
   - {fileID: 1297266486}
   - {fileID: 151880562}
+  - {fileID: 1501991831}
+  - {fileID: 124821608}
+  - {fileID: 859066079}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1472961074
@@ -4203,6 +4394,9 @@ MonoBehaviour:
   playerBase: {fileID: 0}
   towerShop: {fileID: 0}
   bombAbility: {fileID: 151880561}
+  empAbility: {fileID: 0}
+  repulsionAbility: {fileID: 0}
+  repairAbility: {fileID: 0}
   boardManager: {fileID: 0}
   ability1Cooldown:
     cooldownSeconds: 6
@@ -4220,6 +4414,10 @@ MonoBehaviour:
     cooldownSeconds: 5
     usageLimitMode: 0
     maxUses: 3
+  ability5Cooldown:
+    cooldownSeconds: 30
+    usageLimitMode: 2
+    maxUses: 1
   cooldownWipeColor: {r: 0, g: 0, b: 0, a: 0.65}
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
@@ -4411,6 +4609,82 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 9f3d075a89c70b343864d41e3929a3b5, type: 3}
   m_PrefabInstance: {fileID: 1490674588}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1501991830
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1501991831}
+  - component: {fileID: 1501991833}
+  - component: {fileID: 1501991832}
+  m_Layer: 0
+  m_Name: EMPDragAbility
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1501991831
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501991830}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1425753322}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1501991832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501991830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b522f79d70f29fc4da0da6afd96ed9da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EMPDragAbility
+  empAbility: {fileID: 1501991833}
+  empPrefab: {fileID: 8338003122885483358, guid: d0930d4981e25967cb201973e823b685, type: 3}
+  impactEffect: {fileID: 7042460137364555477, guid: ecabc7a4007a8ad43be3e17217dd9057, type: 3}
+  throwHeight: 2
+  fallDuration: 0.3
+  mapLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  raycastDistance: 200
+  indicatorMaterial: {fileID: 2100000, guid: 7f9d9a06ef7a61e4eafc237ac13b8038, type: 2}
+  indicatorSize: 3
+  indicatorHeight: 0.05
+  blinkSpeed: 0.3
+--- !u!114 &1501991833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501991830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25afcd6902cc6934bba43acf1671fdf5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EMPAbility
+  empRadius: 8
+  slowDuration: 4
+  slowMultiplier: 0.35
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!1 &1565455041
 GameObject:
   m_ObjectHideFlags: 0
@@ -12999,3 +13273,4 @@ SceneRoots:
   - {fileID: 1425753322}
   - {fileID: 1472961077}
   - {fileID: 56868382}
+  - {fileID: 464760621}

@@ -72,6 +72,22 @@ public class TowerHealth : MonoBehaviour
             Depleted(this);
     }
 
+    // Le devuelve vida a la torre (la usa el powerup de reparacion). No pasa
+    // de maxHealth ni revive una torre que ya se destruyo del todo: hasta
+    // ese momento la torre sigue viva, asi que reparar antes de que llegue
+    // a 0 siempre sirve.
+    public void Repair(float amount)
+    {
+        EnsureReady();
+        if (amount <= 0f)
+            return;
+
+        _currentHealth = Mathf.Min(maxHealth, _currentHealth + amount);
+
+        if (HealthChanged != null)
+            HealthChanged(_currentHealth);
+    }
+
     // Copia la vida maxima que le toca al nivel actual y llena la vida.
     // Al igual que TowerAttack.RefreshStats, no hace nada si el nivel no
     // cambio desde la ultima vez (asi no se rellena la vida en cada frame).

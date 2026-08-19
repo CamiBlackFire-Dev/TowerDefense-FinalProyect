@@ -8,7 +8,7 @@ using UnityEngine;
 // termina el arrastre, y le pasa la posicion del puntero en pantalla.
 // (Nombre distinto de BombAbility a proposito: esa ya existe en
 // Assets/JeanAssets/Scripts/Drone para la logica de explosion del dron.)
-public class BombDragAbility : MonoBehaviour
+public class BombDragAbility : MonoBehaviour, IDragAbility
 {
     [Header("Referencias")]
     public GameObject bombPrefab;
@@ -49,6 +49,13 @@ public class BombDragAbility : MonoBehaviour
     public bool IsDragging
     {
         get { return _dragging; }
+    }
+
+    // True si al soltar habia un punto valido bajo el puntero. El HUD lo
+    // usa para no cobrar el uso si se solto fuera del tablero.
+    public bool HasValidTarget
+    {
+        get { return _hasValidTarget; }
     }
 
     private void Awake()
@@ -107,12 +114,13 @@ public class BombDragAbility : MonoBehaviour
     }
 
     // Suelta la bomba: la deja caer suave desde donde estaba flotando hasta
-    // la ultima posicion valida, y explota al tocar el suelo. Devuelve la
-    // instancia creada (null si nunca hubo una posicion valida).
-    public GameObject EndDrag()
+    // la ultima posicion valida, y explota al tocar el suelo. Si no hubo
+    // posicion valida no cae nada y HasValidTarget queda en false, para que
+    // el HUD no cobre el uso.
+    public void EndDrag()
     {
         if (!_dragging)
-            return null;
+            return;
 
         _dragging = false;
         Vector3 startPosition = _heldBomb != null ? _heldBomb.transform.position : _lastGroundPoint;
@@ -122,11 +130,13 @@ public class BombDragAbility : MonoBehaviour
             _indicator.SetActive(false);
 
         if (!_hasValidTarget || bombPrefab == null)
-            return null;
+        {
+            _hasValidTarget = false;
+            return;
+        }
 
         GameObject dropped = Instantiate(bombPrefab, startPosition, Quaternion.identity);
         StartCoroutine(FallAndExplode(dropped, startPosition, _lastGroundPoint));
-        return dropped;
     }
 
     // Baja la bomba hasta el suelo con la curva de caida y ahi la hace

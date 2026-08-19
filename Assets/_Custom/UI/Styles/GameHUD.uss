@@ -88,6 +88,18 @@
     scale: 0.95;
 }
 
+.speed-btn-selected {
+    background-color: var(--color-accent);
+    border-color: rgb(255, 224, 130);
+    color: rgb(40, 30, 10);
+    text-shadow: none;
+}
+
+.speed-btn-selected:hover {
+    background-color: var(--color-accent);
+    color: rgb(40, 30, 10);
+}
+
 .center-container {
     align-items: center;
     justify-content: flex-start;

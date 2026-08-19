@@ -1,8 +1,11 @@
 using System.Collections;
 using UnityEngine;
 
-public class RepulsionDragAbility : MonoBehaviour
+public class RepulsionDragAbility : MonoBehaviour, IDragAbility
 {
+    // Lo usa el HUD para saber si cobrar el uso al soltar.
+    public bool HasValidTarget => hasValidTarget;
+
     [Header("References")]
     [SerializeField] private RepulsionAbility repulsionAbility;
     [SerializeField] private GameObject repulsionPrefab;
