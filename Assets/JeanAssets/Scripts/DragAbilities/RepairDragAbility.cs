@@ -1,8 +1,11 @@
 using System.Collections;
 using UnityEngine;
 
-public class RepairDragAbility : MonoBehaviour
+public class RepairDragAbility : MonoBehaviour, IDragAbility
 {
+    // Lo usa el HUD para saber si cobrar el uso al soltar.
+    public bool HasValidTarget => hasValidTarget;
+
     [Header("References")]
     [SerializeField] private RepairAbility repairAbility;
     [SerializeField] private GameObject barrelPrefab;

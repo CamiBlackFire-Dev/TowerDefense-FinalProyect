@@ -18,7 +18,7 @@ public class RepairAbility : MonoBehaviour
             if (tower == null)
                 continue;
 
-            float healthPercentage = tower.GetCurrentHealth() / tower.GetMaxHealth();
+            float healthPercentage = tower.CurrentHealth / tower.maxHealth;
 
             if (healthPercentage >= 1f)
                 continue;
@@ -39,7 +39,7 @@ public class RepairAbility : MonoBehaviour
         if (tower == null)
             return;
 
-        tower.Heal(repairAmount);
+        tower.Repair(repairAmount);
 
         Debug.Log($"Torre reparada: {tower.name}");
     }
