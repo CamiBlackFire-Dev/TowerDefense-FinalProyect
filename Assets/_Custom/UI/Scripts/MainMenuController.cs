@@ -19,6 +19,13 @@ namespace Custom.UI
         private Slider _masterVolumeSlider;
         private Slider _musicVolumeSlider;
         private Slider _sfxVolumeSlider;
+
+        private VisualElement _levelSelectOverlay;
+        private Button _tutorialLevelButton;
+        private Button _level1Button;
+        private Button _level2Button;
+        private Button _level3Button;
+        private Button _closeLevelSelectButton;
         #endregion
 
         #region Audio & Animation
@@ -56,6 +63,13 @@ namespace Custom.UI
             _musicVolumeSlider = root.Q<Slider>("MusicVolumeSlider");
             _sfxVolumeSlider = root.Q<Slider>("SFXVolumeSlider");
 
+            _levelSelectOverlay = root.Q<VisualElement>("LevelSelectOverlay");
+            _tutorialLevelButton = root.Q<Button>("TutorialLevelButton");
+            _level1Button = root.Q<Button>("Level1Button");
+            _level2Button = root.Q<Button>("Level2Button");
+            _level3Button = root.Q<Button>("Level3Button");
+            _closeLevelSelectButton = root.Q<Button>("CloseLevelSelectButton");
+
             if (_playButton != null)
             {
                 _playButton.clicked += OnPlayClicked;
@@ -75,6 +89,40 @@ namespace Custom.UI
             {
                 _backButton.clicked += OnBackClicked;
                 _backButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+
+            int maxLevel = PlayerPrefs.GetInt("MaxLevelUnlocked", 0);
+
+            if (_tutorialLevelButton != null)
+            {
+                _tutorialLevelButton.clicked += OnTutorialLevelClicked;
+                _tutorialLevelButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+            if (_level1Button != null)
+            {
+                _level1Button.clicked += OnLevel1Clicked;
+                _level1Button.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+                _level1Button.SetEnabled(maxLevel >= 1);
+                _level1Button.text = maxLevel >= 1 ? "NIVEL 1" : "NIVEL 1 🔒";
+            }
+            if (_level2Button != null)
+            {
+                _level2Button.clicked += OnLevel2Clicked;
+                _level2Button.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+                _level2Button.SetEnabled(maxLevel >= 2);
+                _level2Button.text = maxLevel >= 2 ? "NIVEL 2" : "NIVEL 2 🔒";
+            }
+            if (_level3Button != null)
+            {
+                _level3Button.clicked += OnLevel3Clicked;
+                _level3Button.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+                _level3Button.SetEnabled(maxLevel >= 3);
+                _level3Button.text = maxLevel >= 3 ? "NIVEL 3" : "NIVEL 3 🔒";
+            }
+            if (_closeLevelSelectButton != null)
+            {
+                _closeLevelSelectButton.clicked += OnCloseLevelSelectClicked;
+                _closeLevelSelectButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
             }
 
             if (AudioManager.Instance != null)
@@ -119,6 +167,32 @@ namespace Custom.UI
                 _backButton.clicked -= OnBackClicked;
                 _backButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
             }
+
+            if (_tutorialLevelButton != null)
+            {
+                _tutorialLevelButton.clicked -= OnTutorialLevelClicked;
+                _tutorialLevelButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+            if (_level1Button != null)
+            {
+                _level1Button.clicked -= OnLevel1Clicked;
+                _level1Button.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+            if (_level2Button != null)
+            {
+                _level2Button.clicked -= OnLevel2Clicked;
+                _level2Button.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+            if (_level3Button != null)
+            {
+                _level3Button.clicked -= OnLevel3Clicked;
+                _level3Button.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+            if (_closeLevelSelectButton != null)
+            {
+                _closeLevelSelectButton.clicked -= OnCloseLevelSelectClicked;
+                _closeLevelSelectButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
         }
 
         private void Update()
@@ -147,7 +221,37 @@ namespace Custom.UI
         private void OnPlayClicked()
         {
             PlayClickSound();
-            SceneManager.LoadScene("0_Main");
+            if (_levelSelectOverlay != null) _levelSelectOverlay.style.display = DisplayStyle.Flex;
+        }
+
+        private void OnTutorialLevelClicked()
+        {
+            PlayClickSound();
+            SceneManager.LoadScene("1_Tutorial");
+        }
+
+        private void OnLevel1Clicked()
+        {
+            PlayClickSound();
+            SceneManager.LoadScene("LevelPrueba");
+        }
+
+        private void OnLevel2Clicked()
+        {
+            PlayClickSound();
+            Debug.Log("Cargando Nivel 2...");
+        }
+
+        private void OnLevel3Clicked()
+        {
+            PlayClickSound();
+            Debug.Log("Cargando Nivel 3...");
+        }
+
+        private void OnCloseLevelSelectClicked()
+        {
+            PlayClickSound();
+            if (_levelSelectOverlay != null) _levelSelectOverlay.style.display = DisplayStyle.None;
         }
 
         private void OnOptionsClicked()

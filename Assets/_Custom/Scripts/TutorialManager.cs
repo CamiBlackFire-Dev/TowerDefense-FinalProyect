@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 using Custom.UI;
 
 public enum TutorialState
@@ -36,10 +37,18 @@ public class TutorialManager : MonoBehaviour
     private Button _startWaveButton;
     private Button _ability1Button;
 
+    private VisualElement _tutorialOverlay;
     private VisualElement _dimTop, _dimBottom, _dimLeft, _dimRight;
     private VisualElement _spotlightBox;
+    private VisualElement _wasdHint;
     private Label _step1, _step2, _step3, _step4, _step5, _step6, _step7;
     private Label _tutorialMessage;
+
+    private VisualElement _introOverlay;
+    private VisualElement _outroOverlay;
+    private Button _introStartButton;
+    private Button _outroMenuButton;
+    private Button _outroNextButton;
 
     private int _towersBought = 0;
     private int _lastMoney = 0;
@@ -71,11 +80,14 @@ public class TutorialManager : MonoBehaviour
         if (_tutorialUIDocument != null)
         {
             var root = _tutorialUIDocument.rootVisualElement;
+
+            _tutorialOverlay = root.Q<VisualElement>("TutorialOverlay");
             _dimTop = root.Q<VisualElement>("DimTop");
             _dimBottom = root.Q<VisualElement>("DimBottom");
             _dimLeft = root.Q<VisualElement>("DimLeft");
             _dimRight = root.Q<VisualElement>("DimRight");
             _spotlightBox = root.Q<VisualElement>("SpotlightBox");
+            _wasdHint = root.Q<VisualElement>("WASDHint");
 
             _step1 = root.Q<Label>("Step1");
             _step2 = root.Q<Label>("Step2");
@@ -85,6 +97,16 @@ public class TutorialManager : MonoBehaviour
             _step6 = root.Q<Label>("Step6");
             _step7 = root.Q<Label>("Step7");
             _tutorialMessage = root.Q<Label>("TutorialMessage");
+
+            _introOverlay = root.Q<VisualElement>("TutorialIntroOverlay");
+            _outroOverlay = root.Q<VisualElement>("TutorialOutroOverlay");
+            _introStartButton = root.Q<Button>("IntroStartButton");
+            _outroMenuButton = root.Q<Button>("OutroMenuButton");
+            _outroNextButton = root.Q<Button>("OutroNextButton");
+
+            if (_introStartButton != null) _introStartButton.clicked += OnIntroStartClicked;
+            if (_outroMenuButton != null) _outroMenuButton.clicked += OnOutroMenuClicked;
+            if (_outroNextButton != null) _outroNextButton.clicked += OnOutroNextClicked;
         }
 
         if (_boardManager != null && _boardManager.inputController != null)
@@ -97,7 +119,10 @@ public class TutorialManager : MonoBehaviour
             _lastMoney = _economyManager.Money;
         }
 
-        AdvanceState(TutorialState.BuyTowers);
+        if (_tutorialOverlay != null) _tutorialOverlay.style.display = DisplayStyle.None;
+        if (_introOverlay != null) _introOverlay.style.display = DisplayStyle.Flex;
+        if (_outroOverlay != null) _outroOverlay.style.display = DisplayStyle.None;
+        Time.timeScale = 0f;
     }
 
     private void Update()
@@ -189,7 +214,13 @@ public class TutorialManager : MonoBehaviour
 
             case TutorialState.UseBomb:
                 BombAbility[] explosions = FindObjectsByType<BombAbility>(FindObjectsSortMode.None);
-                if (explosions.Length > 0)
+                if (explosions.Length > 0 && !_step7.ClassListContains("tutorial-step-done"))
+                {
+                    MarkStepDone(_step7);
+                    _tutorialMessage.text = "¡Excelente! Has usado la bomba. Ahora defiende tu castillo hasta que termine la oleada.";
+                }
+
+                if (_step7.ClassListContains("tutorial-step-done") && _enemySpawner != null && !_enemySpawner.IsRunning)
                 {
                     AdvanceState(TutorialState.Finished);
                 }
@@ -216,7 +247,7 @@ public class TutorialManager : MonoBehaviour
     {
         currentState = newState;
 
-        if (Time.timeScale == 0f && newState != TutorialState.UnlockBomb)
+        if (Time.timeScale == 0f && newState != TutorialState.UnlockBomb && newState != TutorialState.Finished && newState != TutorialState.Init)
         {
             Time.timeScale = 1f;
         }
@@ -226,23 +257,27 @@ public class TutorialManager : MonoBehaviour
             case TutorialState.BuyTowers:
                 SetTargetButton(_buyTowerButton, false);
                 _tutorialMessage.text = "¡Necesitas defensas! Compra 3 torres haciendo click en el botón inferior derecho.";
+                if (_wasdHint != null) _wasdHint.style.display = DisplayStyle.None;
                 break;
 
             case TutorialState.MoveTowers:
                 SetTargetButton(null);
                 MarkStepDone(_step1);
                 _tutorialMessage.text = "Usa las teclas W, A, S, D para deslizar las torres por el tablero.";
+                if (_wasdHint != null) _wasdHint.style.display = DisplayStyle.Flex;
                 break;
 
             case TutorialState.MergeTowers:
                 SetTargetButton(null);
                 MarkStepDone(_step2);
                 _tutorialMessage.text = "¡Eso es! Sigue moviéndolas hasta que 2 torres iguales choquen. ¡Se fusionarán y subirán de nivel!";
+                if (_wasdHint != null) _wasdHint.style.display = DisplayStyle.Flex;
                 break;
 
             case TutorialState.StartWave:
                 MarkStepDone(_step3);
                 SetTargetButton(null);
+                if (_wasdHint != null) _wasdHint.style.display = DisplayStyle.None;
                 break;
 
             case TutorialState.EarnGold:
@@ -274,6 +309,16 @@ public class TutorialManager : MonoBehaviour
                 SetTargetButton(null);
                 MarkStepDone(_step7);
                 _tutorialMessage.text = "¡Felicidades! Has completado el tutorial. ¡Mucha suerte en la batalla real!";
+
+                if (PlayerPrefs.GetInt("MaxLevelUnlocked", 0) < 1)
+                {
+                    PlayerPrefs.SetInt("MaxLevelUnlocked", 1);
+                    PlayerPrefs.Save();
+                }
+
+                if (_tutorialOverlay != null) _tutorialOverlay.style.display = DisplayStyle.None;
+                if (_outroOverlay != null) _outroOverlay.style.display = DisplayStyle.Flex;
+                Time.timeScale = 0f;
                 break;
         }
     }
@@ -286,6 +331,27 @@ public class TutorialManager : MonoBehaviour
         {
             _hasMoved = true;
         }
+    }
+
+    private void OnIntroStartClicked()
+    {
+        Time.timeScale = 1f;
+        if (_introOverlay != null) _introOverlay.style.display = DisplayStyle.None;
+        if (_tutorialOverlay != null) _tutorialOverlay.style.display = DisplayStyle.Flex;
+
+        AdvanceState(TutorialState.BuyTowers);
+    }
+
+    private void OnOutroMenuClicked()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Main Menu");
+    }
+
+    private void OnOutroNextClicked()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("LevelPrueba");
     }
     #endregion
 
@@ -315,6 +381,14 @@ public class TutorialManager : MonoBehaviour
 
     private void UpdateSpotlight()
     {
+        float t = Mathf.PingPong(Time.unscaledTime * 2.5f, 1f);
+        float scale = Mathf.Lerp(1.0f, 1.05f, t);
+
+        if (_wasdHint != null && _wasdHint.style.display == DisplayStyle.Flex)
+        {
+            _wasdHint.style.scale = new StyleScale(new Vector2(scale, scale));
+        }
+
         if (_activeTargetButton == null || _spotlightBox == null) return;
 
         Rect r = _activeTargetButton.worldBound;
@@ -343,7 +417,6 @@ public class TutorialManager : MonoBehaviour
         _dimRight.style.left = r.xMax;
         _dimRight.style.right = 0f;
 
-        float t = Mathf.PingPong(Time.unscaledTime * 2.5f, 1f);
         Color32 baseColor = _isGlowUrgent ? new Color32(241, 196, 15, 255) : new Color32(46, 204, 113, 255);
         Color32 pulseColor = _isGlowUrgent ? new Color32(255, 235, 100, 255) : new Color32(100, 255, 150, 255);
         Color32 currentColor = Color32.Lerp(baseColor, pulseColor, t);
@@ -358,8 +431,12 @@ public class TutorialManager : MonoBehaviour
         _spotlightBox.style.borderLeftWidth = borderWidth;
         _spotlightBox.style.borderRightWidth = borderWidth;
 
-        float scale = Mathf.Lerp(1.0f, 1.05f, t);
         _spotlightBox.style.scale = new StyleScale(new Vector2(scale, scale));
+
+        if (_wasdHint != null && _wasdHint.style.display == DisplayStyle.Flex)
+        {
+            _wasdHint.style.scale = new StyleScale(new Vector2(scale, scale));
+        }
     }
 
     private void MarkStepDone(Label stepLabel)

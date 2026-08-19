@@ -1,5 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/_Custom/UI/Styles/TutorialUI.uss" />
+    <Style src="project://database/Assets/_Custom/UI/Styles/Variables.uss?fileID=7433441132597879392&amp;guid=0d88b972d2caa264ca392885da4c93eb&amp;type=3#Variables"/>
+    <Style src="project://database/Assets/_Custom/UI/Styles/Common.uss?fileID=7433441132597879392&amp;guid=777eec23bf60d49468cb154ccb488532&amp;type=3#Common"/>
     
     <ui:VisualElement name="TutorialOverlay" class="tutorial-overlay" picking-mode="Ignore">
         <ui:VisualElement name="DimTop" picking-mode="Ignore" style="position: absolute; background-color: rgba(0, 0, 0, 0.45); top: 0; left: 0; right: 0;" />
@@ -22,6 +24,34 @@
             </ui:VisualElement>
 
             <ui:Label name="TutorialMessage" text="¡Bienvenido! Sigue los pasos para aprender a jugar." class="tutorial-message"/>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="WASDHint" picking-mode="Ignore" style="position: absolute; right: 15%; top: 35%; align-items: center; display: none;">
+            <ui:VisualElement style="flex-direction: row; justify-content: center; margin-bottom: 5px;" picking-mode="Ignore">
+                <ui:VisualElement class="tutorial-key" picking-mode="Ignore"><ui:Label text="W" class="tutorial-key-text" picking-mode="Ignore"/></ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-direction: row; justify-content: center;" picking-mode="Ignore">
+                <ui:VisualElement class="tutorial-key" style="margin-right: 5px;" picking-mode="Ignore"><ui:Label text="A" class="tutorial-key-text" picking-mode="Ignore"/></ui:VisualElement>
+                <ui:VisualElement class="tutorial-key" style="margin-right: 5px;" picking-mode="Ignore"><ui:Label text="S" class="tutorial-key-text" picking-mode="Ignore"/></ui:VisualElement>
+                <ui:VisualElement class="tutorial-key" picking-mode="Ignore"><ui:Label text="D" class="tutorial-key-text" picking-mode="Ignore"/></ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+
+    <ui:VisualElement name="TutorialIntroOverlay" class="options-overlay" style="display: flex;">
+        <ui:VisualElement class="options-panel" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Backgrounds/Fondo2.png?fileID=2800000&amp;guid=72b6550b8e6bcd44b8e6e066f339e28e&amp;type=3#Fondo2&quot;); align-items: center; justify-content: center; width: 800px; padding: 100px;">
+            <ui:Label text="TUTORIAL" class="title-text"/>
+            <ui:Label text="Bienvenido al tutorial de Grid Guard. Complétalo para empezar la batalla real." style="font-size: 35px; color: rgb(80, 60, 40); white-space: normal; -unity-text-align: middle-center; margin-top: 20px; margin-bottom: 40px;"/>
+            <ui:Button text="EMPEZAR" name="IntroStartButton" class="unity-button"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+
+    <ui:VisualElement name="TutorialOutroOverlay" class="options-overlay" style="display: none; padding-bottom: 250px; background-color: rgba(0, 0, 0, 0.8);">
+        <ui:VisualElement class="banner-image" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Paneles/Felicitaciones.png?fileID=2800000&amp;guid=91bfbab0f8f059544ada34ae73fe96be&amp;type=3#Felicitaciones&quot;);"/>
+        <ui:Label text="¡Felicidades por completar el tutorial!" style="font-size: 40px; color: white; -unity-font-style: bold; -unity-text-align: middle-center; margin-top: 20px; margin-bottom: 20px; -unity-text-outline-width: 2px; -unity-text-outline-color: black; text-shadow: 2px 2px 0 rgba(0,0,0,0.5);"/>
+        <ui:VisualElement class="options-panel mini-action-box" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Panel/Button%20Frame.png?fileID=2800000&amp;guid=a9ae898ead53012428b3e87a32c971a5&amp;type=3#Button Frame&quot;);">
+            <ui:Button text="MENÚ PRINCIPAL" name="OutroMenuButton" class="unity-button panel-btn-menu"/>
+            <ui:Button text="IR AL NIVEL 1" name="OutroNextButton" class="unity-button panel-btn-next"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

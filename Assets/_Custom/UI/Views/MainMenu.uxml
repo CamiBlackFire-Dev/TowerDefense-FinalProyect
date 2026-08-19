@@ -27,4 +27,14 @@
             <ui:Button text="VOLVER" name="BackButton" style="margin-top: 50px;"/>
         </ui:VisualElement>
     </ui:VisualElement>
+    <ui:VisualElement name="LevelSelectOverlay" class="options-overlay" style="display: none;">
+        <ui:VisualElement class="options-panel" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Backgrounds/Fondo2.png?fileID=2800000&amp;guid=72b6550b8e6bcd44b8e6e066f339e28e&amp;type=3#Fondo2&quot;); display: flex; align-items: center; justify-content: center; padding-top: 90px; padding-bottom: 70px;">
+            <ui:Label text="SELECCIONAR NIVEL" class="title-text" style="display: flex; margin-bottom: 10px; font-size: 45px; white-space: normal; -unity-text-align: middle-center;"/>
+            <ui:Button text="TUTORIAL" name="TutorialLevelButton" style="width: 420px; height: 110px; margin-top: 5px; margin-bottom: 5px; font-size: 45px;"/>
+            <ui:Button text="NIVEL 1 🔒" name="Level1Button" style="width: 420px; height: 110px; margin-top: 5px; margin-bottom: 5px; font-size: 45px;"/>
+            <ui:Button text="NIVEL 2 🔒" name="Level2Button" style="width: 420px; height: 110px; margin-top: 5px; margin-bottom: 5px; font-size: 45px;"/>
+            <ui:Button text="NIVEL 3 🔒" name="Level3Button" style="width: 420px; height: 110px; margin-top: 5px; margin-bottom: 5px; font-size: 45px;"/>
+            <ui:Button text="VOLVER" name="CloseLevelSelectButton" style="width: 420px; height: 110px; margin-top: 20px; margin-bottom: 5px; font-size: 45px;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
 </ui:UXML>
