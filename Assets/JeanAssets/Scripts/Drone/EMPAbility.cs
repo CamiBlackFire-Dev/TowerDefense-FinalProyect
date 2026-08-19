@@ -30,6 +30,11 @@ public class EMPAbility : MonoBehaviour
         }
     }
 
+    public float GetSlowDuration()
+    {
+        return slowDuration;
+    }
+
     public float GetRadius()
     {
         return empRadius;

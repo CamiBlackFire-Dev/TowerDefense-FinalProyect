@@ -112,12 +112,12 @@ public class DroneAbilityController : MonoBehaviour
 
                 break;
 
-            case Ability.Repulsion:
+            /*case Ability.Repulsion:
 
                 if (repulsionAbility != null)
                     repulsionAbility.ActivateRepulsion();
 
-                break;
+                break;*/
         }
     }
 
@@ -144,7 +144,7 @@ public class DroneAbilityController : MonoBehaviour
         if (repairAbility != null)
             repairAbility.SetGizmoVisible(currentAbility == Ability.Repair);
 
-        if (repulsionAbility != null)
-            repulsionAbility.SetGizmoVisible(currentAbility == Ability.Repulsion);
+        /*if (repulsionAbility != null)
+            repulsionAbility.SetGizmoVisible(currentAbility == Ability.Repulsion);*/
     }
 }

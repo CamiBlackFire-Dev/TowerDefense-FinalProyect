@@ -13,9 +13,9 @@ public class RepulsionAbility : MonoBehaviour
     [Header("Detection")]
     [SerializeField] private Path path;
 
-    public void ActivateRepulsion()
+    public void ActivateRepulsion(Vector3 position)
     {
-        Collider[] enemies = Physics.OverlapSphere(transform.position, repulsionRadius, enemyLayer);
+        Collider[] enemies = Physics.OverlapSphere(position, repulsionRadius, enemyLayer);
 
         Debug.Log($"Repulsión: {enemies.Length} enemigos detectados.");
 
@@ -52,6 +52,7 @@ public class RepulsionAbility : MonoBehaviour
             if (distance < closestDistance)
             {
                 closestDistance = distance;
+
                 closestIndex = i;
             }
         }
@@ -66,8 +67,8 @@ public class RepulsionAbility : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        if(!showGizmo)
-        return;
+        if (!showGizmo)
+            return;
 
         Gizmos.color = Color.yellow;
 

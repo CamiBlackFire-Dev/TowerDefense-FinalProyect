@@ -7,10 +7,12 @@ public class EMPDragAbility : MonoBehaviour
     [SerializeField] private EMPAbility empAbility;
     [SerializeField] private GameObject empPrefab;
 
+    [Header("Visual Effect")]
+    [SerializeField] private GameObject impactEffect;
+
     [Header("Throw")]
     [SerializeField] private float throwHeight = 2f;
     [SerializeField] private float fallDuration = 0.5f;
-    [SerializeField] private float effectDuration = 3f;
 
     [Header("Map")]
     [SerializeField] private LayerMask mapLayer;
@@ -20,7 +22,7 @@ public class EMPDragAbility : MonoBehaviour
     [SerializeField] private Material indicatorMaterial;
     [SerializeField] private float indicatorSize = 1.5f;
     [SerializeField] private float indicatorHeight = 0.05f;
-    [SerializeField] private float blinkSpeed = 0.15f;
+    [SerializeField] private float blinkSpeed = 0.3f;
 
     private Camera mainCamera;
 
@@ -65,29 +67,22 @@ public class EMPDragAbility : MonoBehaviour
 
         Ray ray = mainCamera.ScreenPointToRay(screenPosition);
 
-        if (Physics.Raycast(
-            ray,
-            out RaycastHit hit,
-            raycastDistance,
-            mapLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, raycastDistance, mapLayer))
         {
             hasValidTarget = true;
 
             targetPosition = hit.point;
 
-            emp.transform.position =
-                targetPosition + Vector3.up * throwHeight;
+            emp.transform.position = targetPosition + Vector3.up * throwHeight;
 
             indicator.SetActive(true);
 
-            indicator.transform.position =
-                targetPosition + Vector3.up * indicatorHeight;
+            indicator.transform.position = targetPosition + Vector3.up * indicatorHeight;
 
             UpdateIndicatorBlink();
         }
         else
         {
-
             hasValidTarget = false;
 
             indicator.SetActive(false);
@@ -118,6 +113,7 @@ public class EMPDragAbility : MonoBehaviour
     public void CancelDrag()
     {
         isDragging = false;
+
         hasValidTarget = false;
 
         if (emp != null)
@@ -137,29 +133,28 @@ public class EMPDragAbility : MonoBehaviour
         {
             timer += Time.deltaTime;
 
-            float progress =
-                Mathf.Clamp01(timer / fallDuration);
+            float progress = Mathf.Clamp01(timer / fallDuration);
 
-            emp.transform.position =
-                Vector3.Lerp(
-                    startPosition,
-                    targetPosition,
-                    progress
-                );
+            emp.transform.position = Vector3.Lerp(startPosition, targetPosition, progress);
 
             yield return null;
         }
 
         emp.transform.position = targetPosition;
 
+        emp.SetActive(false);
+
         if (empAbility != null)
         {
             empAbility.ActivateEMP(targetPosition);
+
+            if (impactEffect != null)
+            {
+                GameObject effect = Instantiate(impactEffect, targetPosition, Quaternion.identity);
+
+                Destroy(effect, empAbility.GetSlowDuration());
+            }
         }
-
-        yield return new WaitForSeconds(effectDuration);
-
-        emp.SetActive(false);
     }
 
     private void UpdateIndicatorBlink()
@@ -170,37 +165,27 @@ public class EMPDragAbility : MonoBehaviour
         {
             blinkTimer = 0f;
 
-            indicatorRenderer.enabled =
-                !indicatorRenderer.enabled;
+            indicatorRenderer.enabled = !indicatorRenderer.enabled;
         }
     }
 
     private void CreateIndicator()
     {
-        indicator =
-            GameObject.CreatePrimitive(
-                PrimitiveType.Quad
-            );
+        indicator = GameObject.CreatePrimitive(PrimitiveType.Quad);
 
         indicator.name = "EMP Indicator";
 
-        Destroy(
-            indicator.GetComponent<Collider>()
-        );
+        Destroy(indicator.GetComponent<Collider>());
 
-        indicator.transform.rotation =
-            Quaternion.Euler(90f, 0f, 0f);
+        indicator.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
 
-        indicator.transform.localScale =
-            Vector3.one * indicatorSize;
+        indicator.transform.localScale = Vector3.one * indicatorSize;
 
-        indicatorRenderer =
-            indicator.GetComponent<Renderer>();
+        indicatorRenderer = indicator.GetComponent<Renderer>();
 
         if (indicatorMaterial != null)
         {
-            indicatorRenderer.material =
-                indicatorMaterial;
+            indicatorRenderer.material = indicatorMaterial;
         }
 
         indicator.SetActive(false);
