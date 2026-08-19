@@ -7,9 +7,6 @@ public class TowerHealth : MonoBehaviour
 
     private float currentHealth;
 
-    public float CurrentHealth => currentHealth;
-    public float MaxHealth => maxHealth;
-
     private void Start()
     {
         currentHealth = maxHealth;
@@ -18,45 +15,38 @@ public class TowerHealth : MonoBehaviour
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
+        
+        currentHealth = Mathf.Max(currentHealth, 0f);
 
-        currentHealth = Mathf.Clamp(
-            currentHealth,
-            0f,
-            maxHealth
-        );
-
-        Debug.Log(
-            $"{gameObject.name} recibió {damage} de daño. " +
-            $"Vida: {currentHealth}/{maxHealth}"
-        );
+        Debug.Log($"Torre {gameObject.name}: {currentHealth}/{maxHealth} HP");
 
         if (currentHealth <= 0f)
         {
-            Die();
+            DestroyTower();
         }
     }
 
-    public void Repair(float amount)
+    private void DestroyTower()
+    {
+        Destroy(gameObject);
+    }
+
+    public float GetCurrentHealth()
+    {
+        return currentHealth;
+    }
+
+    public float GetMaxHealth()
+    {
+        return maxHealth;
+    }
+
+    public void Heal(float amount)
     {
         currentHealth += amount;
 
-        currentHealth = Mathf.Clamp(
-            currentHealth,
-            0f,
-            maxHealth
-        );
+        currentHealth = Mathf.Min(currentHealth, maxHealth);
 
-        Debug.Log(
-            $"{gameObject.name} reparada. " +
-            $"Vida: {currentHealth}/{maxHealth}"
-        );
-    }
-
-    private void Die()
-    {
-        Debug.Log($"{gameObject.name} fue destruida.");
-
-        // Después podemos poner aquí
-        // animación, partículas, etc.
+        Debug.Log($"Torre reparada: {currentHealth}/{maxHealth}");
     }
 }

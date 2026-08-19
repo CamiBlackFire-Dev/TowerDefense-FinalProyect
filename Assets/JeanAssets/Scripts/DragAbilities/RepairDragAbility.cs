@@ -4,14 +4,19 @@ using UnityEngine;
 public class RepairDragAbility : MonoBehaviour
 {
     [Header("References")]
+    [SerializeField] private RepairAbility repairAbility;
     [SerializeField] private GameObject barrelPrefab;
-    [SerializeField] private GameObject repairEffectPrefab;
 
-    [Header("Repair")]
-    [SerializeField] private float repairDuration = 1f;
+    [Header("Visual Effect")]
+    [SerializeField] private GameObject repairEffect;
+    [SerializeField] private float effectDuration = 3f;
+
+    [Header("Throw")]
+    [SerializeField] private float throwHeight = 1f;
+    [SerializeField] private float moveSpeed = 5f;
 
     [Header("Map")]
-    [SerializeField] private LayerMask boardLayer;
+    [SerializeField] private LayerMask mapLayer;
     [SerializeField] private float raycastDistance = 100f;
 
     [Header("Indicator")]
@@ -67,16 +72,15 @@ public class RepairDragAbility : MonoBehaviour
             ray,
             out RaycastHit hit,
             raycastDistance,
-            boardLayer))
+            mapLayer))
         {
             hasValidTarget = true;
+
             targetPosition = hit.point;
 
-            // Barril sigue al dedo
             barrel.transform.position =
-                targetPosition + Vector3.up * 1f;
+                targetPosition + Vector3.up * throwHeight;
 
-            // Indicador verde
             indicator.SetActive(true);
 
             indicator.transform.position =
@@ -87,6 +91,7 @@ public class RepairDragAbility : MonoBehaviour
         else
         {
             hasValidTarget = false;
+
             indicator.SetActive(false);
         }
     }
@@ -104,12 +109,12 @@ public class RepairDragAbility : MonoBehaviour
         {
             barrel.SetActive(false);
 
-            Debug.Log("Repair cancelado: fuera del tablero.");
+            Debug.Log("Repair cancelado: fuera del mapa.");
 
             return;
         }
 
-        StartCoroutine(RepairSequence());
+        StartCoroutine(SendBarrel());
     }
 
     public void CancelDrag()
@@ -124,86 +129,80 @@ public class RepairDragAbility : MonoBehaviour
             indicator.SetActive(false);
     }
 
-    private IEnumerator RepairSequence()
+    private IEnumerator SendBarrel()
     {
-        // Por ahora simulamos que encontró
-        // la torre más dañada.
-        Transform targetTower = FindMostDamagedTower();
+        TowerHealth targetTower =
+            repairAbility.GetMostDamagedTower();
 
         if (targetTower == null)
         {
-            Debug.Log("No se encontró ninguna torre para reparar.");
+            barrel.SetActive(false);
 
+            Debug.Log("No hay torres dañadas para reparar.");
+
+            yield break;
+        }
+
+        while (true)
+        {
+            if (barrel == null)
+                yield break;
+
+            if (targetTower == null)
+            {
+                barrel.SetActive(false);
+
+                Debug.Log(
+                    "Repair cancelado: la torre objetivo fue destruida."
+                );
+
+                yield break;
+            }
+
+            barrel.transform.position =
+                Vector3.MoveTowards(
+                    barrel.transform.position,
+                    targetTower.transform.position,
+                    moveSpeed * Time.deltaTime
+                );
+
+            float distance =
+                Vector3.Distance(
+                    barrel.transform.position,
+                    targetTower.transform.position
+                );
+
+            if (distance <= 0.5f)
+                break;
+
+            yield return null;
+        }
+
+        if (targetTower == null)
+        {
             barrel.SetActive(false);
 
             yield break;
         }
 
-        Vector3 startPosition = barrel.transform.position;
+        Vector3 effectPosition =
+            targetTower.transform.position;
 
-        float timer = 0f;
+        repairAbility.RepairTower(targetTower);
 
-        while (timer < repairDuration)
+        if (repairEffect != null)
         {
-            timer += Time.deltaTime;
+            GameObject effect =
+                Instantiate(
+                    repairEffect,
+                    effectPosition,
+                    Quaternion.identity
+                );
 
-            float progress =
-                Mathf.Clamp01(timer / repairDuration);
-
-            barrel.transform.position = Vector3.Lerp(
-                startPosition,
-                targetTower.position,
-                progress
-            );
-
-            yield return null;
+            Destroy(effect, effectDuration);
         }
 
-        barrel.transform.position = targetTower.position;
-
-        // Barril desaparece
         barrel.SetActive(false);
-
-        // Efecto de reparación
-        if (repairEffectPrefab != null)
-        {
-            GameObject effect = Instantiate(
-                repairEffectPrefab,
-                targetTower.position,
-                Quaternion.identity
-            );
-
-            Destroy(effect, 2f);
-        }
-
-        Debug.Log(
-            $"Torre reparada: {targetTower.name}"
-        );
-    }
-
-    private Transform FindMostDamagedTower()
-    {
-        // MAQUETA:
-        // Por ahora simplemente busca las torres
-        // dentro del tablero y toma la primera.
-        //
-        // Cuando tengamos TowerHealth,
-        // aquí buscaremos la que tenga menor vida.
-
-        Collider[] towers = Physics.OverlapSphere(
-            targetPosition,
-            20f
-        );
-
-        foreach (Collider tower in towers)
-        {
-            if (tower.CompareTag("Tower"))
-            {
-                return tower.transform;
-            }
-        }
-
-        return null;
     }
 
     private void UpdateIndicatorBlink()
@@ -221,9 +220,10 @@ public class RepairDragAbility : MonoBehaviour
 
     private void CreateIndicator()
     {
-        indicator = GameObject.CreatePrimitive(
-            PrimitiveType.Quad
-        );
+        indicator =
+            GameObject.CreatePrimitive(
+                PrimitiveType.Quad
+            );
 
         indicator.name = "Repair Indicator";
 

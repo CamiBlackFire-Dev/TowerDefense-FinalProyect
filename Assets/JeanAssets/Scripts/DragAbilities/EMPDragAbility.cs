@@ -9,7 +9,8 @@ public class EMPDragAbility : MonoBehaviour
 
     [Header("Visual Effect")]
     [SerializeField] private GameObject impactEffect;
-
+    [SerializeField] private float effectDuration = 3f;
+    
     [Header("Throw")]
     [SerializeField] private float throwHeight = 2f;
     [SerializeField] private float fallDuration = 0.5f;
@@ -22,7 +23,7 @@ public class EMPDragAbility : MonoBehaviour
     [SerializeField] private Material indicatorMaterial;
     [SerializeField] private float indicatorSize = 1.5f;
     [SerializeField] private float indicatorHeight = 0.05f;
-    [SerializeField] private float blinkSpeed = 0.3f;
+    [SerializeField] private float blinkSpeed = 0.2f;
 
     private Camera mainCamera;
 
@@ -52,9 +53,11 @@ public class EMPDragAbility : MonoBehaviour
         }
 
         isDragging = true;
+
         hasValidTarget = false;
 
         emp.SetActive(true);
+
         indicator.SetActive(false);
 
         blinkTimer = 0f;
@@ -135,7 +138,8 @@ public class EMPDragAbility : MonoBehaviour
 
             float progress = Mathf.Clamp01(timer / fallDuration);
 
-            emp.transform.position = Vector3.Lerp(startPosition, targetPosition, progress);
+            emp.transform.position =
+                Vector3.Lerp(startPosition, targetPosition, progress);
 
             yield return null;
         }
@@ -147,13 +151,13 @@ public class EMPDragAbility : MonoBehaviour
         if (empAbility != null)
         {
             empAbility.ActivateEMP(targetPosition);
+        }
 
-            if (impactEffect != null)
-            {
-                GameObject effect = Instantiate(impactEffect, targetPosition, Quaternion.identity);
+        if (impactEffect != null)
+        {
+            GameObject effect = Instantiate(impactEffect, targetPosition, Quaternion.identity);
 
-                Destroy(effect, empAbility.GetSlowDuration());
-            }
+            Destroy(effect, effectDuration);
         }
     }
 
