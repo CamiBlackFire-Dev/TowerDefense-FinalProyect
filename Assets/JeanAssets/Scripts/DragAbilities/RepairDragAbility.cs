@@ -1,24 +1,22 @@
 using System.Collections;
 using UnityEngine;
 
-public class RepairDragAbility : MonoBehaviour, IDragAbility
+public class RepairDragAbility : MonoBehaviour
 {
-    // Lo usa el HUD para saber si cobrar el uso al soltar.
-    public bool HasValidTarget => hasValidTarget;
-
     [Header("References")]
+    [SerializeField] private RepairAbility repairAbility;
     [SerializeField] private GameObject barrelPrefab;
-    [SerializeField] private GameObject repairEffectPrefab;
 
-    [Header("Repair")]
-    [SerializeField] private float repairDuration = 1f;
-    // Vida que recupera la torre reparada.
-    [SerializeField] private float repairAmount = 25f;
-    // Que tan lejos del punto donde se solto se busca una torre herida.
-    [SerializeField] private float repairRadius = 20f;
+    [Header("Visual Effect")]
+    [SerializeField] private GameObject repairEffect;
+    [SerializeField] private float effectDuration = 3f;
+
+    [Header("Throw")]
+    [SerializeField] private float throwHeight = 1f;
+    [SerializeField] private float moveSpeed = 5f;
 
     [Header("Map")]
-    [SerializeField] private LayerMask boardLayer;
+    [SerializeField] private LayerMask mapLayer;
     [SerializeField] private float raycastDistance = 100f;
 
     [Header("Indicator")]
@@ -74,16 +72,15 @@ public class RepairDragAbility : MonoBehaviour, IDragAbility
             ray,
             out RaycastHit hit,
             raycastDistance,
-            boardLayer))
+            mapLayer))
         {
             hasValidTarget = true;
+
             targetPosition = hit.point;
 
-            // Barril sigue al dedo
             barrel.transform.position =
-                targetPosition + Vector3.up * 1f;
+                targetPosition + Vector3.up * throwHeight;
 
-            // Indicador verde
             indicator.SetActive(true);
 
             indicator.transform.position =
@@ -94,6 +91,7 @@ public class RepairDragAbility : MonoBehaviour, IDragAbility
         else
         {
             hasValidTarget = false;
+
             indicator.SetActive(false);
         }
     }
@@ -111,12 +109,12 @@ public class RepairDragAbility : MonoBehaviour, IDragAbility
         {
             barrel.SetActive(false);
 
-            Debug.Log("Repair cancelado: fuera del tablero.");
+            Debug.Log("Repair cancelado: fuera del mapa.");
 
             return;
         }
 
-        StartCoroutine(RepairSequence());
+        StartCoroutine(SendBarrel());
     }
 
     public void CancelDrag()
@@ -131,98 +129,80 @@ public class RepairDragAbility : MonoBehaviour, IDragAbility
             indicator.SetActive(false);
     }
 
-    private IEnumerator RepairSequence()
+    private IEnumerator SendBarrel()
     {
-        TowerHealth targetTower = FindMostDamagedTower();
+        TowerHealth targetTower =
+            repairAbility.GetMostDamagedTower();
 
         if (targetTower == null)
         {
-            Debug.Log("No se encontró ninguna torre para reparar.");
+            barrel.SetActive(false);
 
+            Debug.Log("No hay torres dañadas para reparar.");
+
+            yield break;
+        }
+
+        while (true)
+        {
+            if (barrel == null)
+                yield break;
+
+            if (targetTower == null)
+            {
+                barrel.SetActive(false);
+
+                Debug.Log(
+                    "Repair cancelado: la torre objetivo fue destruida."
+                );
+
+                yield break;
+            }
+
+            barrel.transform.position =
+                Vector3.MoveTowards(
+                    barrel.transform.position,
+                    targetTower.transform.position,
+                    moveSpeed * Time.deltaTime
+                );
+
+            float distance =
+                Vector3.Distance(
+                    barrel.transform.position,
+                    targetTower.transform.position
+                );
+
+            if (distance <= 0.5f)
+                break;
+
+            yield return null;
+        }
+
+        if (targetTower == null)
+        {
             barrel.SetActive(false);
 
             yield break;
         }
 
-        Vector3 startPosition = barrel.transform.position;
+        Vector3 effectPosition =
+            targetTower.transform.position;
 
-        float timer = 0f;
+        repairAbility.RepairTower(targetTower);
 
-        while (timer < repairDuration)
+        if (repairEffect != null)
         {
-            timer += Time.deltaTime;
+            GameObject effect =
+                Instantiate(
+                    repairEffect,
+                    effectPosition,
+                    Quaternion.identity
+                );
 
-            float progress =
-                Mathf.Clamp01(timer / repairDuration);
-
-            barrel.transform.position = Vector3.Lerp(
-                startPosition,
-                targetTower.transform.position,
-                progress
-            );
-
-            yield return null;
+            Destroy(effect, effectDuration);
         }
 
-        barrel.transform.position = targetTower.transform.position;
-
-        // Barril desaparece
         barrel.SetActive(false);
-
-        // Aquí se cura de verdad (TowerHealth ya no deja pasar de maxHealth).
-        float healthBefore = targetTower.CurrentHealth;
-        targetTower.Repair(repairAmount);
-
-        // Efecto de reparación
-        if (repairEffectPrefab != null)
-        {
-            GameObject effect = Instantiate(
-                repairEffectPrefab,
-                targetTower.transform.position,
-                Quaternion.identity
-            );
-
-            Destroy(effect, 2f);
-        }
-
-        Debug.Log(
-            $"Torre reparada: {targetTower.name} " +
-            $"({healthBefore} -> {targetTower.CurrentHealth})"
-        );
-    }
-
-    // Torre mas herida dentro del radio, o null si no hay ninguna a la que
-    // le falte vida. Se buscan los componentes TowerHealth directamente en
-    // vez de por collider/tag: las torres del tablero no tienen collider
-    // propio (BoardManager solo les pone el modelo), asi que un
-    // OverlapSphere no encontraria ninguna.
-    private TowerHealth FindMostDamagedTower()
-    {
-        TowerHealth[] towers = Object.FindObjectsByType<TowerHealth>(FindObjectsSortMode.None);
-
-        TowerHealth mostDamaged = null;
-        float lowestRatio = 1f;
-
-        foreach (TowerHealth tower in towers)
-        {
-            float distance = Vector3.Distance(targetPosition, tower.transform.position);
-
-            if (distance > repairRadius)
-                continue;
-
-            // Se compara por porcentaje y no por vida absoluta: si no, una
-            // torre de nivel alto con mucha vida maxima siempre ganaria
-            // aunque este casi intacta.
-            float ratio = tower.CurrentHealth / Mathf.Max(1f, tower.maxHealth);
-
-            if (ratio < lowestRatio)
-            {
-                lowestRatio = ratio;
-                mostDamaged = tower;
-            }
-        }
-
-        return mostDamaged;
     }
 
     private void UpdateIndicatorBlink()
@@ -240,9 +220,10 @@ public class RepairDragAbility : MonoBehaviour, IDragAbility
 
     private void CreateIndicator()
     {
-        indicator = GameObject.CreatePrimitive(
-            PrimitiveType.Quad
-        );
+        indicator =
+            GameObject.CreatePrimitive(
+                PrimitiveType.Quad
+            );
 
         indicator.name = "Repair Indicator";
 

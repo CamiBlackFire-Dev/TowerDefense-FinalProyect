@@ -6,7 +6,6 @@ public class TestEnemyMovement : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float movementSpeed = 2f;
     [SerializeField] private Path path;
-
     private Transform[] waypoints;
     private int currentWaypoint = 0;
 
@@ -20,8 +19,6 @@ public class TestEnemyMovement : MonoBehaviour
 
     [Header("Attack")]
     [SerializeField] private EnemyAttack enemyAttack;
-
-    // Aviso de que el enemigo llegó al final del recorrido.
     public event System.Action<TestEnemyMovement> Finished;
 
     private void Start()
@@ -32,7 +29,6 @@ public class TestEnemyMovement : MonoBehaviour
         originalSpeed = movementSpeed;
     }
 
-    // El spawner le pasa el camino recién creado el enemigo.
     public void SetPath(Path newPath)
     {
         path = newPath;
@@ -42,13 +38,6 @@ public class TestEnemyMovement : MonoBehaviour
 
     private void Update()
     {
-        // Si el enemigo está dentro del rango de una torre,
-        // se queda quieto para que EnemyAttack pueda atacar.
-        /*if (enemyAttack != null && enemyAttack.HasTarget())
-        {
-            return;
-        }*/
-
         if (isReversing)
             return;
 
@@ -59,10 +48,7 @@ public class TestEnemyMovement : MonoBehaviour
 
         Vector3 direction = target.position - transform.position;
 
-        transform.position +=
-            direction.normalized *
-            movementSpeed *
-            Time.deltaTime;
+        transform.position += direction.normalized * movementSpeed * Time.deltaTime;
 
         if (Vector3.Distance(transform.position, target.position) < 0.1f)
         {
@@ -70,8 +56,6 @@ public class TestEnemyMovement : MonoBehaviour
 
             if (currentWaypoint >= waypoints.Length)
             {
-                Debug.Log("El enemigo llegó al final del Path");
-
                 enabled = false;
 
                 if (Finished != null)
@@ -89,15 +73,10 @@ public class TestEnemyMovement : MonoBehaviour
             StopCoroutine(slowCoroutine);
         }
 
-        slowCoroutine =
-            StartCoroutine(
-                SlowCoroutine(multiplier, duration)
-            );
+        slowCoroutine = StartCoroutine(SlowCoroutine(multiplier, duration));
     }
 
-    private IEnumerator SlowCoroutine(
-        float multiplier,
-        float duration)
+    private IEnumerator SlowCoroutine(float multiplier, float duration)
     {
         movementSpeed = originalSpeed * multiplier;
 
@@ -117,14 +96,10 @@ public class TestEnemyMovement : MonoBehaviour
             StopCoroutine(reverseCoroutine);
         }
 
-        reverseCoroutine =
-            StartCoroutine(
-                ReversePathCoroutine(duration)
-            );
+        reverseCoroutine = StartCoroutine(ReversePathCoroutine(duration));
     }
 
-    private IEnumerator ReversePathCoroutine(
-        float duration)
+    private IEnumerator ReversePathCoroutine(float duration)
     {
         isReversing = true;
 
@@ -135,19 +110,11 @@ public class TestEnemyMovement : MonoBehaviour
             if (currentWaypoint <= 0)
                 break;
 
-            Transform previousWaypoint =
-                waypoints[currentWaypoint - 1];
+            Transform previousWaypoint = waypoints[currentWaypoint - 1];
 
-            transform.position =
-                Vector3.MoveTowards(
-                    transform.position,
-                    previousWaypoint.position,
-                    movementSpeed * Time.deltaTime
-                );
+            transform.position = Vector3.MoveTowards(transform.position, previousWaypoint.position, movementSpeed * Time.deltaTime);
 
-            if (Vector3.Distance(
-                transform.position,
-                previousWaypoint.position) <= 0.1f)
+            if (Vector3.Distance(transform.position, previousWaypoint.position) <= 0.1f)
             {
                 currentWaypoint--;
             }
