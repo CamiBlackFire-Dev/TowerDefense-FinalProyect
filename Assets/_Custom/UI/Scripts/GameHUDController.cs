@@ -124,6 +124,16 @@ namespace Custom.UI
         // Color del "reloj" que cubre el icono mientras esta en cooldown.
         public Color cooldownWipeColor = new Color(0f, 0f, 0f, 0.65f);
 
+        [Header("Costo de desbloqueo")]
+        // Oro que cuesta destrabar cada ranura la primera vez. Se lee solo
+        // al armar los slots (OnEnable), asi que un cambio en Play Mode no
+        // se nota hasta la proxima vez que se abra la escena.
+        public int ability1Cost = 100;
+        public int ability2Cost = 200;
+        public int ability3Cost = 300;
+        public int ability4Cost = 400;
+        public int ability5Cost = 500;
+
         // Estado en vivo de cada ranura (boton + overlay + cooldown/usos
         // restantes). Se arma una vez en OnEnable a partir de los campos de
         // arriba y de los elementos del UXML.
@@ -739,19 +749,54 @@ namespace Custom.UI
             RefreshSlotVisual(slot);
         }
 
+        // --- Debug (llamado desde GameDebugWindow, nunca desde el juego) ---
+
+        // Pone en 0 el cooldown y recarga los usos de las 5 ranuras, sin
+        // gastar oro ni tocar si estan desbloqueadas.
+        public void DebugResetAllCooldowns()
+        {
+            if (_allSlots == null)
+                return;
+
+            foreach (AbilitySlot slot in _allSlots)
+            {
+                if (slot == null)
+                    continue;
+
+                slot.RemainingCooldown = 0f;
+                if (slot.Config != null && slot.Config.usageLimitMode != PowerUpUsageLimitMode.Unlimited)
+                    slot.UsesRemaining = slot.Config.maxUses;
+
+                RefreshSlotVisual(slot);
+            }
+        }
+
+        // Quita el candado de las 5 ranuras sin gastar oro.
+        public void DebugUnlockAllAbilities()
+        {
+            if (_allSlots == null)
+                return;
+
+            foreach (AbilitySlot slot in _allSlots)
+            {
+                if (slot != null && slot.Button != null)
+                    slot.Button.RemoveFromClassList("locked");
+            }
+        }
+
         // AQUI se decide que powerup va en cada ranura y cuanto cuesta.
         // Para mover un powerup de ranura o cambiarle el precio, este es el
         // unico sitio que hay que tocar.
         private void BuildAllAbilitySlots(VisualElement root)
         {
-            _slotAbility1 = BuildAbilitySlot(_ability1, root, "Ability1", ability1Cooldown, 100, bombAbility, null);
-            _slotAbility2 = BuildAbilitySlot(_ability2, root, "Ability2", ability2Cooldown, 200, empAbility, null);
-            _slotAbility3 = BuildAbilitySlot(_ability3, root, "Ability3", ability3Cooldown, 300, repulsionAbility, null);
-            _slotAbility4 = BuildAbilitySlot(_ability4, root, "Ability4", ability4Cooldown, 400, repairAbility, null);
+            _slotAbility1 = BuildAbilitySlot(_ability1, root, "Ability1", ability1Cooldown, ability1Cost, bombAbility, null);
+            _slotAbility2 = BuildAbilitySlot(_ability2, root, "Ability2", ability2Cooldown, ability2Cost, empAbility, null);
+            _slotAbility3 = BuildAbilitySlot(_ability3, root, "Ability3", ability3Cooldown, ability3Cost, repulsionAbility, null);
+            _slotAbility4 = BuildAbilitySlot(_ability4, root, "Ability4", ability4Cooldown, ability4Cost, repairAbility, null);
 
             // La ranura 5 no es de arrastre: se usa con un click y su efecto
             // es desbloquear el tablero durante unos segundos.
-            _slotAbility5 = BuildAbilitySlot(_ability5, root, "Ability5", ability5Cooldown, 500, null, UnlockBoardTemporarily);
+            _slotAbility5 = BuildAbilitySlot(_ability5, root, "Ability5", ability5Cooldown, ability5Cost, null, UnlockBoardTemporarily);
 
             _allSlots = new AbilitySlot[]
             {

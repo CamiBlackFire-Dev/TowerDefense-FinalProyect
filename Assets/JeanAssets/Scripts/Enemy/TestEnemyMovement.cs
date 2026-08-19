@@ -36,6 +36,15 @@ public class TestEnemyMovement : MonoBehaviour
         currentWaypoint = 0;
     }
 
+    // El spawner deja aqui la velocidad de esta oleada. Se guarda tambien
+    // como originalSpeed para que un EMP posterior recupere esta velocidad
+    // (y no la que traiga el prefab por defecto) al terminar el slow.
+    public void SetMovementSpeed(float speed)
+    {
+        movementSpeed = speed;
+        originalSpeed = speed;
+    }
+
     private void Update()
     {
         if (isReversing)

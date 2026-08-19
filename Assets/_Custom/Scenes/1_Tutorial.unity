@@ -1588,12 +1588,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CastleLowHealthSmoke
   playerBase: {fileID: 1017545644}
-  smokeMaterial: {fileID: 2100000, guid: 7f9d9a06ef7a61e4eafc237ac13b8038, type: 2}
-  smokeOffset: {x: 0, y: 2, z: 0}
-  smokeColor: {r: 0.08, g: 0.08, b: 0.08, a: 0.85}
-  smokeSize: 2
-  emissionRate: 7
-  lowHealthThreshold: 10
+  firePrefab: {fileID: 1159356881141625346, guid: 5d0d163256664e342be83c804ecb0a48, type: 3}
+  fireOffset: {x: 0, y: 2, z: 0}
+  fireScale: 1
 --- !u!1001 &260616873
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2073,6 +2070,15 @@ MonoBehaviour:
   enemiesPerWave: 8
   enemyHealth: 20
   enemyReward: 10
+  enemySpeed: 2
+  shooterChance: 0.35
+  shooterRange: 5
+  shooterDamage: 4
+  shooterAttackRate: 0.5
+  shooterProjectilePrefab: {fileID: 0}
+  shooterProjectileSpeed: 8
+  shooterPopupPrefab: {fileID: 0}
+  shooterImpactEffect: {fileID: 0}
 --- !u!1 &465256710
 GameObject:
   m_ObjectHideFlags: 0
@@ -3181,6 +3187,7 @@ MonoBehaviour:
   - {r: 0.8, g: 0.4, b: 1, a: 1}
   - {r: 1, g: 1, b: 1, a: 1}
   towersAttack: 1
+  towerTargetRadius: 0.5
   towerCatalog: {fileID: 11400000, guid: 5803adb5b45d66147a2358fe6eb528c3, type: 2}
   projectilePrefab: {fileID: 4570541557667802443, guid: fd26bfe326f4783428bcf130c003beab, type: 3}
   damagePopup: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
@@ -3222,6 +3229,7 @@ MonoBehaviour:
   maxBufferedMoves: 8
   inputController: {fileID: 1260824858}
   spawner: {fileID: 0}
+  temporaryUnlockDuration: 30
 --- !u!1 &756700760
 GameObject:
   m_ObjectHideFlags: 0
@@ -5326,6 +5334,7 @@ MonoBehaviour:
   - {r: 0.8, g: 0.4, b: 1, a: 1}
   - {r: 1, g: 1, b: 1, a: 1}
   towersAttack: 1
+  towerTargetRadius: 0.5
   towerCatalog: {fileID: 0}
   projectilePrefab: {fileID: 4570541557667802443, guid: fd26bfe326f4783428bcf130c003beab, type: 3}
   damagePopup: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
@@ -5367,6 +5376,7 @@ MonoBehaviour:
   maxBufferedMoves: 8
   inputController: {fileID: 1260824858}
   spawner: {fileID: 0}
+  temporaryUnlockDuration: 30
 --- !u!4 &1137570619
 Transform:
   m_ObjectHideFlags: 0
@@ -7169,6 +7179,10 @@ MonoBehaviour:
   playerBase: {fileID: 0}
   towerShop: {fileID: 0}
   bombAbility: {fileID: 151880561}
+  empAbility: {fileID: 0}
+  repulsionAbility: {fileID: 0}
+  repairAbility: {fileID: 0}
+  boardManager: {fileID: 0}
   ability1Cooldown:
     cooldownSeconds: 6
     usageLimitMode: 0
@@ -7185,7 +7199,16 @@ MonoBehaviour:
     cooldownSeconds: 5
     usageLimitMode: 0
     maxUses: 3
+  ability5Cooldown:
+    cooldownSeconds: 30
+    usageLimitMode: 2
+    maxUses: 1
   cooldownWipeColor: {r: 0, g: 0, b: 0, a: 0.65}
+  ability1Cost: 100
+  ability2Cost: 200
+  ability3Cost: 300
+  ability4Cost: 400
+  ability5Cost: 500
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
   waveAnnouncerSound: {fileID: 0}
@@ -7664,6 +7687,15 @@ MonoBehaviour:
   enemiesPerWave: 8
   enemyHealth: 20
   enemyReward: 10
+  enemySpeed: 2
+  shooterChance: 0.35
+  shooterRange: 5
+  shooterDamage: 4
+  shooterAttackRate: 0.5
+  shooterProjectilePrefab: {fileID: 0}
+  shooterProjectileSpeed: 8
+  shooterPopupPrefab: {fileID: 0}
+  shooterImpactEffect: {fileID: 0}
 --- !u!114 &1549257791
 MonoBehaviour:
   m_ObjectHideFlags: 0

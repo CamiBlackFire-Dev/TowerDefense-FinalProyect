@@ -30,6 +30,7 @@ public class EnemySpawner : MonoBehaviour
     [Header("Vida de los enemigos")]
     public float enemyHealth = 20f;
     public int enemyReward = 10;
+    public float enemySpeed = 2f;   // unidades por segundo (TestEnemyMovement.SetMovementSpeed)
 
     [Header("Enemigos que disparan")]
     // Que parte de los enemigos sale armada: 0 = ninguno, 1 = todos.
@@ -227,6 +228,7 @@ public class EnemySpawner : MonoBehaviour
         if (movement != null)
         {
             movement.SetPath(path);
+            movement.SetMovementSpeed(enemySpeed);
             movement.Finished += HandleEnemyFinished;
         }
 
