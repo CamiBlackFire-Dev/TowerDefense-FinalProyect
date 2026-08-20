@@ -1424,7 +1424,6 @@ MonoBehaviour:
   shooterProjectilePrefab: {fileID: 5175319666275068441, guid: 4a1e8296c170a6647b9e4be22295154c, type: 3}
   shooterProjectileSpeed: 8
   shooterPopupPrefab: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
-  shooterImpactEffect: {fileID: 0}
 --- !u!1 &464760619
 GameObject:
   m_ObjectHideFlags: 0

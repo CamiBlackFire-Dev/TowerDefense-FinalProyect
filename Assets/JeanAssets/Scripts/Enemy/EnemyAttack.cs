@@ -24,6 +24,21 @@ public class EnemyAttack : MonoBehaviour
         detector = GetComponent<EnemyTargetDetector>();
     }
 
+    // Puente para EnemySpawner (Assets/_Custom): le permite configurar esta
+    // ranura al vuelo por oleada, igual que ya hace con EnemyHealth.Setup.
+    // No toca projectileHeight a proposito: eso queda como ajuste fijo del
+    // prefab, no algo que varie oleada a oleada.
+    public void Setup(float newDamage, float newAttackRate,
+        GameObject newProjectilePrefab, float newProjectileSpeed,
+        DamageNumber newPopup)
+    {
+        damage = newDamage;
+        attackRate = newAttackRate;
+        projectilePrefab = newProjectilePrefab;
+        projectileSpeed = newProjectileSpeed;
+        popupPrefab = newPopup;
+    }
+
     private void Update()
     {
         Transform target = detector.CurrentTarget;
