@@ -200,6 +200,7 @@ namespace Custom.UI
             _waveSubtitleText = root.Q<Label>("WaveSubtitleText");
             _optionsButton = root.Q<Button>("OptionsButton");
             _startWaveButton = root.Q<Button>("StartWaveButton");
+            _startWaveButton.BringToFront();
             _buyTowerButton = root.Q<Button>("BuyTowerButton");
             _speed1xButton = root.Q<Button>("Speed1xButton");
             _speed2xButton = root.Q<Button>("Speed2xButton");
