@@ -348,8 +348,8 @@
 }
 
 .lock-icon {
-    font-size: 25px;
-    color: white;
+    width: 28px;
+    height: 28px;
     margin-bottom: 2px;
 }
 
@@ -401,15 +401,12 @@
     text-shadow: 2px 2px 0 rgb(0, 0, 0);
 }
 
-.ability-icon-emoji {
+.ability-icon-vector {
     position: absolute;
     left: 0;
     top: 0;
     right: 0;
     bottom: 0;
-    font-size: 48px;
-    -unity-text-align: middle-center;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6);
 }
 
 .cooldown-overlay {

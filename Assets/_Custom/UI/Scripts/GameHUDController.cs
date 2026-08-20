@@ -41,6 +41,12 @@ namespace Custom.UI
         private Button _optionsButton;
         private Button _startWaveButton;
         private Button _buyTowerButton;
+        // Candado dibujado a mano (Painter2D): los emojis (🔒⚡💨🔧🔓) se ven
+        // en el Editor porque Windows les busca una fuente de respaldo, pero
+        // en un build (WebGL incluido) no hay ese respaldo y no se dibuja
+        // nada. Dibujar el icono con vectores evita depender de una fuente.
+        private VisualElement _buyTowerLockIcon;
+        private Action<MeshGenerationContext> _buyTowerLockIconDrawCallback;
         private Button _speed1xButton;
         private Button _speed2xButton;
 
@@ -154,6 +160,12 @@ namespace Custom.UI
             public float RemainingCooldown;
             public int UsesRemaining;
             public Action<MeshGenerationContext> DrawCallback;
+            // Icono de la habilidad (dibujado a mano, ver DrawLockIcon)
+            // y el candado que se le superpone mientras esta bloqueada.
+            public VisualElement IconElement;
+            public Action<MeshGenerationContext> IconDrawCallback;
+            public VisualElement LockIconElement;
+            public Action<MeshGenerationContext> LockIconDrawCallback;
             // Cuanto cuesta desbloquearla la primera vez.
             public int Cost;
             // Powerup de arrastre de esta ranura (null si se usa con click).
@@ -267,6 +279,13 @@ namespace Custom.UI
             {
                 _buyTowerButton.clicked += OnBuyTowerClicked;
                 _buyTowerButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+
+            _buyTowerLockIcon = root.Q<VisualElement>("BuyTowerLockIcon");
+            if (_buyTowerLockIcon != null)
+            {
+                _buyTowerLockIconDrawCallback = DrawLockIcon;
+                _buyTowerLockIcon.generateVisualContent += _buyTowerLockIconDrawCallback;
             }
 
             if (_speed1xButton != null)
@@ -399,6 +418,8 @@ namespace Custom.UI
                 _buyTowerButton.clicked -= OnBuyTowerClicked;
                 _buyTowerButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
             }
+            if (_buyTowerLockIcon != null && _buyTowerLockIconDrawCallback != null)
+                _buyTowerLockIcon.generateVisualContent -= _buyTowerLockIconDrawCallback;
             if (_speed1xButton != null)
             {
                 _speed1xButton.clicked -= OnSpeed1xClicked;
@@ -806,14 +827,16 @@ namespace Custom.UI
         // unico sitio que hay que tocar.
         private void BuildAllAbilitySlots(VisualElement root)
         {
+            // La ranura 1 (bomba) ya trae su propio sprite de fondo en el
+            // UXML, asi que no necesita un icono dibujado a mano.
             _slotAbility1 = BuildAbilitySlot(_ability1, root, "Ability1", ability1Cooldown, ability1Cost, bombAbility, null);
-            _slotAbility2 = BuildAbilitySlot(_ability2, root, "Ability2", ability2Cooldown, ability2Cost, empAbility, null);
-            _slotAbility3 = BuildAbilitySlot(_ability3, root, "Ability3", ability3Cooldown, ability3Cost, repulsionAbility, null);
-            _slotAbility4 = BuildAbilitySlot(_ability4, root, "Ability4", ability4Cooldown, ability4Cost, repairAbility, null);
+            _slotAbility2 = BuildAbilitySlot(_ability2, root, "Ability2", ability2Cooldown, ability2Cost, empAbility, null, DrawLightningIcon);
+            _slotAbility3 = BuildAbilitySlot(_ability3, root, "Ability3", ability3Cooldown, ability3Cost, repulsionAbility, null, DrawRepulsionIcon);
+            _slotAbility4 = BuildAbilitySlot(_ability4, root, "Ability4", ability4Cooldown, ability4Cost, repairAbility, null, DrawHealIcon);
 
             // La ranura 5 no es de arrastre: se usa con un click y su efecto
             // es desbloquear el tablero durante unos segundos.
-            _slotAbility5 = BuildAbilitySlot(_ability5, root, "Ability5", ability5Cooldown, ability5Cost, null, UnlockBoardTemporarily);
+            _slotAbility5 = BuildAbilitySlot(_ability5, root, "Ability5", ability5Cooldown, ability5Cost, null, UnlockBoardTemporarily, DrawUnlockIcon);
 
             _allSlots = new AbilitySlot[]
             {
@@ -826,7 +849,8 @@ namespace Custom.UI
         // dibujo del "reloj" de cooldown y registra los eventos que le tocan
         // segun sea de arrastre o de click.
         private AbilitySlot BuildAbilitySlot(Button button, VisualElement root, string elementPrefix,
-            PowerUpCooldownConfig config, int cost, IDragAbility dragAbility, Action onUse)
+            PowerUpCooldownConfig config, int cost, IDragAbility dragAbility, Action onUse,
+            Action<MeshGenerationContext> drawIcon = null)
         {
             if (button == null)
                 return null;
@@ -848,6 +872,23 @@ namespace Custom.UI
             {
                 slot.DrawCallback = context => DrawCooldownWipe(context, slot);
                 slot.CooldownOverlay.generateVisualContent += slot.DrawCallback;
+            }
+
+            // Icono de la habilidad: la ranura 1 (bomba) trae su propio
+            // sprite de fondo y no pasa drawIcon (queda null a proposito).
+            slot.IconElement = root.Q<VisualElement>(elementPrefix + "Icon");
+            if (slot.IconElement != null && drawIcon != null)
+            {
+                slot.IconDrawCallback = drawIcon;
+                slot.IconElement.generateVisualContent += slot.IconDrawCallback;
+            }
+
+            // Candado del overlay "bloqueada": igual en las cinco ranuras.
+            slot.LockIconElement = root.Q<VisualElement>(elementPrefix + "LockIcon");
+            if (slot.LockIconElement != null)
+            {
+                slot.LockIconDrawCallback = DrawLockIcon;
+                slot.LockIconElement.generateVisualContent += slot.LockIconDrawCallback;
             }
 
             // El desbloqueo (comprar el powerup) siempre es un click normal.
@@ -878,6 +919,12 @@ namespace Custom.UI
 
             if (slot.CooldownOverlay != null && slot.DrawCallback != null)
                 slot.CooldownOverlay.generateVisualContent -= slot.DrawCallback;
+
+            if (slot.IconElement != null && slot.IconDrawCallback != null)
+                slot.IconElement.generateVisualContent -= slot.IconDrawCallback;
+
+            if (slot.LockIconElement != null && slot.LockIconDrawCallback != null)
+                slot.LockIconElement.generateVisualContent -= slot.LockIconDrawCallback;
 
             if (slot.ClickedCallback != null)
                 slot.Button.clicked -= slot.ClickedCallback;
@@ -956,6 +1003,193 @@ namespace Custom.UI
             painter.MoveTo(center);
             painter.Arc(center, radius, Angle.Degrees(-90f), Angle.Degrees(-90f + sweep), ArcDirection.Clockwise);
             painter.LineTo(center);
+            painter.Fill();
+        }
+
+        // --- Iconos de habilidades ---
+        // Antes estos iconos eran emojis (🔒⚡💨🔧🔓) en un Label: se ven
+        // bien en el Editor porque Windows les busca una fuente de
+        // respaldo, pero un build (WebGL incluido) no tiene ese respaldo y
+        // el glifo no se dibuja. Estos metodos los dibujan a mano con
+        // Painter2D (la misma tecnica de DrawCooldownWipe), asi que no
+        // dependen de ninguna fuente y se ven igual en Editor y en build.
+
+        // Candado cerrado: una sola version para las 5 ranuras bloqueadas
+        // y para el boton de comprar torre cuando no alcanza el oro.
+        private void DrawLockIcon(MeshGenerationContext context)
+        {
+            Rect rect = context.visualElement.contentRect;
+            if (rect.width <= 0f || rect.height <= 0f)
+                return;
+
+            float w = rect.width;
+            float h = rect.height;
+            Painter2D painter = context.painter2D;
+
+            painter.fillColor = Color.white;
+            painter.BeginPath();
+            painter.MoveTo(new Vector2(w * 0.16f, h * 0.42f));
+            painter.LineTo(new Vector2(w * 0.84f, h * 0.42f));
+            painter.LineTo(new Vector2(w * 0.84f, h * 0.94f));
+            painter.LineTo(new Vector2(w * 0.16f, h * 0.94f));
+            painter.ClosePath();
+            painter.Fill();
+
+            painter.strokeColor = Color.white;
+            painter.lineWidth = w * 0.14f;
+            painter.lineCap = LineCap.Round;
+            painter.BeginPath();
+            painter.Arc(new Vector2(w * 0.5f, h * 0.40f), w * 0.28f, Angle.Degrees(180f), Angle.Degrees(360f), ArcDirection.Clockwise);
+            painter.Stroke();
+        }
+
+        // Candado abierto: icono de la ranura 5 (desbloqueo del tablero).
+        // Misma base que el candado cerrado, pero con la argolla despegada
+        // y flotando arriba en vez de apoyada sobre el cuerpo.
+        private void DrawUnlockIcon(MeshGenerationContext context)
+        {
+            Rect rect = context.visualElement.contentRect;
+            if (rect.width <= 0f || rect.height <= 0f)
+                return;
+
+            float w = rect.width;
+            float h = rect.height;
+            Color gold = new Color(0.945f, 0.769f, 0.059f);
+            Painter2D painter = context.painter2D;
+
+            painter.fillColor = gold;
+            painter.BeginPath();
+            painter.MoveTo(new Vector2(w * 0.20f, h * 0.50f));
+            painter.LineTo(new Vector2(w * 0.80f, h * 0.50f));
+            painter.LineTo(new Vector2(w * 0.80f, h * 0.94f));
+            painter.LineTo(new Vector2(w * 0.20f, h * 0.94f));
+            painter.ClosePath();
+            painter.Fill();
+
+            painter.strokeColor = gold;
+            painter.lineWidth = w * 0.13f;
+            painter.lineCap = LineCap.Round;
+            painter.BeginPath();
+            painter.Arc(new Vector2(w * 0.62f, h * 0.26f), w * 0.26f, Angle.Degrees(180f), Angle.Degrees(360f), ArcDirection.Clockwise);
+            painter.Stroke();
+        }
+
+        // Rayo: icono de la ranura 2 (EMP).
+        private void DrawLightningIcon(MeshGenerationContext context)
+        {
+            Rect rect = context.visualElement.contentRect;
+            if (rect.width <= 0f || rect.height <= 0f)
+                return;
+
+            float w = rect.width;
+            float h = rect.height;
+            Painter2D painter = context.painter2D;
+
+            painter.fillColor = new Color(0.35f, 0.85f, 1f);
+            painter.strokeColor = new Color(0.05f, 0.25f, 0.45f);
+            painter.lineWidth = w * 0.03f;
+            painter.lineJoin = LineJoin.Round;
+
+            painter.BeginPath();
+            painter.MoveTo(new Vector2(w * 0.60f, h * 0.04f));
+            painter.LineTo(new Vector2(w * 0.26f, h * 0.56f));
+            painter.LineTo(new Vector2(w * 0.46f, h * 0.56f));
+            painter.LineTo(new Vector2(w * 0.36f, h * 0.96f));
+            painter.LineTo(new Vector2(w * 0.76f, h * 0.42f));
+            painter.LineTo(new Vector2(w * 0.54f, h * 0.42f));
+            painter.ClosePath();
+            painter.Fill();
+            painter.Stroke();
+        }
+
+        // Estallido de flechas hacia afuera: icono de la ranura 3
+        // (Repulsion). Representa lo que hace de verdad la habilidad:
+        // empuja a los enemigos lejos del punto donde cae, haciendolos
+        // retroceder por el camino.
+        private void DrawRepulsionIcon(MeshGenerationContext context)
+        {
+            Rect rect = context.visualElement.contentRect;
+            if (rect.width <= 0f || rect.height <= 0f)
+                return;
+
+            float w = rect.width;
+            float h = rect.height;
+            Painter2D painter = context.painter2D;
+            Color orange = new Color(1f, 0.55f, 0.15f);
+
+            Vector2 center = new Vector2(w * 0.5f, h * 0.5f);
+            float innerR = w * 0.14f;
+            float shaftR = w * 0.34f;
+            float tipR = w * 0.46f;
+            float headHalfWidth = w * 0.13f;
+
+            painter.fillColor = orange;
+            painter.strokeColor = orange;
+            painter.lineCap = LineCap.Round;
+            painter.lineWidth = w * 0.09f;
+
+            // Tres flechas repartidas en circulo (120 grados entre si),
+            // cada una con su vara y su punta.
+            float[] angles = { -90f, 30f, 150f };
+            for (int i = 0; i < angles.Length; i++)
+            {
+                float rad = angles[i] * Mathf.Deg2Rad;
+                Vector2 dir = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
+                Vector2 perp = new Vector2(-dir.y, dir.x);
+
+                Vector2 innerPoint = center + dir * innerR;
+                Vector2 shaftEnd = center + dir * shaftR;
+                Vector2 tip = center + dir * tipR;
+                Vector2 headBaseA = shaftEnd + perp * headHalfWidth;
+                Vector2 headBaseB = shaftEnd - perp * headHalfWidth;
+
+                painter.BeginPath();
+                painter.MoveTo(innerPoint);
+                painter.LineTo(shaftEnd);
+                painter.Stroke();
+
+                painter.BeginPath();
+                painter.MoveTo(tip);
+                painter.LineTo(headBaseA);
+                painter.LineTo(headBaseB);
+                painter.ClosePath();
+                painter.Fill();
+            }
+        }
+
+        // Cruz de curacion: icono de la ranura 4 (Reparacion).
+        private void DrawHealIcon(MeshGenerationContext context)
+        {
+            Rect rect = context.visualElement.contentRect;
+            if (rect.width <= 0f || rect.height <= 0f)
+                return;
+
+            float w = rect.width;
+            float h = rect.height;
+            Color green = new Color(0.25f, 0.80f, 0.35f);
+            Painter2D painter = context.painter2D;
+
+            float cx = w * 0.5f;
+            float cy = h * 0.5f;
+            float barThickness = w * 0.26f;
+            float barLength = w * 0.74f;
+
+            painter.fillColor = green;
+
+            painter.BeginPath();
+            painter.MoveTo(new Vector2(cx - barThickness * 0.5f, cy - barLength * 0.5f));
+            painter.LineTo(new Vector2(cx + barThickness * 0.5f, cy - barLength * 0.5f));
+            painter.LineTo(new Vector2(cx + barThickness * 0.5f, cy + barLength * 0.5f));
+            painter.LineTo(new Vector2(cx - barThickness * 0.5f, cy + barLength * 0.5f));
+            painter.ClosePath();
+            painter.Fill();
+
+            painter.BeginPath();
+            painter.MoveTo(new Vector2(cx - barLength * 0.5f, cy - barThickness * 0.5f));
+            painter.LineTo(new Vector2(cx + barLength * 0.5f, cy - barThickness * 0.5f));
+            painter.LineTo(new Vector2(cx + barLength * 0.5f, cy + barThickness * 0.5f));
+            painter.LineTo(new Vector2(cx - barLength * 0.5f, cy + barThickness * 0.5f));
+            painter.ClosePath();
             painter.Fill();
         }
         #endregion
