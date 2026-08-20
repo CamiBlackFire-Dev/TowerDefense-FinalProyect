@@ -16,6 +16,11 @@ public class BombAbility : MonoBehaviour
     // no se dibuja nada (el dano y la deteccion siguen funcionando igual).
     [SerializeField] private Material explosionVisualMaterial;
     [SerializeField] private float explosionVisualDuration = 0.4f;
+    // VFX de fuego (Casual RPG VFX) que se instancia encima del disco, para
+    // que la explosion se vea como una bola de fuego real y no solo el
+    // area marcada. Sin prefab asignado no aparece nada, el resto sigue igual.
+    [SerializeField] private GameObject explosionVfxPrefab;
+    [SerializeField] private float explosionVfxDuration = 6.5f;
     // Texto "Boom" flotante (Damage Numbers Pro). Opcional: sin prefab
     // asignado no aparece nada, el resto de la explosion sigue igual.
     [SerializeField] private DamageNumber boomTextPrefab;
@@ -81,6 +86,12 @@ public class BombAbility : MonoBehaviour
     private void DetectEnemies(Vector3 explosionPosition)
     {
         ExplosionVisual.Spawn(explosionPosition, explosionRadius, explosionVisualMaterial, explosionVisualDuration);
+
+        if (explosionVfxPrefab != null)
+        {
+            GameObject vfx = Instantiate(explosionVfxPrefab, explosionPosition, Quaternion.identity);
+            Destroy(vfx, explosionVfxDuration);
+        }
 
         if (boomTextPrefab != null)
             boomTextPrefab.Spawn(explosionPosition + Vector3.up * boomTextHeightOffset);

@@ -50,6 +50,16 @@ public class EconomyManager : MonoBehaviour
         return true;
     }
 
+    // Deja el dinero en un valor exacto, sin pasar por sumas o gastos.
+    // Pensado para depurar (GameDebugWindow); el juego normal siempre usa
+    // AddCurrency/TrySpend.
+    public void SetMoney(int amount)
+    {
+        EnsureInitialized();
+        _money = Mathf.Max(0, amount);
+        NotifyMoneyChanged();
+    }
+
     // Inicializa el dinero la primera vez que se usa.
     // Se llama desde Awake y desde cada metodo publico porque, fuera de
     // Play Mode (por ejemplo en pruebas de editor), Awake no se ejecuta.
