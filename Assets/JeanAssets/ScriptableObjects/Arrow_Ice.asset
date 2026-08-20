@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Arrow_Ice
   m_EditorClassIdentifier: Assembly-CSharp::ArrowData
   arrowName: Ice
-  prefab: {fileID: 0}
+  prefab: {fileID: 6760192031667610764, guid: a486bfc052431e4449ab0e58a8dd7a32, type: 3}
+  speed: 10
   damage: 30
-  speed: 30
   effectType: 3
   effectDuration: 3
   effectValue: 0.5
-  effectPrefab: {fileID: 0}
+  effectPrefab: {fileID: 3607185601950021820, guid: d6d1ed8faf0030f4cb28009ba37496f4, type: 3}

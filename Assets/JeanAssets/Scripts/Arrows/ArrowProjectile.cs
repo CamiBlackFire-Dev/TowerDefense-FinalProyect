@@ -26,7 +26,7 @@ public class ArrowProjectile : MonoBehaviour
 
         Vector3 direction = target.position - transform.position;
 
-        transform.position += direction.normalized * arrowData.speed * Time.deltaTime;
+        transform.position += direction.normalized * Time.deltaTime;
 
         transform.LookAt(target);
 

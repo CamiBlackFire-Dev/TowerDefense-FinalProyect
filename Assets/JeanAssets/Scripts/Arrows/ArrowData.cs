@@ -9,12 +9,12 @@ public class ArrowData : ScriptableObject
     [Header("Identity")]
     public string arrowName;
 
-    [Header("Prefab")]
+    [Header("Projectile")]
     public GameObject prefab;
+    public float speed = 10f;
 
     [Header("Stats")]
     public float damage = 10f;
-    public float speed = 10f;
 
     [Header("Effect")]
     public ArrowEffectType effectType;

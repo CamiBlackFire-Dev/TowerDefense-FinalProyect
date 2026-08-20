@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 6408524975986249499}
   - component: {fileID: 5968191571004327246}
   - component: {fileID: 5208400686652437264}
-  - component: {fileID: 2679876116802624247}
+  - component: {fileID: 4745198208474341951}
   m_Layer: 0
-  m_Name: PoisonArrow
+  m_Name: Normal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 0b5c445f5fb874f42bc5731c32f933d8, type: 2}
+  - {fileID: -6538903991835684241, guid: fbfffd160a2e62e4f836da65f5a488fd, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -91,7 +91,7 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &2679876116802624247
+--- !u!114 &4745198208474341951
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

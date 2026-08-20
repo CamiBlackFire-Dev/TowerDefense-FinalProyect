@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Arrow_Poison
   m_EditorClassIdentifier: Assembly-CSharp::ArrowData
   arrowName: Poison
-  prefab: {fileID: 0}
+  prefab: {fileID: 6760192031667610764, guid: c74c05b41be73fc4fa40f56413ed8524, type: 3}
+  speed: 10
   damage: 20
-  speed: 20
   effectType: 1
   effectDuration: 3
   effectValue: 0.5
-  effectPrefab: {fileID: 0}
+  effectPrefab: {fileID: 5984480896937644376, guid: a5751cdcc19e35141b9794ed4c040008, type: 3}
