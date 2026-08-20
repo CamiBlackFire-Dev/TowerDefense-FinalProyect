@@ -3,13 +3,18 @@ using DamageNumbersPro;
 
 public class EnemyProjectile : MonoBehaviour
 {
+    [Header("Projectile")]
+    [SerializeField] private float speed = 10f;
+    [SerializeField] private float hitDistance = 0.2f;
+
+    [Header("Impact Effect")]
+    [SerializeField] private GameObject impactEffect;
+
     private Transform target;
     private float damage;
     private DamageNumber popupPrefab;
-    private GameObject impactEffect;
-    private float speed;
 
-    public void Setup(Transform target, float damage, float speed, DamageNumber popupPrefab, GameObject impactEffect)
+    public void Setup(Transform target, float damage, float speed, DamageNumber popupPrefab)
     {
         this.target = target;
 
@@ -18,8 +23,6 @@ public class EnemyProjectile : MonoBehaviour
         this.speed = speed;
 
         this.popupPrefab = popupPrefab;
-        
-        this.impactEffect = impactEffect;
     }
 
     private void Update()
@@ -39,7 +42,7 @@ public class EnemyProjectile : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(direction);
         }
 
-        if (Vector3.Distance(transform.position, target.position) < 0.2f)
+        if (Vector3.Distance(transform.position, target.position) <= hitDistance)
         {
             HitTarget();
         }
@@ -57,11 +60,13 @@ public class EnemyProjectile : MonoBehaviour
             {
                 popupPrefab.Spawn(target.position, damage);
             }
+        }
 
-            if (impactEffect != null)
-            {
-                Instantiate(impactEffect, target.position, Quaternion.identity);
-            }
+        if (impactEffect != null)
+        {
+            GameObject effect = Instantiate(impactEffect, target.position, Quaternion.identity);
+
+            Destroy(effect, 3f);
         }
 
         Destroy(gameObject);

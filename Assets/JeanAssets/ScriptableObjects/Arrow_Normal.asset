@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Arrow_Normal
   m_EditorClassIdentifier: Assembly-CSharp::ArrowData
   arrowName: Normal
-  prefab: {fileID: 0}
-  damage: 10
+  prefab: {fileID: 6760192031667610764, guid: fbf047f87efb1094985ae401a594782b, type: 3}
   speed: 10
+  damage: 10
   effectType: 0
   effectDuration: 3
   effectValue: 0.5
-  effectPrefab: {fileID: 0}
+  effectPrefab: {fileID: 5013878782555061258, guid: d9fa0c80412e48448acaa78def63d086, type: 3}

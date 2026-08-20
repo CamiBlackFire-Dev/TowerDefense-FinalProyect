@@ -8,14 +8,13 @@ public class EnemyAttack : MonoBehaviour
     [SerializeField] private float damage = 10f;
     [SerializeField] private float attackRate = 1f;
 
-    [Header("Effects")]
-    [SerializeField] private DamageNumber popupPrefab;
-    [SerializeField] private GameObject impactEffect;
-
     [Header("Projectile")]
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private float projectileSpeed = 10f;
     [SerializeField] private float projectileHeight = 1f;
+
+    [Header("Effects")]
+    [SerializeField] private DamageNumber popupPrefab;
 
     private EnemyTargetDetector detector;
     private float cooldown;
@@ -51,37 +50,22 @@ public class EnemyAttack : MonoBehaviour
 
     private void Attack(Transform target)
     {
-        if (projectilePrefab != null)
-        {
-            Vector3 spawnPosition = transform.position + Vector3.up * projectileHeight;
-
-            GameObject arrow =Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
-
-            EnemyProjectile projectile = arrow.GetComponent<EnemyProjectile>();
-
-            if (projectile != null)
-            {
-                projectile.Setup(target, damage, projectileSpeed, popupPrefab, impactEffect);
-            }
-
+        if (projectilePrefab == null)
             return;
-        }
 
-        TowerHealth towerHealth = target.GetComponentInParent<TowerHealth>();
+        Vector3 spawnPosition = transform.position + Vector3.up * projectileHeight;
 
-        if (towerHealth != null)
+        GameObject arrow = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
+
+        EnemyProjectile projectile = arrow.GetComponent<EnemyProjectile>();
+
+        if (projectile != null)
         {
-            towerHealth.TakeDamage(damage);
-
-            if (popupPrefab != null)
-            {
-                popupPrefab.Spawn(target.position, damage);
-            }
-
-            if (impactEffect != null)
-            {
-                Instantiate(impactEffect, target.position, Quaternion.identity);
-            }
+            projectile.Setup(target, damage, projectileSpeed, popupPrefab);
+        }
+        else
+        {
+            Debug.LogWarning("El projectilePrefab no tiene el componente EnemyProjectile.");
         }
     }
 }

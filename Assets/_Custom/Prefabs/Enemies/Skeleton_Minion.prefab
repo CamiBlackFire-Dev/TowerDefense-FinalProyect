@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 8656538152801287656}
   - component: {fileID: 2800973588283081172}
   - component: {fileID: 5100486307732661573}
+  - component: {fileID: 5683005396687947657}
   m_Layer: 3
   m_Name: Skeleton_Minion
   m_TagString: Untagged
@@ -76,6 +77,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TestEnemyMovement
   movementSpeed: 2
   path: {fileID: 0}
+  enemyAttack: {fileID: 0}
 --- !u!114 &4635337305100229995
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -155,12 +157,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttack
   damage: 10
   attackRate: 1
-  range: 2
-  towerLayer:
-    serializedVersion: 2
-    m_Bits: 128
+  projectilePrefab: {fileID: 0}
+  projectileSpeed: 10
+  projectileHeight: 1
   popupPrefab: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
-  impactEffect: {fileID: 4136125158120372866, guid: 4f971cfbcf5d36a4d84ed34cd8c05810, type: 3}
+--- !u!114 &5683005396687947657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5379352500915273197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 407b67dbb3d5bf44582d36b4e8c15e9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyStatusEffects
 --- !u!1001 &6991397754652376002
 PrefabInstance:
   m_ObjectHideFlags: 0
