@@ -1408,12 +1408,14 @@ MonoBehaviour:
   pathBuilder: {fileID: 56868381}
   economy: {fileID: 1085780038}
   playerBase: {fileID: 1017545644}
+  castleTransform: {fileID: 0}
   goldPopupPrefab: {fileID: 7734501003, guid: 1b2d1593dfc81e5458989485a23908d7, type: 3}
   damagePerEnemy: 1
   spawnOnStart: 0
   startDelay: 2
   spawnInterval: 2
   enemiesPerWave: 8
+  waveSurvivalGold: 50
   enemyHealth: 20
   enemyReward: 10
   enemySpeed: 2

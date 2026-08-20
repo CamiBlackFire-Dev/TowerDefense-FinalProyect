@@ -11,11 +11,15 @@ public class EnemySpawner : MonoBehaviour
     // Prefabs de los enemigos. En cada spawn sale uno al azar de la lista.
     // Los crea el menu Tower Defense > Crear prefabs de enemigos.
     public GameObject[] enemyPrefabs;
-    // Los tres de abajo se buscan solos si se dejan vacios.
+    // Los cuatro de abajo se buscan solos si se dejan vacios.
     public PathBuilder pathBuilder; // camino que van a recorrer
     public EconomyManager economy;  // paga al jugador cuando mueren
     public PlayerBase playerBase;   // pierde vidas si un enemigo llega al final
+    // Donde flota el numero del bono de oleada (ver waveSurvivalGold): se
+    // busca el objeto con CastleDamageFeedback, que vive en el castillo.
+    public Transform castleTransform;
     // Numero flotante de oro al morir (opcional). Ej: Assets/_Custom/Prefabs/VFX/GoldNumber.prefab
+    // Se reutiliza tambien para el bono de oleada completa.
     public DamageNumber goldPopupPrefab;
 
     [Header("Dano al escaparse")]
@@ -26,6 +30,11 @@ public class EnemySpawner : MonoBehaviour
     public float startDelay = 2f;    // espera antes del primer enemigo
     public float spawnInterval = 2f; // segundos entre un enemigo y el siguiente
     public int enemiesPerWave = 8;   // cuantos salen (0 = sin parar)
+    // Oro garantizado al terminar una oleada, sin importar cuantos enemigos
+    // mataron las torres. Sin esto, si te quedas sin torres y sin la bomba
+    // (la unica forma de matar enemigos sin torres) el oro deja de entrar
+    // por completo y la partida queda sin salida.
+    public int waveSurvivalGold = 50;
 
     [Header("Vida de los enemigos")]
     public float enemyHealth = 20f;
@@ -115,6 +124,13 @@ public class EnemySpawner : MonoBehaviour
         // el HUD, para que ambos escuchen siempre la misma instancia.
         if (playerBase == null)
             playerBase = PlayerBase.Instance;
+
+        if (castleTransform == null)
+        {
+            CastleDamageFeedback castle = FindFirstObjectByType<CastleDamageFeedback>();
+            if (castle != null)
+                castleTransform = castle.transform;
+        }
     }
 
     // Empieza una oleada nueva desde cero.
@@ -173,6 +189,15 @@ public class EnemySpawner : MonoBehaviour
         if (doneSpawning && _aliveCount <= 0)
         {
             _running = false;
+
+            if (economy != null)
+            {
+                economy.AddCurrency(waveSurvivalGold);
+
+                if (goldPopupPrefab != null && waveSurvivalGold > 0 && castleTransform != null)
+                    goldPopupPrefab.Spawn(castleTransform.position, waveSurvivalGold);
+            }
+
             if (WaveFinished != null)
                 WaveFinished();
         }

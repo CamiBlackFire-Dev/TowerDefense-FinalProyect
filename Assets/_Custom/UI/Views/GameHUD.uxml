@@ -36,7 +36,7 @@
                 <ui:Button name="Ability1" class="ability-slot locked" style="background-image: url(&quot;project://database/Assets/_Custom/Models/PowerUps/Bomb/BombaIcono.png?fileID=2800000&amp;guid=7c0517bb66c43d44191132a2ea3d1da4&amp;type=3#BombaIcono&quot;); background-size: 70% 70%; -unity-background-scale-mode: scale-to-fit;">
                     <ui:Label text="1" class="ability-hotkey"/>
                     <ui:VisualElement class="lock-overlay">
-                        <ui:Label text="🔒" class="lock-icon"/>
+                        <ui:VisualElement name="Ability1LockIcon" class="lock-icon" picking-mode="Ignore"/>
                         <ui:VisualElement style="flex-direction: row; align-items: center;">
                             <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
                             <ui:Label text="100" class="lock-price"/>
@@ -47,9 +47,9 @@
                 </ui:Button>
                 <ui:Button name="Ability2" class="ability-slot locked">
                     <ui:Label text="2" class="ability-hotkey"/>
-                    <ui:Label text="⚡" class="ability-icon-emoji" picking-mode="Ignore"/>
+                    <ui:VisualElement name="Ability2Icon" class="ability-icon-vector" picking-mode="Ignore"/>
                     <ui:VisualElement class="lock-overlay">
-                        <ui:Label text="🔒" class="lock-icon"/>
+                        <ui:VisualElement name="Ability2LockIcon" class="lock-icon" picking-mode="Ignore"/>
                         <ui:VisualElement style="flex-direction: row; align-items: center;">
                             <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
                             <ui:Label text="200" class="lock-price"/>
@@ -60,9 +60,9 @@
                 </ui:Button>
                 <ui:Button name="Ability3" class="ability-slot locked">
                     <ui:Label text="3" class="ability-hotkey"/>
-                    <ui:Label text="💨" class="ability-icon-emoji" picking-mode="Ignore"/>
+                    <ui:VisualElement name="Ability3Icon" class="ability-icon-vector" picking-mode="Ignore"/>
                     <ui:VisualElement class="lock-overlay">
-                        <ui:Label text="🔒" class="lock-icon"/>
+                        <ui:VisualElement name="Ability3LockIcon" class="lock-icon" picking-mode="Ignore"/>
                         <ui:VisualElement style="flex-direction: row; align-items: center;">
                             <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
                             <ui:Label text="300" class="lock-price"/>
@@ -73,9 +73,9 @@
                 </ui:Button>
                 <ui:Button name="Ability4" class="ability-slot locked">
                     <ui:Label text="4" class="ability-hotkey"/>
-                    <ui:Label text="🔧" class="ability-icon-emoji" picking-mode="Ignore"/>
+                    <ui:VisualElement name="Ability4Icon" class="ability-icon-vector" picking-mode="Ignore"/>
                     <ui:VisualElement class="lock-overlay">
-                        <ui:Label text="🔒" class="lock-icon"/>
+                        <ui:VisualElement name="Ability4LockIcon" class="lock-icon" picking-mode="Ignore"/>
                         <ui:VisualElement style="flex-direction: row; align-items: center;">
                             <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
                             <ui:Label text="400" class="lock-price"/>
@@ -86,9 +86,9 @@
                 </ui:Button>
                 <ui:Button name="Ability5" class="ability-slot locked" style="margin-right: 0;">
                     <ui:Label text="5" class="ability-hotkey"/>
-                    <ui:Label text="🔓" class="ability-icon-emoji" picking-mode="Ignore"/>
+                    <ui:VisualElement name="Ability5Icon" class="ability-icon-vector" picking-mode="Ignore"/>
                     <ui:VisualElement class="lock-overlay">
-                        <ui:Label text="🔒" class="lock-icon"/>
+                        <ui:VisualElement name="Ability5LockIcon" class="lock-icon" picking-mode="Ignore"/>
                         <ui:VisualElement style="flex-direction: row; align-items: center;">
                             <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
                             <ui:Label text="500" class="lock-price"/>
@@ -103,7 +103,7 @@
                     <ui:Label text="COMPRAR TORRE" class="buy-tower-title"/>
                     <ui:Label text="(50 ORO)" class="buy-tower-price"/>
                     <ui:VisualElement picking-mode="Ignore" class="lock-overlay" style="bottom: 0; right: 0; width: 203px; left: 23px; top: 34px; height: 105px; border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-bottom-left-radius: 15px; border-top-width: 10px; border-right-width: 10px; border-bottom-width: 10px; border-left-width: 10px;">
-                        <ui:Label text="🔒" picking-mode="Ignore" class="lock-icon" style="display: flex;"/>
+                        <ui:VisualElement name="BuyTowerLockIcon" picking-mode="Ignore" class="lock-icon" style="display: flex;"/>
                     </ui:VisualElement>
                 </ui:Button>
             </ui:VisualElement>
