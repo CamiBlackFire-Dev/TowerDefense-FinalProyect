@@ -46,6 +46,8 @@ namespace Custom.UI
         public GameFlowConfig gameFlow;
         private const string FallbackGameplayScene = "0_Main";
 
+        private VisualElement _fadeOverlay;
+
         #region Unity Lifecycle
         private void OnEnable()
         {
@@ -53,6 +55,20 @@ namespace Custom.UI
             var root = _uiDocument.rootVisualElement;
 
             if (root == null) return;
+
+            _fadeOverlay = new VisualElement();
+            _fadeOverlay.style.position = Position.Absolute;
+            _fadeOverlay.style.left = 0;
+            _fadeOverlay.style.right = 0;
+            _fadeOverlay.style.top = 0;
+            _fadeOverlay.style.bottom = 0;
+            _fadeOverlay.style.backgroundColor = Color.black;
+            _fadeOverlay.style.opacity = 1f;
+            _fadeOverlay.style.transitionDuration = new System.Collections.Generic.List<TimeValue> { new TimeValue(0.5f) };
+            _fadeOverlay.style.transitionProperty = new System.Collections.Generic.List<StylePropertyName> { new StylePropertyName("opacity") };
+            _fadeOverlay.pickingMode = PickingMode.Ignore;
+            root.Add(_fadeOverlay);
+            _fadeOverlay.schedule.Execute(() => _fadeOverlay.style.opacity = 0f).StartingIn(100);
 
             if (AudioManager.Instance != null && menuMusic != null)
             {
@@ -234,12 +250,9 @@ namespace Custom.UI
         private void OnTutorialLevelClicked()
         {
             PlayClickSound();
-            SceneManager.LoadScene("1_Tutorial");
+            LoadSceneWithFade("1_Tutorial");
         }
 
-        // Nivel 1 sigue saliendo de GameFlowConfig (Tower Defense > Escenas)
-        // en vez de un nombre de escena fijo, para poder cambiarlo sin tocar
-        // codigo. Por defecto apunta a la misma escena que antes (LevelPrueba).
         private void OnLevel1Clicked()
         {
             PlayClickSound();
@@ -251,7 +264,20 @@ namespace Custom.UI
             if (gameFlow == null)
                 Debug.LogWarning("MainMenuController: no hay GameFlowConfig asignado, se usa " + FallbackGameplayScene + " por defecto.", this);
 
-            SceneManager.LoadScene(sceneName);
+            LoadSceneWithFade(sceneName);
+        }
+
+        private void LoadSceneWithFade(string sceneName)
+        {
+            if (_fadeOverlay != null)
+            {
+                _fadeOverlay.style.opacity = 1f;
+                _fadeOverlay.schedule.Execute(() => SceneManager.LoadScene(sceneName)).StartingIn(500);
+            }
+            else
+            {
+                SceneManager.LoadScene(sceneName);
+            }
         }
 
         private void OnLevel2Clicked()

@@ -44,6 +44,8 @@ public class TutorialManager : MonoBehaviour
     private Label _step1, _step2, _step3, _step4, _step5, _step6, _step7;
     private Label _tutorialMessage;
 
+    private VisualElement _fadeOverlay;
+
     private VisualElement _introOverlay;
     private VisualElement _outroOverlay;
     private Button _introStartButton;
@@ -80,6 +82,20 @@ public class TutorialManager : MonoBehaviour
         if (_tutorialUIDocument != null)
         {
             var root = _tutorialUIDocument.rootVisualElement;
+
+            _fadeOverlay = new UnityEngine.UIElements.VisualElement();
+            _fadeOverlay.style.position = UnityEngine.UIElements.Position.Absolute;
+            _fadeOverlay.style.left = 0;
+            _fadeOverlay.style.right = 0;
+            _fadeOverlay.style.top = 0;
+            _fadeOverlay.style.bottom = 0;
+            _fadeOverlay.style.backgroundColor = UnityEngine.Color.black;
+            _fadeOverlay.style.opacity = 1f;
+            _fadeOverlay.style.transitionDuration = new System.Collections.Generic.List<UnityEngine.UIElements.TimeValue> { new UnityEngine.UIElements.TimeValue(0.5f) };
+            _fadeOverlay.style.transitionProperty = new System.Collections.Generic.List<UnityEngine.UIElements.StylePropertyName> { new UnityEngine.UIElements.StylePropertyName("opacity") };
+            _fadeOverlay.pickingMode = UnityEngine.UIElements.PickingMode.Ignore;
+            root.Add(_fadeOverlay);
+            _fadeOverlay.schedule.Execute(() => _fadeOverlay.style.opacity = 0f).StartingIn(100);
 
             _tutorialOverlay = root.Q<VisualElement>("TutorialOverlay");
             _dimTop = root.Q<VisualElement>("DimTop");
@@ -345,13 +361,26 @@ public class TutorialManager : MonoBehaviour
     private void OnOutroMenuClicked()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("Main Menu");
+        LoadSceneWithFade("Main Menu");
     }
 
     private void OnOutroNextClicked()
     {
         Time.timeScale = 1f;
-        SceneManager.LoadScene("LevelPrueba");
+        LoadSceneWithFade("LevelPrueba");
+    }
+
+    private void LoadSceneWithFade(string sceneName)
+    {
+        if (_fadeOverlay != null)
+        {
+            _fadeOverlay.style.opacity = 1f;
+            _fadeOverlay.schedule.Execute(() => SceneManager.LoadScene(sceneName)).StartingIn(500);
+        }
+        else
+        {
+            SceneManager.LoadScene(sceneName);
+        }
     }
     #endregion
 
