@@ -42,6 +42,13 @@ public class TowerShop : MonoBehaviour
         if (!economy.TrySpend(towerCost))
             return false;
 
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "1_Tutorial")
+        {
+            if (board.PlaceTower(0, 0, 1)) return true;
+            if (board.PlaceTower(2, 1, 1)) return true;
+            if (board.PlaceTower(1, 3, 1)) return true;
+        }
+
         // La torre aparece en una celda libre aleatoria.
         return board.PlaceTowerRandom(1);
     }
