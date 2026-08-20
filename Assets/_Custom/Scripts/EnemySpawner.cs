@@ -30,6 +30,7 @@ public class EnemySpawner : MonoBehaviour
     [Header("Vida de los enemigos")]
     public float enemyHealth = 20f;
     public int enemyReward = 10;
+    public float enemySpeed = 2f;   // unidades por segundo (TestEnemyMovement.SetMovementSpeed)
 
     [Header("Enemigos que disparan")]
     // Que parte de los enemigos sale armada: 0 = ninguno, 1 = todos.
@@ -41,11 +42,13 @@ public class EnemySpawner : MonoBehaviour
     public float shooterRange = 5f;
     public float shooterDamage = 4f;
     public float shooterAttackRate = 0.5f;  // disparos por segundo
-    // Bala visible. Sin prefab el dano es instantaneo.
+    // Bala visible (obligatoria: EnemyAttack no dispara sin un prefab asignado).
     public GameObject shooterProjectilePrefab;
     public float shooterProjectileSpeed = 8f;
     public DamageNumber shooterPopupPrefab;  // numero de dano sobre la torre
-    public GameObject shooterImpactEffect;
+    // El efecto de impacto ahora es un campo propio de EnemyProjectile
+    // (del prefab de la bala), no algo que el spawner pueda variar por
+    // oleada: se configura una sola vez en shooterProjectilePrefab.
 
     private float _timer;
     private int _spawned;
@@ -227,6 +230,7 @@ public class EnemySpawner : MonoBehaviour
         if (movement != null)
         {
             movement.SetPath(path);
+            movement.SetMovementSpeed(enemySpeed);
             movement.Finished += HandleEnemyFinished;
         }
 
@@ -284,7 +288,7 @@ public class EnemySpawner : MonoBehaviour
 
         attack.Setup(shooterDamage, shooterAttackRate,
             shooterProjectilePrefab, shooterProjectileSpeed,
-            shooterPopupPrefab, shooterImpactEffect);
+            shooterPopupPrefab);
     }
 
     // Cuando un enemigo llega al final le quita vidas al jugador y desaparece.

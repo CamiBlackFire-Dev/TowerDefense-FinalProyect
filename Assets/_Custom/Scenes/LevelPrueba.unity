@@ -1186,12 +1186,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CastleLowHealthSmoke
   playerBase: {fileID: 1017545644}
-  smokeMaterial: {fileID: 2100000, guid: 7f9d9a06ef7a61e4eafc237ac13b8038, type: 2}
-  smokeOffset: {x: 0, y: 2, z: 0}
-  smokeColor: {r: 0.08, g: 0.08, b: 0.08, a: 0.85}
-  smokeSize: 2
-  emissionRate: 7
-  lowHealthThreshold: 10
+  firePrefab: {fileID: 1159356881141625346, guid: 5d0d163256664e342be83c804ecb0a48, type: 3}
+  fireOffset: {x: 0, y: 2, z: 0}
+  fireScale: 1
 --- !u!1001 &260616873
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1419,6 +1416,7 @@ MonoBehaviour:
   enemiesPerWave: 8
   enemyHealth: 20
   enemyReward: 10
+  enemySpeed: 2
   shooterChance: 0.35
   shooterRange: 5
   shooterDamage: 4
@@ -1426,7 +1424,6 @@ MonoBehaviour:
   shooterProjectilePrefab: {fileID: 5175319666275068441, guid: 4a1e8296c170a6647b9e4be22295154c, type: 3}
   shooterProjectileSpeed: 8
   shooterPopupPrefab: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
-  shooterImpactEffect: {fileID: 0}
 --- !u!1 &464760619
 GameObject:
   m_ObjectHideFlags: 0
@@ -2579,7 +2576,7 @@ MonoBehaviour:
   moveSpeed: 5
   mapLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   raycastDistance: 200
   indicatorMaterial: {fileID: 2100000, guid: 69ab6c5da6c7b354d87d572836172e37, type: 2}
   indicatorSize: 3
@@ -4353,6 +4350,11 @@ MonoBehaviour:
     usageLimitMode: 2
     maxUses: 1
   cooldownWipeColor: {r: 0, g: 0, b: 0, a: 0.65}
+  ability1Cost: 100
+  ability2Cost: 200
+  ability3Cost: 300
+  ability4Cost: 400
+  ability5Cost: 500
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
   waveAnnouncerSound: {fileID: 0}

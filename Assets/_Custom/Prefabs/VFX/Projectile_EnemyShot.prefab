@@ -99,7 +99,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 806231545178248427}
-  - component: {fileID: 5618274609663696569}
+  - component: {fileID: 2436411020028185693}
   m_Layer: 0
   m_Name: Projectile_EnemyShot
   m_TagString: Untagged
@@ -123,7 +123,7 @@ Transform:
   - {fileID: 645140944345201652}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5618274609663696569
+--- !u!114 &2436411020028185693
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -132,10 +132,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 5175319666275068441}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d693d5f989491334188c43986bd736ef, type: 3}
+  m_Script: {fileID: 11500000, guid: d04b496e931fdc34e925763c21629bdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyProjectile
   speed: 8
-  maxLifetime: 5
-  popupPrefab: {fileID: 0}
+  hitDistance: 0.4
   impactEffect: {fileID: 0}
