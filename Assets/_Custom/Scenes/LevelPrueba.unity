@@ -644,6 +644,7 @@ MonoBehaviour:
   repulsionPrefab: {fileID: 2039108583650060249, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
   effectPrefab: {fileID: 6476705285018846829, guid: 5d476669689df3d4aa4dfe91a12ea8ad, type: 3}
   effectDuration: 2.5
+  impactSound: {fileID: 8300000, guid: f80d52f35867a4c40973657112b32ea8, type: 3}
   throwHeight: 2
   fallDuration: 0.4
   mapLayer:
@@ -1189,6 +1190,8 @@ MonoBehaviour:
   firePrefab: {fileID: 1159356881141625346, guid: 5d0d163256664e342be83c804ecb0a48, type: 3}
   fireOffset: {x: 0, y: 2, z: 0}
   fireScale: 1
+  fireLoopSound: {fileID: 8300000, guid: b0d532c29bd716a4d97972bc4e99d6ff, type: 3}
+  fireLoopVolume: 0.5
 --- !u!1001 &260616873
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1415,10 +1418,23 @@ MonoBehaviour:
   startDelay: 2
   spawnInterval: 2
   enemiesPerWave: 8
+  spawnWaypointIndex: 0
+  spawnSources: []
   waveSurvivalGold: 50
   enemyHealth: 20
   enemyReward: 10
   enemySpeed: 2
+  bossPrefab: {fileID: 7775042401366044771, guid: 2bfddf91a2fa8ae48bf26caaf547d618, type: 3}
+  bossWave: 5
+  bossHealth: 400
+  bossReward: 200
+  bossSpeed: 1.2
+  bossSourceIndex: 0
+  healthGrowthPerWave: 0.15
+  speedGrowthPerWave: 0.05
+  shooterDamageGrowthPerWave: 0.1
+  enemiesGrowthPerWave: 2
+  shooterChanceGrowthPerWave: 0.05
   shooterChance: 0.35
   shooterRange: 5
   shooterDamage: 4
@@ -2194,6 +2210,8 @@ MonoBehaviour:
   towerCatalog: {fileID: 11400000, guid: 5803adb5b45d66147a2358fe6eb528c3, type: 2}
   projectilePrefab: {fileID: 4570541557667802443, guid: fd26bfe326f4783428bcf130c003beab, type: 3}
   damagePopup: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
+  towerShootSound: {fileID: 8300000, guid: bf844511c1b400b40b4f89864d305009, type: 3}
+  towerImpactSound: {fileID: 8300000, guid: f4c6eb51bf1dc8b45906e26c6cc8b395, type: 3}
   moveDuration: 0.14
   mergeFeedbackDuration: 0.22
   moveCurve:
@@ -2231,6 +2249,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   maxBufferedMoves: 8
   inputController: {fileID: 1260824858}
+  acceptsInput: 1
   spawner: {fileID: 0}
   temporaryUnlockDuration: 30
 --- !u!114 &751125480
@@ -2574,6 +2593,7 @@ MonoBehaviour:
   barrelPrefab: {fileID: 8434672052455401329, guid: 1b8b83ebd4dcb924b906b28d3e156c9d, type: 3}
   repairEffect: {fileID: 0}
   effectDuration: 3
+  impactSound: {fileID: 8300000, guid: 4923e9ff5b664e643b1378e38ec1b62a, type: 3}
   throwHeight: 1
   moveSpeed: 5
   mapLayer:
@@ -3777,6 +3797,58 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1425753322}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1283526501
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1283526503}
+  - component: {fileID: 1283526502}
+  m_Layer: 0
+  m_Name: SpawnArrows
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1283526502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283526501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e741e23a49935f42a17711d4b2a33aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnArrowIndicator
+  spawner: {fileID: 448451414}
+  arrowMaterial: {fileID: 2100000, guid: 1b07ecdb6933ce742925853f6e837a82, type: 2}
+  arrowColor: {r: 1, g: 0.15, b: 0.1, a: 0.9}
+  arrowLength: 2.6
+  arrowWidth: 1.4
+  height: 1.6
+  bobAmplitude: 0.25
+  bobSpeed: 2
+--- !u!4 &1283526503
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1283526501}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1290770397
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3900,6 +3972,8 @@ MonoBehaviour:
   inputController: {fileID: 1260824858}
   spawner: {fileID: 0}
   towerCost: 50
+  purchaseSound: {fileID: 8300000, guid: 7fbfc3f08b3d83e4399db0c20bde55ad, type: 3}
+  failureSound: {fileID: 8300000, guid: b3eafbfdcbddebe45a696438dd01ff3d, type: 3}
 --- !u!1 &1316596472
 GameObject:
   m_ObjectHideFlags: 0
@@ -3912,6 +3986,7 @@ GameObject:
   - component: {fileID: 1316596474}
   - component: {fileID: 1316596473}
   - component: {fileID: 1316596476}
+  - component: {fileID: 1316596477}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -4037,6 +4112,24 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &1316596477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1316596472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 367526c1a36ca314182b4326a7c54af9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraEdgePan
+  panEnabled: 1
+  edgeThickness: 40
+  panSpeed: 18
+  limitMin: {x: -13.889047, y: -18.708128}
+  limitMax: {x: 11.007953, y: -4.659129}
+  drawLimitsGizmo: 1
 --- !u!1 &1323661494
 GameObject:
   m_ObjectHideFlags: 0
@@ -4331,6 +4424,7 @@ MonoBehaviour:
   repulsionAbility: {fileID: 0}
   repairAbility: {fileID: 0}
   boardManager: {fileID: 0}
+  gameFlow: {fileID: 11400000, guid: e5c8d12d4aa65284e83777bce081ca71, type: 2}
   ability1Cooldown:
     cooldownSeconds: 6
     usageLimitMode: 0
@@ -4360,6 +4454,14 @@ MonoBehaviour:
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
   waveAnnouncerSound: {fileID: 0}
+  defeatSound: {fileID: 8300000, guid: f4ca7beafba3327489e4244c9894dc39, type: 3}
+  boardUnlockSound: {fileID: 8300000, guid: 3f74253daf7cdeb4aa2ab8434a67736a, type: 3}
+  abilityUnlockFailedSound: {fileID: 8300000, guid: b3eafbfdcbddebe45a696438dd01ff3d, type: 3}
+  ability1UnlockSound: {fileID: 8300000, guid: 8a7623583fdecaf44bbaa66240fa9811, type: 3}
+  ability2UnlockSound: {fileID: 8300000, guid: 501ff4727e80d884fba4aabae46f7de1, type: 3}
+  ability3UnlockSound: {fileID: 8300000, guid: f636f389362c30c43a5a0ceac6387b19, type: 3}
+  ability4UnlockSound: {fileID: 8300000, guid: 8b12370610f304344acd11832aa44650, type: 3}
+  ability5UnlockSound: {fileID: 8300000, guid: 61449a3b7c6c8e7459c3fbf9470e305a, type: 3}
   debugKeys: 1
 --- !u!114 &1472961076
 MonoBehaviour:
@@ -4596,6 +4698,7 @@ MonoBehaviour:
   empPrefab: {fileID: 8338003122885483358, guid: d0930d4981e25967cb201973e823b685, type: 3}
   impactEffect: {fileID: 7042460137364555477, guid: ecabc7a4007a8ad43be3e17217dd9057, type: 3}
   effectDuration: 3
+  impactSound: {fileID: 8300000, guid: 1bf50cf402f842a4aa2504db387bb13b, type: 3}
   throwHeight: 2
   fallDuration: 0.3
   mapLayer:
@@ -4722,6 +4825,8 @@ MonoBehaviour:
   muzzleHeight: 1.2
   impactEffect: {fileID: 0}
   popupPrefab: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
+  shootSound: {fileID: 8300000, guid: bf844511c1b400b40b4f89864d305009, type: 3}
+  impactSound: {fileID: 8300000, guid: f4c6eb51bf1dc8b45906e26c6cc8b395, type: 3}
 --- !u!114 &1537014432
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13326,3 +13431,4 @@ SceneRoots:
   - {fileID: 1472961077}
   - {fileID: 56868382}
   - {fileID: 464760621}
+  - {fileID: 1283526503}

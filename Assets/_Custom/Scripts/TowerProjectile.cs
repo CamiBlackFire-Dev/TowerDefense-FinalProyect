@@ -13,6 +13,9 @@ public class TowerProjectile : MonoBehaviour
     [Header("Impacto")]
     public DamageNumber popupPrefab;  // numero de dano (Damage Numbers Pro)
     public GameObject impactEffect;   // efecto opcional donde pega
+    // Lo deja puesto TowerAttack antes de Setup(), no viaja por Setup()
+    // porque es el mismo para cualquier bala que dispare esa torre.
+    public AudioClip impactSound;
 
     private Transform _target;
     private float _damage;
@@ -79,6 +82,9 @@ public class TowerProjectile : MonoBehaviour
 
         if (impactEffect != null)
             Instantiate(impactEffect, transform.position, Quaternion.identity);
+
+        if (AudioManager.Instance != null && impactSound != null)
+            AudioManager.Instance.PlaySFX(impactSound, true);
 
         DestroyObject(gameObject);
     }

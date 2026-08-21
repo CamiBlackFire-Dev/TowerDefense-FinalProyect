@@ -13,6 +13,7 @@ public class EnemyHealth : MonoBehaviour
     [Header("Muerte")]
     public float deathDelay = 1.2f;      // tiempo para que se vea la animacion
     public string dieTrigger = "Die";    // trigger del EnemyAnimator
+    public AudioClip deathSound;
 
     [Header("Barra de vida")]
     public bool showHealthBar = true;    // barra flotante sobre el enemigo
@@ -86,6 +87,9 @@ public class EnemyHealth : MonoBehaviour
 
         if (deathEffect != null)
             Instantiate(deathEffect, transform.position, Quaternion.identity);
+
+        if (AudioManager.Instance != null && deathSound != null)
+            AudioManager.Instance.PlaySFX(deathSound, true);
 
         // Se apaga el enemigo: deja de caminar y las torres dejan de verlo,
         // asi no le siguen disparando mientras cae.

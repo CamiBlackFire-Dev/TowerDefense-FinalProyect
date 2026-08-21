@@ -4,18 +4,44 @@ using UnityEngine;
 // La torre aparece sola en una celda libre aleatoria (sin drag & drop).
 public class TowerShop : MonoBehaviour
 {
+    // Tablero por defecto: el que se usa en los niveles de un solo tablero.
     [SerializeField] private BoardManager board;
     [SerializeField] private EconomyManager economy;
     [SerializeField] private InputController inputController;
     [SerializeField] private EnemySpawner spawner;
+    // En los niveles con varios tableros la torre tiene que aparecer en el
+    // que el jugador tiene elegido, no siempre en el mismo. Se busca solo
+    // en la escena si se deja vacio; si no hay ninguno se usa "board".
+    [SerializeField] private BoardSelector boardSelector;
     [SerializeField] private int towerCost = 50;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip purchaseSound;
+    // Se usa tanto si no alcanza el oro como si no hay celda libre o hay
+    // una oleada en curso: cualquier intento de comprar que no funciona.
+    [SerializeField] private AudioClip failureSound;
+
     public int TowerCost => towerCost;
+
+    // Donde va a aparecer la torre: el tablero elegido si el nivel tiene
+    // selector, y si no el de siempre.
+    public BoardManager TargetBoard
+    {
+        get
+        {
+            if (boardSelector != null && boardSelector.SelectedBoard != null)
+                return boardSelector.SelectedBoard;
+
+            return board;
+        }
+    }
 
     private void OnEnable()
     {
         if (spawner == null)
             spawner = FindFirstObjectByType<EnemySpawner>();
+        if (boardSelector == null)
+            boardSelector = FindFirstObjectByType<BoardSelector>();
         SubscribeToInput();
     }
 
@@ -28,29 +54,57 @@ public class TowerShop : MonoBehaviour
     // Intenta comprar una torre. Devuelve false si falla.
     public bool TryBuyTower()
     {
-        if (board == null || economy == null)
+        // Se resuelve una sola vez: si el jugador cambiara de tablero a
+        // mitad de la compra, el sitio libre que se comprobo y el sitio
+        // donde se coloca tienen que ser el mismo, o se cobraria el oro sin
+        // llegar a poner la torre.
+        BoardManager target = TargetBoard;
+
+        if (target == null || economy == null)
             return false;
 
         if (spawner != null && spawner.IsRunning)
+        {
+            PlayFailureSound();
             return false;
+        }
 
         // Si no hay celdas libres no se gasta dinero.
-        if (!board.Grid.HasFreeCell())
+        if (!target.Grid.HasFreeCell())
+        {
+            PlayFailureSound();
             return false;
+        }
 
         // Si el dinero no alcanza tampoco se gasta nada.
         if (!economy.TrySpend(towerCost))
-            return false;
-
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "1_Tutorial")
         {
-            if (board.PlaceTower(0, 0, 1)) return true;
-            if (board.PlaceTower(2, 1, 1)) return true;
-            if (board.PlaceTower(1, 3, 1)) return true;
+            PlayFailureSound();
+            return false;
         }
 
-        // La torre aparece en una celda libre aleatoria.
-        return board.PlaceTowerRandom(1);
+        bool placed;
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "1_Tutorial"
+            && (target.PlaceTower(0, 0, 1) || target.PlaceTower(2, 1, 1) || target.PlaceTower(1, 3, 1)))
+        {
+            placed = true;
+        }
+        else
+        {
+            // La torre aparece en una celda libre aleatoria.
+            placed = target.PlaceTowerRandom(1);
+        }
+
+        if (placed && AudioManager.Instance != null && purchaseSound != null)
+            AudioManager.Instance.PlaySFX(purchaseSound);
+
+        return placed;
+    }
+
+    private void PlayFailureSound()
+    {
+        if (AudioManager.Instance != null && failureSound != null)
+            AudioManager.Instance.PlaySFX(failureSound);
     }
 
     private void SubscribeToInput()

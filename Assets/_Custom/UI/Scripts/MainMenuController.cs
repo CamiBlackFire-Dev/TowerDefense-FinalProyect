@@ -255,14 +255,32 @@ namespace Custom.UI
 
         private void OnLevel1Clicked()
         {
+            LoadLevel(1);
+        }
+
+        // Carga el nivel N leyendo su escena del GameFlowConfig, para no
+        // tener los nombres escritos a mano aqui. El nivel 1 cae en
+        // gameplayScene si la lista de niveles esta vacia, que es como
+        // funcionaba antes de que existiera esa lista.
+        private void LoadLevel(int levelNumber)
+        {
             PlayClickSound();
 
-            string sceneName = gameFlow != null && !string.IsNullOrEmpty(gameFlow.gameplayScene)
-                ? gameFlow.gameplayScene
-                : FallbackGameplayScene;
+            string sceneName = gameFlow != null ? gameFlow.GetLevelScene(levelNumber) : string.Empty;
 
-            if (gameFlow == null)
-                Debug.LogWarning("MainMenuController: no hay GameFlowConfig asignado, se usa " + FallbackGameplayScene + " por defecto.", this);
+            if (string.IsNullOrEmpty(sceneName) && levelNumber == 1)
+            {
+                sceneName = gameFlow != null && !string.IsNullOrEmpty(gameFlow.gameplayScene)
+                    ? gameFlow.gameplayScene
+                    : FallbackGameplayScene;
+            }
+
+            if (string.IsNullOrEmpty(sceneName))
+            {
+                Debug.LogWarning("MainMenuController: el nivel " + levelNumber +
+                    " no tiene escena asignada en el GameFlowConfig.", this);
+                return;
+            }
 
             LoadSceneWithFade(sceneName);
         }
@@ -282,14 +300,12 @@ namespace Custom.UI
 
         private void OnLevel2Clicked()
         {
-            PlayClickSound();
-            Debug.Log("Cargando Nivel 2...");
+            LoadLevel(2);
         }
 
         private void OnLevel3Clicked()
         {
-            PlayClickSound();
-            Debug.Log("Cargando Nivel 3...");
+            LoadLevel(3);
         }
 
         private void OnCloseLevelSelectClicked()

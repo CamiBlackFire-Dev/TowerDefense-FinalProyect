@@ -20,8 +20,18 @@ public class CastleLowHealthFire : MonoBehaviour
     public Vector3 fireOffset = new Vector3(0f, 2f, 0f);
     public float fireScale = 1f;
 
+    [Header("Audio")]
+    // Sonido en bucle mientras arde. Va en un AudioSource propio (no el
+    // AudioManager compartido, que solo hace disparos sueltos) porque tiene
+    // que sonar y parar junto con el fuego, no una vez y listo. Vive en
+    // este GameObject (el castillo) y no en _fireInstance: ese se apaga y
+    // prende, y un AudioSource en un objeto inactivo no suena.
+    public AudioClip fireLoopSound;
+    [Range(0f, 1f)] public float fireLoopVolume = 0.5f;
+
     private GameObject _fireInstance;
     private ParticleSystem _fireRoot;
+    private AudioSource _fireAudio;
 
     private void OnEnable()
     {
@@ -64,13 +74,36 @@ public class CastleLowHealthFire : MonoBehaviour
             _fireInstance.SetActive(true);
             if (_fireRoot != null)
                 _fireRoot.Play();
+
+            EnsureFireAudio();
+            if (_fireAudio != null)
+                _fireAudio.Play();
         }
         else if (!shouldBurn && isActive)
         {
             if (_fireRoot != null)
                 _fireRoot.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             _fireInstance.SetActive(false);
+
+            if (_fireAudio != null)
+                _fireAudio.Stop();
         }
+    }
+
+    // El AudioSource del fuego se crea aparte (no en EnsureFire) porque
+    // vive en este GameObject, siempre activo, mientras _fireInstance se
+    // prende y apaga con cada oleada.
+    private void EnsureFireAudio()
+    {
+        if (_fireAudio != null || fireLoopSound == null)
+            return;
+
+        _fireAudio = gameObject.AddComponent<AudioSource>();
+        _fireAudio.clip = fireLoopSound;
+        _fireAudio.loop = true;
+        _fireAudio.playOnAwake = false;
+        _fireAudio.spatialBlend = 1f; // 3D: mas fuerte cuanto mas cerca este la camara
+        _fireAudio.volume = fireLoopVolume;
     }
 
     // Instancia el fuego una sola vez, desactivado, listo para prenderse.

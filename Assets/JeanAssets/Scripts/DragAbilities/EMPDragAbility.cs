@@ -13,7 +13,10 @@ public class EMPDragAbility : MonoBehaviour, IDragAbility
     [Header("Visual Effect")]
     [SerializeField] private GameObject impactEffect;
     [SerializeField] private float effectDuration = 3f;
-    
+
+    [Header("Audio")]
+    [SerializeField] private AudioClip impactSound;
+
     [Header("Throw")]
     [SerializeField] private float throwHeight = 2f;
     [SerializeField] private float fallDuration = 0.5f;
@@ -161,6 +164,11 @@ public class EMPDragAbility : MonoBehaviour, IDragAbility
             GameObject effect = Instantiate(impactEffect, targetPosition, Quaternion.identity);
 
             Destroy(effect, effectDuration);
+        }
+
+        if (AudioManager.Instance != null && impactSound != null)
+        {
+            AudioManager.Instance.PlaySFX(impactSound);
         }
     }
 

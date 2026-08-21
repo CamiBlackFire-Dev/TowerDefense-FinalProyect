@@ -8,6 +8,8 @@ public class InputController : MonoBehaviour
 {
     public event Action<GridDirection> MoveRequested;
     public event Action BuyRequested;
+    // Cambiar de tablero, en los niveles que tienen mas de uno (Tab).
+    public event Action NextBoardRequested;
 
     private void Update()
     {
@@ -43,6 +45,12 @@ public class InputController : MonoBehaviour
         {
             if (BuyRequested != null)
                 BuyRequested();
+        }
+
+        if (Keyboard.current.tabKey.wasPressedThisFrame)
+        {
+            if (NextBoardRequested != null)
+                NextBoardRequested();
         }
     }
 

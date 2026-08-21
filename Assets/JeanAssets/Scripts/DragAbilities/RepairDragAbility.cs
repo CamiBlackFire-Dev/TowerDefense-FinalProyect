@@ -14,6 +14,9 @@ public class RepairDragAbility : MonoBehaviour, IDragAbility
     [SerializeField] private GameObject repairEffect;
     [SerializeField] private float effectDuration = 3f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip impactSound;
+
     [Header("Throw")]
     [SerializeField] private float throwHeight = 1f;
     [SerializeField] private float moveSpeed = 5f;
@@ -203,6 +206,11 @@ public class RepairDragAbility : MonoBehaviour, IDragAbility
                 );
 
             Destroy(effect, effectDuration);
+        }
+
+        if (AudioManager.Instance != null && impactSound != null)
+        {
+            AudioManager.Instance.PlaySFX(impactSound);
         }
 
         barrel.SetActive(false);

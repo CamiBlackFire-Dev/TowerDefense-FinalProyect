@@ -26,6 +26,9 @@ public class BombAbility : MonoBehaviour
     [SerializeField] private DamageNumber boomTextPrefab;
     [SerializeField] private float boomTextHeightOffset = 1f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip explosionSound;
+
     [Header("Raycast")]
     [SerializeField] private float raycastDistance = 10f;
     [SerializeField] private LayerMask floorLayer;
@@ -95,6 +98,9 @@ public class BombAbility : MonoBehaviour
 
         if (boomTextPrefab != null)
             boomTextPrefab.Spawn(explosionPosition + Vector3.up * boomTextHeightOffset);
+
+        if (AudioManager.Instance != null && explosionSound != null)
+            AudioManager.Instance.PlaySFX(explosionSound);
 
         Collider[] enemies = Physics.OverlapSphere(explosionPosition, explosionRadius, enemyLayer);
 

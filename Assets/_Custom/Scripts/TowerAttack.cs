@@ -29,6 +29,10 @@ public class TowerAttack : MonoBehaviour
     public GameObject impactEffect; // efecto opcional donde pega el disparo
     public DamageNumber popupPrefab; // numero de dano al pegar (opcional)
 
+    [Header("Audio")]
+    public AudioClip shootSound;   // al disparar
+    public AudioClip impactSound;  // al pegar (se copia al proyectil si hay uno)
+
     private TowerTargetDetector _detector;
     private Tower _tower;
     private float _cooldown;
@@ -72,6 +76,9 @@ public class TowerAttack : MonoBehaviour
     {
         _cooldown = attackRate > 0f ? 1f / attackRate : 1f;
 
+        if (AudioManager.Instance != null && shootSound != null)
+            AudioManager.Instance.PlaySFX(shootSound, true);
+
         if (projectilePrefab != null && target != null)
         {
             // Disparo visible: sale una bala que persigue al enemigo
@@ -80,7 +87,10 @@ public class TowerAttack : MonoBehaviour
             GameObject bala = Instantiate(projectilePrefab, origen, Quaternion.identity);
             TowerProjectile projectile = bala.GetComponent<TowerProjectile>();
             if (projectile != null)
+            {
+                projectile.impactSound = impactSound;
                 projectile.Setup(target, damage, popupPrefab, impactEffect);
+            }
             return;
         }
 
@@ -94,6 +104,9 @@ public class TowerAttack : MonoBehaviour
 
         if (impactEffect != null)
             Instantiate(impactEffect, target.position, Quaternion.identity);
+
+        if (AudioManager.Instance != null && impactSound != null)
+            AudioManager.Instance.PlaySFX(impactSound, true);
     }
 
     // Copia el dano, el alcance y la cadencia que le tocan al nivel actual,

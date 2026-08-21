@@ -1588,12 +1588,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CastleLowHealthSmoke
   playerBase: {fileID: 1017545644}
-  smokeMaterial: {fileID: 2100000, guid: 7f9d9a06ef7a61e4eafc237ac13b8038, type: 2}
-  smokeOffset: {x: 0, y: 2, z: 0}
-  smokeColor: {r: 0.08, g: 0.08, b: 0.08, a: 0.85}
-  smokeSize: 2
-  emissionRate: 7
-  lowHealthThreshold: 10
+  firePrefab: {fileID: 0}
+  fireOffset: {x: 0, y: 2, z: 0}
+  fireScale: 1
+  fireLoopSound: {fileID: 8300000, guid: b0d532c29bd716a4d97972bc4e99d6ff, type: 3}
+  fireLoopVolume: 0.5
 --- !u!1001 &260616873
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2177,14 +2176,24 @@ MonoBehaviour:
   pathBuilder: {fileID: 1549257792}
   economy: {fileID: 1085780038}
   playerBase: {fileID: 1017545644}
+  castleTransform: {fileID: 0}
   goldPopupPrefab: {fileID: 7734501003, guid: 1b2d1593dfc81e5458989485a23908d7, type: 3}
   damagePerEnemy: 1
   spawnOnStart: 0
   startDelay: 2
   spawnInterval: 2
   enemiesPerWave: 8
+  spawnWaypointIndex: 0
+  spawnSources: []
+  waveSurvivalGold: 50
   enemyHealth: 10
   enemyReward: 10
+  enemySpeed: 2
+  healthGrowthPerWave: 0.15
+  speedGrowthPerWave: 0.05
+  shooterDamageGrowthPerWave: 0.1
+  enemiesGrowthPerWave: 2
+  shooterChanceGrowthPerWave: 0.05
   shooterChance: 0.35
   shooterRange: 4
   shooterDamage: 2
@@ -2192,7 +2201,6 @@ MonoBehaviour:
   shooterProjectilePrefab: {fileID: 0}
   shooterProjectileSpeed: 8
   shooterPopupPrefab: {fileID: 0}
-  shooterImpactEffect: {fileID: 0}
 --- !u!1 &466526416
 GameObject:
   m_ObjectHideFlags: 0
@@ -3417,6 +3425,8 @@ MonoBehaviour:
   towerCatalog: {fileID: 11400000, guid: 5803adb5b45d66147a2358fe6eb528c3, type: 2}
   projectilePrefab: {fileID: 4570541557667802443, guid: fd26bfe326f4783428bcf130c003beab, type: 3}
   damagePopup: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
+  towerShootSound: {fileID: 0}
+  towerImpactSound: {fileID: 0}
   moveDuration: 0.14
   mergeFeedbackDuration: 0.22
   moveCurve:
@@ -3454,6 +3464,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   maxBufferedMoves: 8
   inputController: {fileID: 1260824858}
+  acceptsInput: 1
   spawner: {fileID: 0}
   temporaryUnlockDuration: 30
 --- !u!1 &756700760
@@ -5452,6 +5463,8 @@ MonoBehaviour:
   towerCatalog: {fileID: 11400000, guid: 5803adb5b45d66147a2358fe6eb528c3, type: 2}
   projectilePrefab: {fileID: 4570541557667802443, guid: fd26bfe326f4783428bcf130c003beab, type: 3}
   damagePopup: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
+  towerShootSound: {fileID: 8300000, guid: bf844511c1b400b40b4f89864d305009, type: 3}
+  towerImpactSound: {fileID: 8300000, guid: f4c6eb51bf1dc8b45906e26c6cc8b395, type: 3}
   moveDuration: 0.14
   mergeFeedbackDuration: 0.22
   moveCurve:
@@ -5489,6 +5502,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   maxBufferedMoves: 8
   inputController: {fileID: 1260824858}
+  acceptsInput: 1
   spawner: {fileID: 0}
   temporaryUnlockDuration: 30
 --- !u!4 &1137570619
@@ -6472,6 +6486,8 @@ MonoBehaviour:
   inputController: {fileID: 1260824858}
   spawner: {fileID: 0}
   towerCost: 50
+  purchaseSound: {fileID: 8300000, guid: 7fbfc3f08b3d83e4399db0c20bde55ad, type: 3}
+  failureSound: {fileID: 8300000, guid: b3eafbfdcbddebe45a696438dd01ff3d, type: 3}
 --- !u!1 &1316596472
 GameObject:
   m_ObjectHideFlags: 0
@@ -6484,6 +6500,7 @@ GameObject:
   - component: {fileID: 1316596474}
   - component: {fileID: 1316596473}
   - component: {fileID: 1316596476}
+  - component: {fileID: 1316596477}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -6609,6 +6626,24 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &1316596477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1316596472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 367526c1a36ca314182b4326a7c54af9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraEdgePan
+  panEnabled: 1
+  edgeThickness: 40
+  panSpeed: 18
+  limitMin: {x: -13.797, y: -18.283905}
+  limitMax: {x: 11.099999, y: -4.2349052}
+  drawLimitsGizmo: 1
 --- !u!1 &1323661494
 GameObject:
   m_ObjectHideFlags: 0
@@ -7185,6 +7220,7 @@ MonoBehaviour:
   repulsionAbility: {fileID: 0}
   repairAbility: {fileID: 0}
   boardManager: {fileID: 0}
+  gameFlow: {fileID: 11400000, guid: e5c8d12d4aa65284e83777bce081ca71, type: 2}
   ability1Cooldown:
     cooldownSeconds: 6
     usageLimitMode: 0
@@ -7206,9 +7242,22 @@ MonoBehaviour:
     usageLimitMode: 2
     maxUses: 1
   cooldownWipeColor: {r: 0, g: 0, b: 0, a: 0.65}
+  ability1Cost: 100
+  ability2Cost: 200
+  ability3Cost: 300
+  ability4Cost: 400
+  ability5Cost: 500
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
   waveAnnouncerSound: {fileID: 0}
+  defeatSound: {fileID: 8300000, guid: f4ca7beafba3327489e4244c9894dc39, type: 3}
+  boardUnlockSound: {fileID: 8300000, guid: 3f74253daf7cdeb4aa2ab8434a67736a, type: 3}
+  abilityUnlockFailedSound: {fileID: 8300000, guid: b3eafbfdcbddebe45a696438dd01ff3d, type: 3}
+  ability1UnlockSound: {fileID: 8300000, guid: 8a7623583fdecaf44bbaa66240fa9811, type: 3}
+  ability2UnlockSound: {fileID: 8300000, guid: 501ff4727e80d884fba4aabae46f7de1, type: 3}
+  ability3UnlockSound: {fileID: 8300000, guid: f636f389362c30c43a5a0ceac6387b19, type: 3}
+  ability4UnlockSound: {fileID: 8300000, guid: 8b12370610f304344acd11832aa44650, type: 3}
+  ability5UnlockSound: {fileID: 8300000, guid: 61449a3b7c6c8e7459c3fbf9470e305a, type: 3}
   debugKeys: 1
 --- !u!114 &1472961076
 MonoBehaviour:
@@ -7452,14 +7501,24 @@ MonoBehaviour:
   pathBuilder: {fileID: 0}
   economy: {fileID: 0}
   playerBase: {fileID: 0}
+  castleTransform: {fileID: 0}
   goldPopupPrefab: {fileID: 0}
   damagePerEnemy: 1
   spawnOnStart: 0
   startDelay: 2
   spawnInterval: 2
   enemiesPerWave: 8
+  spawnWaypointIndex: 0
+  spawnSources: []
+  waveSurvivalGold: 50
   enemyHealth: 20
   enemyReward: 10
+  enemySpeed: 2
+  healthGrowthPerWave: 0.15
+  speedGrowthPerWave: 0.05
+  shooterDamageGrowthPerWave: 0.1
+  enemiesGrowthPerWave: 2
+  shooterChanceGrowthPerWave: 0.05
   shooterChance: 0.35
   shooterRange: 5
   shooterDamage: 4
@@ -7467,7 +7526,6 @@ MonoBehaviour:
   shooterProjectilePrefab: {fileID: 0}
   shooterProjectileSpeed: 8
   shooterPopupPrefab: {fileID: 0}
-  shooterImpactEffect: {fileID: 0}
 --- !u!114 &1549257791
 MonoBehaviour:
   m_ObjectHideFlags: 0

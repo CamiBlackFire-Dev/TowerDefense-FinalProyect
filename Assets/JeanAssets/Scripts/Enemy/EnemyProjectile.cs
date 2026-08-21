@@ -9,6 +9,7 @@ public class EnemyProjectile : MonoBehaviour
 
     [Header("Impact Effect")]
     [SerializeField] private GameObject impactEffect;
+    [SerializeField] private AudioClip impactSound;
 
     private Transform target;
     private float damage;
@@ -67,6 +68,11 @@ public class EnemyProjectile : MonoBehaviour
             GameObject effect = Instantiate(impactEffect, target.position, Quaternion.identity);
 
             Destroy(effect, 3f);
+        }
+
+        if (AudioManager.Instance != null && impactSound != null)
+        {
+            AudioManager.Instance.PlaySFX(impactSound, true);
         }
 
         Destroy(gameObject);

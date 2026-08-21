@@ -74,6 +74,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TestEnemyMovement
   movementSpeed: 2
   path: {fileID: 0}
+  enemyAttack: {fileID: 0}
+  footstepsSound: {fileID: 8300000, guid: 073895fb31d721048b23c59a9bb87a82, type: 3}
+  footstepsVolume: 0.35
 --- !u!114 &136688936428972049
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105,6 +108,7 @@ MonoBehaviour:
   deathEffect: {fileID: 0}
   deathDelay: 1.2
   dieTrigger: Die
+  deathSound: {fileID: 8300000, guid: 8a64d057401279c45bd11b10771dbef7, type: 3}
   showHealthBar: 1
 --- !u!114 &4710723690431259778
 MonoBehaviour:

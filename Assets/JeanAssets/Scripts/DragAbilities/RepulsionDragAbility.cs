@@ -14,6 +14,9 @@ public class RepulsionDragAbility : MonoBehaviour, IDragAbility
     [SerializeField] private GameObject effectPrefab;
     [SerializeField] private float effectDuration = 3f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip impactSound;
+
     [Header("Throw")]
     [SerializeField] private float throwHeight = 2f;
     [SerializeField] private float fallDuration = 0.5f;
@@ -158,6 +161,11 @@ public class RepulsionDragAbility : MonoBehaviour, IDragAbility
             GameObject effect = Instantiate(effectPrefab, targetPosition, Quaternion.identity);
 
             Destroy(effect, effectDuration);
+        }
+
+        if (AudioManager.Instance != null && impactSound != null)
+        {
+            AudioManager.Instance.PlaySFX(impactSound);
         }
 
         repulsion.SetActive(false);

@@ -105,6 +105,10 @@ namespace Custom.UI
         public RepulsionDragAbility repulsionAbility; // ranura 3 (empuja enemigos hacia atras)
         public RepairDragAbility repairAbility;       // ranura 4 (cura torres)
         public BoardManager boardManager;             // ranura 5 (desbloqueo temporal del tablero)
+        // Lista de niveles del juego. Se usa para saber que nivel es este
+        // (y asi abrir el siguiente al ganar) y a donde va el boton
+        // "siguiente nivel". Sin el, ambas cosas se quedan quietas.
+        public GameFlowConfig gameFlow;
 
         // Ranura que se esta arrastrando ahora mismo (null si ninguna).
         private AbilitySlot _draggingSlot;
@@ -168,6 +172,8 @@ namespace Custom.UI
             public Action<MeshGenerationContext> LockIconDrawCallback;
             // Cuanto cuesta desbloquearla la primera vez.
             public int Cost;
+            // Sonido al desbloquearla (distinto del click generico).
+            public AudioClip UnlockSound;
             // Powerup de arrastre de esta ranura (null si se usa con click).
             public IDragAbility DragAbility;
             // Que hace al usarse, para las ranuras de click.
@@ -182,6 +188,23 @@ namespace Custom.UI
         public AudioClip hoverSound;
         public AudioClip clickSound;
         public AudioClip waveAnnouncerSound;
+        public AudioClip defeatSound;
+        // Al usar el desbloqueo temporal del tablero (ranura 5): el efecto
+        // en si (empujar el tablero) no tiene sonido propio, esto es lo
+        // unico que se oye al activarlo.
+        public AudioClip boardUnlockSound;
+        // Al intentar desbloquear una ranura sin oro suficiente. El mismo
+        // clip que TowerShop usa para "no se pudo comprar torre", pero
+        // asignado aca aparte: no hay un registro central de sonidos, cada
+        // script que necesita uno tiene su propio campo (igual que ya hacen
+        // hoverSound/clickSound).
+        public AudioClip abilityUnlockFailedSound;
+        // Sonido al desbloquear cada ranura, en el orden 1..5 del HUD.
+        public AudioClip ability1UnlockSound;
+        public AudioClip ability2UnlockSound;
+        public AudioClip ability3UnlockSound;
+        public AudioClip ability4UnlockSound;
+        public AudioClip ability5UnlockSound;
 
         [Header("Debug")]
         // Teclas de prueba V, C, F y Espacio. Escape (pausa) nunca se desactiva.
@@ -638,6 +661,8 @@ namespace Custom.UI
         public void ShowVictoryScreen(bool isFinalLevel = false)
         {
             Time.timeScale = 0f;
+            UnlockNextLevel();
+
             if (isFinalLevel)
             {
                 if (_gameCompleteOverlay != null) _gameCompleteOverlay.style.display = DisplayStyle.Flex;
@@ -648,10 +673,36 @@ namespace Custom.UI
             }
         }
 
+        // Superar un nivel abre el siguiente en el menu principal, que lee
+        // el mismo MaxLevelUnlocked. Sin esto los botones de NIVEL 2 y 3 se
+        // quedan con el candado para siempre: el tutorial solo llega a 1.
+        // Se guarda el mayor alcanzado, asi rejugar un nivel viejo no
+        // vuelve a cerrar los que ya estaban abiertos.
+        private void UnlockNextLevel()
+        {
+            if (gameFlow == null)
+                return;
+
+            string scene = SceneManager.GetActiveScene().name;
+            int levelNumber = gameFlow.GetLevelNumber(scene);
+            if (levelNumber <= 0)
+                return;   // esta escena no es un nivel de la lista
+
+            int unlocked = Mathf.Min(levelNumber + 1, gameFlow.LevelCount);
+            if (unlocked > PlayerPrefs.GetInt("MaxLevelUnlocked", 0))
+            {
+                PlayerPrefs.SetInt("MaxLevelUnlocked", unlocked);
+                PlayerPrefs.Save();
+            }
+        }
+
         public void ShowDefeatScreen()
         {
             Time.timeScale = 0f;
             if (_defeatOverlay != null) _defeatOverlay.style.display = DisplayStyle.Flex;
+
+            if (AudioManager.Instance != null && defeatSound != null)
+                AudioManager.Instance.PlaySFX(defeatSound);
         }
 
         public void ShowCreditsScreen()
@@ -688,7 +739,7 @@ namespace Custom.UI
             }
         }
 
-        private void TryUnlockAbility(Button abilityButton, int cost)
+        private void TryUnlockAbility(Button abilityButton, int cost, AudioClip unlockSound)
         {
             if (abilityButton == null) return;
 
@@ -700,12 +751,19 @@ namespace Custom.UI
 
             if (economy != null && economy.TrySpend(cost))
             {
-                PlayClickSound();
+                if (AudioManager.Instance != null && unlockSound != null)
+                    AudioManager.Instance.PlaySFX(unlockSound);
+                else
+                    PlayClickSound();
+
                 abilityButton.RemoveFromClassList("locked");
                 Debug.Log($"Habilidad {abilityButton.name} desbloqueada.");
             }
             else
             {
+                if (AudioManager.Instance != null && abilityUnlockFailedSound != null)
+                    AudioManager.Instance.PlaySFX(abilityUnlockFailedSound);
+
                 Debug.LogWarning($"Oro insuficiente para desbloquear {abilityButton.name} ({cost} necesarios).");
             }
         }
@@ -722,7 +780,7 @@ namespace Custom.UI
 
             if (slot.Button.ClassListContains("locked"))
             {
-                TryUnlockAbility(slot.Button, cost);
+                TryUnlockAbility(slot.Button, cost, slot.UnlockSound);
                 return false;
             }
 
@@ -828,14 +886,14 @@ namespace Custom.UI
         {
             // La ranura 1 (bomba) ya trae su propio sprite de fondo en el
             // UXML, asi que no necesita un icono dibujado a mano.
-            _slotAbility1 = BuildAbilitySlot(_ability1, root, "Ability1", ability1Cooldown, ability1Cost, bombAbility, null);
-            _slotAbility2 = BuildAbilitySlot(_ability2, root, "Ability2", ability2Cooldown, ability2Cost, empAbility, null, DrawLightningIcon);
-            _slotAbility3 = BuildAbilitySlot(_ability3, root, "Ability3", ability3Cooldown, ability3Cost, repulsionAbility, null, DrawRepulsionIcon);
-            _slotAbility4 = BuildAbilitySlot(_ability4, root, "Ability4", ability4Cooldown, ability4Cost, repairAbility, null, DrawHealIcon);
+            _slotAbility1 = BuildAbilitySlot(_ability1, root, "Ability1", ability1Cooldown, ability1Cost, bombAbility, null, null, ability1UnlockSound);
+            _slotAbility2 = BuildAbilitySlot(_ability2, root, "Ability2", ability2Cooldown, ability2Cost, empAbility, null, DrawLightningIcon, ability2UnlockSound);
+            _slotAbility3 = BuildAbilitySlot(_ability3, root, "Ability3", ability3Cooldown, ability3Cost, repulsionAbility, null, DrawRepulsionIcon, ability3UnlockSound);
+            _slotAbility4 = BuildAbilitySlot(_ability4, root, "Ability4", ability4Cooldown, ability4Cost, repairAbility, null, DrawHealIcon, ability4UnlockSound);
 
             // La ranura 5 no es de arrastre: se usa con un click y su efecto
             // es desbloquear el tablero durante unos segundos.
-            _slotAbility5 = BuildAbilitySlot(_ability5, root, "Ability5", ability5Cooldown, ability5Cost, null, UnlockBoardTemporarily, DrawUnlockIcon);
+            _slotAbility5 = BuildAbilitySlot(_ability5, root, "Ability5", ability5Cooldown, ability5Cost, null, UnlockBoardTemporarily, DrawUnlockIcon, ability5UnlockSound);
 
             _allSlots = new AbilitySlot[]
             {
@@ -849,7 +907,7 @@ namespace Custom.UI
         // segun sea de arrastre o de click.
         private AbilitySlot BuildAbilitySlot(Button button, VisualElement root, string elementPrefix,
             PowerUpCooldownConfig config, int cost, IDragAbility dragAbility, Action onUse,
-            Action<MeshGenerationContext> drawIcon = null)
+            Action<MeshGenerationContext> drawIcon = null, AudioClip unlockSound = null)
         {
             if (button == null)
                 return null;
@@ -863,6 +921,7 @@ namespace Custom.UI
                 Cost = cost,
                 DragAbility = dragAbility,
                 OnUse = onUse,
+                UnlockSound = unlockSound,
                 RemainingCooldown = 0f,
                 UsesRemaining = config != null && config.usageLimitMode != PowerUpUsageLimitMode.Unlimited ? config.maxUses : -1
             };
@@ -1299,7 +1358,7 @@ namespace Custom.UI
         {
             if (slot.Button.ClassListContains("locked"))
             {
-                TryUnlockAbility(slot.Button, slot.Cost);
+                TryUnlockAbility(slot.Button, slot.Cost, slot.UnlockSound);
                 return;
             }
 
@@ -1351,7 +1410,12 @@ namespace Custom.UI
         private void UnlockBoardTemporarily()
         {
             if (boardManager != null)
+            {
                 boardManager.UnlockTemporarily();
+
+                if (AudioManager.Instance != null && boardUnlockSound != null)
+                    AudioManager.Instance.PlaySFX(boardUnlockSound);
+            }
             else
                 Debug.LogWarning("GameHUD: falta BoardManager en la escena, no se puede desbloquear el tablero.", this);
         }
@@ -1419,8 +1483,20 @@ namespace Custom.UI
         {
             PlayClickSound();
             GameSpeedController.SetSpeed(GameSpeedController.DefaultSpeed);
-            // TODO: Determinar dinamicamente el siguiente nivel
-            LoadSceneWithFade(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+
+            // El siguiente nivel sale de la lista del GameFlowConfig. Si no
+            // hay config, o este era el ultimo, se recarga el actual (que es
+            // lo que hacia antes siempre).
+            string next = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            if (gameFlow != null)
+            {
+                int levelNumber = gameFlow.GetLevelNumber(next);
+                string candidate = gameFlow.GetLevelScene(levelNumber + 1);
+                if (levelNumber > 0 && !string.IsNullOrEmpty(candidate))
+                    next = candidate;
+            }
+
+            LoadSceneWithFade(next);
         }
 
         private void LoadSceneWithFade(string sceneName)

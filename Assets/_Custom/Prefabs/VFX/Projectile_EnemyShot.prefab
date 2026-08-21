@@ -138,3 +138,4 @@ MonoBehaviour:
   speed: 8
   hitDistance: 0.4
   impactEffect: {fileID: 0}
+  impactSound: {fileID: 8300000, guid: cf2551365e1dad44d9cd4a2e3b02f9fa, type: 3}

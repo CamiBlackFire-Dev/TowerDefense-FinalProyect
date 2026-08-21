@@ -65,6 +65,8 @@ public class BoardManager : MonoBehaviour
     public TowerCatalog towerCatalog;   // dano, alcance y cadencia de cada nivel
     public GameObject projectilePrefab; // bala visible de las torres (bola de canon)
     public DamageNumber damagePopup;    // numero de dano al pegar (Damage Numbers Pro)
+    public AudioClip towerShootSound;   // al disparar
+    public AudioClip towerImpactSound;  // al pegar
 
     [Header("Animacion")]
     public float moveDuration = 0.14f;          // duracion del deslizamiento
@@ -74,6 +76,10 @@ public class BoardManager : MonoBehaviour
 
     [Header("Input")]
     public InputController inputController;
+    // Si el nivel tiene mas de un tablero, solo el elegido hace caso a las
+    // teclas: sin esto los dos se moverian a la vez con la misma pulsacion.
+    // Lo maneja BoardSelector; con un solo tablero se queda siempre en true.
+    public bool acceptsInput = true;
 
     [Header("Oleadas")]
     // Se busca solo en la escena si se deja vacio. Mientras spawner.IsRunning
@@ -259,8 +265,15 @@ public class BoardManager : MonoBehaviour
             return;
         }
 
-        List<float> columnsX = DistinctSorted(valid, t => t.localPosition.x);
-        List<float> rowsZ = DistinctSorted(valid, t => t.localPosition.z);
+        // Las columnas y filas se reparten por la posicion en el MUNDO, no
+        // por la local. El jugador pulsa "derecha" pensando en la pantalla,
+        // y la camara mira segun los ejes del mundo: si el tablero esta
+        // girado (los de Level2 y Level3 estan a 90 grados), su eje X local
+        // apunta al Z del mundo y "derecha" saldria moviendo hacia abajo.
+        // Lo que se guarda sigue siendo la posicion local, que es la que
+        // necesita AnchorLocalPosition para colocar las torres.
+        List<float> columnsX = DistinctSorted(valid, t => t.position.x);
+        List<float> rowsZ = DistinctSorted(valid, t => t.position.z);
 
         boardWidth = columnsX.Count;
         boardHeight = rowsZ.Count;
@@ -268,8 +281,8 @@ public class BoardManager : MonoBehaviour
 
         foreach (Transform t in valid)
         {
-            int x = ClosestIndex(columnsX, t.localPosition.x);
-            int y = ClosestIndex(rowsZ, t.localPosition.z);
+            int x = ClosestIndex(columnsX, t.position.x);
+            int y = ClosestIndex(rowsZ, t.position.z);
             _anchorLocalPositions[x, y] = t.localPosition;
         }
     }
@@ -474,6 +487,8 @@ public class BoardManager : MonoBehaviour
         attack.catalog = towerCatalog;
         attack.projectilePrefab = projectilePrefab;
         attack.popupPrefab = damagePopup;
+        attack.shootSound = towerShootSound;
+        attack.impactSound = towerImpactSound;
     }
 
     // Le da vida a la torre (base para que en el futuro los enemigos puedan
@@ -679,6 +694,9 @@ public class BoardManager : MonoBehaviour
 
     private void HandleMoveRequested(GridDirection direction)
     {
+        if (!acceptsInput)
+            return;
+
         Move(direction);
     }
 

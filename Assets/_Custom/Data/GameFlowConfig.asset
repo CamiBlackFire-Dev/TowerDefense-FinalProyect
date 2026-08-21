@@ -14,3 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameFlowConfig
   mainMenuScene: Main Menu
   gameplayScene: LevelPrueba
+  levelScenes:
+  - LevelPrueba
+  - Level2
+  - Level3

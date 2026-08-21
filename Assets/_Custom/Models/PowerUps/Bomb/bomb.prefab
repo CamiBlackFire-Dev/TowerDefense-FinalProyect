@@ -113,6 +113,7 @@ MonoBehaviour:
   explosionVfxDuration: 6.5
   boomTextPrefab: {fileID: 7734502003, guid: eb43d6ef277c69040a41823157cce048, type: 3}
   boomTextHeightOffset: 1
+  explosionSound: {fileID: 8300000, guid: 8b342d3db43486b449e541a8c76c5a56, type: 3}
   raycastDistance: 10
   floorLayer:
     serializedVersion: 2

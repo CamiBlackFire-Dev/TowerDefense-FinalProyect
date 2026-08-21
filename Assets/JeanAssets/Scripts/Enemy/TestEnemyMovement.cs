@@ -21,6 +21,15 @@ public class TestEnemyMovement : MonoBehaviour
     [SerializeField] private EnemyAttack enemyAttack;
     public event System.Action<TestEnemyMovement> Finished;
 
+    [Header("Audio")]
+    // En bucle mientras el enemigo esta activo (caminando, o retrocediendo
+    // por Repulsion). Se detiene sola al morir o al llegar al final, porque
+    // las dos cosas apagan este componente (ver EnemyHealth.Die y el
+    // "enabled = false" de mas abajo) y eso dispara OnDisable.
+    [SerializeField] private AudioClip footstepsSound;
+    [SerializeField] [Range(0f, 1f)] private float footstepsVolume = 0.35f;
+    private AudioSource footstepsSource;
+
     private void Start()
     {
         if (path != null)
@@ -29,11 +38,49 @@ public class TestEnemyMovement : MonoBehaviour
         originalSpeed = movementSpeed;
     }
 
+    private void OnEnable()
+    {
+        if (footstepsSound == null)
+            return;
+
+        if (footstepsSource == null)
+        {
+            footstepsSource = gameObject.AddComponent<AudioSource>();
+            footstepsSource.clip = footstepsSound;
+            footstepsSource.loop = true;
+            footstepsSource.playOnAwake = false;
+            footstepsSource.spatialBlend = 1f;
+            footstepsSource.volume = footstepsVolume;
+            // Un pitch fijo por enemigo evita que sonoros identicos que
+            // arrancan juntos se escuchen como un solo golpe de volumen.
+            footstepsSource.pitch = UnityEngine.Random.Range(0.92f, 1.08f);
+        }
+
+        footstepsSource.Play();
+    }
+
+    private void OnDisable()
+    {
+        if (footstepsSource != null)
+            footstepsSource.Stop();
+    }
+
     public void SetPath(Path newPath)
     {
         path = newPath;
         waypoints = path != null ? path.GetWaypoints() : null;
         currentWaypoint = 0;
+    }
+
+    // Desde que waypoint arranca. Lo usa el spawner cuando los enemigos
+    // salen de un punto intermedio del camino: sin esto seguirian yendo
+    // primero al waypoint 0, es decir caminando hacia atras.
+    public void SetStartWaypoint(int index)
+    {
+        if (waypoints == null || waypoints.Length == 0)
+            return;
+
+        currentWaypoint = Mathf.Clamp(index, 0, waypoints.Length - 1);
     }
 
     // El spawner deja aqui la velocidad de esta oleada. Se guarda tambien
