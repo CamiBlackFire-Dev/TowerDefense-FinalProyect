@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class RutaEnemigo : MonoBehaviour
+public class RotarHelice : MonoBehaviour
 {
-    public NavMeshAgent enemigo;
-    public Transform destino;
+    public Transform rotacion;
+    public float speed;
     void Start()
     {
         
@@ -13,6 +13,6 @@ public class RutaEnemigo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        enemigo.SetDestination(destino.position);
+        rotacion.Rotate(0f, speed * Time.deltaTime, 0f);
     }
 }
