@@ -103,3 +103,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a73a12b0525abc47999107c01089ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CrossbowProjectile
+  arcHeight: 5

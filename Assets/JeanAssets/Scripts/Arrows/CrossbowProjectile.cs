@@ -5,104 +5,115 @@ public class CrossbowProjectile : MonoBehaviour
     private Transform target;
     private ArrowData arrowData;
 
+    private Vector3 targetPosition;
+    private Vector3 startPosition;
+
+    private float travelDistance;
+    private float elapsedTime;
+
+    [Header("Trajectory")]
+    [SerializeField] private float arcHeight = 5f;
+
     private void Update()
     {
-        if (target == null ||
-            !target.gameObject.activeInHierarchy)
+        if (arrowData == null)
         {
             Destroy(gameObject);
             return;
         }
 
-        MoveTowardsTarget();
+        MoveTowardsTargetPosition();
     }
 
-    public void Setup(Transform newTarget, ArrowData newArrowData)
+    public void Setup(Transform newTarget, ArrowData newArrowData, Vector3 predictedPosition)
     {
         target = newTarget;
+
         arrowData = newArrowData;
+
+        startPosition = transform.position;
+
+        targetPosition = predictedPosition;
+
+        travelDistance = Vector3.Distance(startPosition, targetPosition);
+
+        elapsedTime = 0f;
     }
 
-    private void MoveTowardsTarget()
+    private void MoveTowardsTargetPosition()
     {
-        Vector3 direction =
-            target.position - transform.position;
-
-        float distance =
-            direction.magnitude;
-
-        float movement =
-            arrowData.speed * Time.deltaTime;
-
-        if (movement >= distance)
+        if (travelDistance <= 0.01f)
         {
-            transform.position = target.position;
+            transform.position = targetPosition;
 
             HitTarget();
 
             return;
         }
 
-        transform.position +=
-            direction.normalized * movement;
+        float movement = arrowData.speed * Time.deltaTime;
+
+        elapsedTime += movement / travelDistance;
+
+        float progress = Mathf.Clamp01(elapsedTime);
+
+        Vector3 position = Vector3.Lerp(startPosition, targetPosition, progress);
+
+        float arc = Mathf.Sin(progress * Mathf.PI) * arcHeight;
+
+        position += Vector3.up * arc;
+
+        Vector3 direction = position - transform.position;
+
+        transform.position = position;
 
         if (direction != Vector3.zero)
         {
-            transform.rotation =
-                Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.LookRotation(direction);
+        }
+
+        if (progress >= 1f)
+        {
+            HitTarget();
         }
     }
 
     private void HitTarget()
     {
-        if (target == null ||
-            arrowData == null)
+        if (arrowData == null)
         {
             Destroy(gameObject);
             return;
         }
 
-        EnemyHealth health =
-            target.GetComponentInParent<EnemyHealth>();
-
-        if (health == null)
+        if (target != null && target.gameObject.activeInHierarchy)
         {
-            Destroy(gameObject);
-            return;
+            EnemyHealth health = target.GetComponentInParent<EnemyHealth>();
+
+            if (health != null)
+            {
+                health.TakeDamage(arrowData.damage);
+
+                EnemyStatusEffects statusEffects = target.GetComponentInParent<EnemyStatusEffects>();
+
+                if (statusEffects != null)
+                {
+                    ApplyArrowEffect(statusEffects);
+                }
+            }
         }
 
-        // Daño base.
-        health.TakeDamage(arrowData.damage);
-
-        // Buscar efectos de estado.
-        EnemyStatusEffects statusEffects =
-            target.GetComponentInParent<EnemyStatusEffects>();
-
-        if (statusEffects != null)
-        {
-            ApplyArrowEffect(statusEffects);
-        }
-
-        // Efecto visual del impacto.
         if (arrowData.effectPrefab != null)
         {
-            GameObject effect = Instantiate(
-                arrowData.effectPrefab,
-                transform.position,
-                Quaternion.identity
-            );
+            GameObject effect = Instantiate(arrowData.effectPrefab, transform.position, Quaternion.identity);
 
-            Destroy(
-                effect,
-                arrowData.effectDuration
-            );
+            Destroy(effect, arrowData.effectDuration);
         }
 
         Destroy(gameObject);
     }
 
-    private void ApplyArrowEffect(
-        EnemyStatusEffects statusEffects)
+    private void ApplyArrowEffect(EnemyStatusEffects statusEffects)
     {
         switch (arrowData.effectType)
         {
@@ -111,29 +122,19 @@ public class CrossbowProjectile : MonoBehaviour
 
             case ArrowEffectType.Fire:
 
-                statusEffects.ApplyBurn(
-                    arrowData.effectValue,
-                    arrowData.effectDuration
-                );
+                statusEffects.ApplyBurn(arrowData.effectValue, arrowData.effectDuration);
 
                 break;
 
             case ArrowEffectType.Poison:
 
-                statusEffects.ApplyPoison(
-                    arrowData.effectValue,
-                    1f,
-                    arrowData.effectDuration
-                );
+                statusEffects.ApplyPoison(arrowData.effectValue, 1f, arrowData.effectDuration);
 
                 break;
 
             case ArrowEffectType.Ice:
 
-                statusEffects.ApplyIce(
-                    arrowData.effectValue,
-                    arrowData.effectDuration
-                );
+                statusEffects.ApplyIce(arrowData.effectValue, arrowData.effectDuration);
 
                 break;
         }
