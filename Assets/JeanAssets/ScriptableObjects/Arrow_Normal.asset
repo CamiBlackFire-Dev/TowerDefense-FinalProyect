@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArrowData
   arrowName: Normal
   prefab: {fileID: 6760192031667610764, guid: fbf047f87efb1094985ae401a594782b, type: 3}
-  speed: 10
-  damage: 10
+  speed: 5
+  damage: 1
   effectType: 0
-  effectDuration: 3
-  effectValue: 0.5
+  effectDuration: 1.3
+  effectValue: 0
   effectPrefab: {fileID: 5013878782555061258, guid: d9fa0c80412e48448acaa78def63d086, type: 3}
