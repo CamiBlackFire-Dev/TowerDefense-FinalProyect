@@ -20,20 +20,29 @@
             <ui:VisualElement class="center-container">
                 <ui:VisualElement class="health-bar-container">
                     <ui:VisualElement name="HealthBarFill" class="health-bar-fill" style="width: 100%;"/>
-                    <ui:Label text="20/20" name="HealthText" class="health-bar-text"/>
+                    <ui:Label text="❤️ 20/20" name="HealthText" class="health-bar-text"/>
                 </ui:VisualElement>
                 <ui:VisualElement class="wave-container">
                     <ui:Label text="OLEADA 1" name="WaveText" class="wave-text"/>
                 </ui:VisualElement>
-                <ui:Label text="¡Prepara tus torres para la batalla!" name="WaveSubtitleText" class="wave-subtitle-text" style="-unity-font-style: bold; font-size: 40px; color: rgb(255, 235, 0); -unity-text-outline-width: 1px; -unity-text-outline-color: rgb(0, 0, 0);"/>
+                <ui:Label text="¡PREPARA TU DEFENSA!" name="WaveSubtitleText" class="wave-subtitle-text" style="-unity-font-style: bold; font-size: 40px; color: rgb(255, 235, 0); -unity-text-outline-width: 1px; -unity-text-outline-color: rgb(0, 0, 0);"/>
             </ui:VisualElement>
-            <ui:Button name="OptionsButton" text="" class="options-btn-small" style="border-left-color: rgb(241, 196, 15); border-right-color: rgb(241, 196, 15); border-top-color: rgb(241, 196, 15); border-bottom-color: rgb(241, 196, 15);"/>
+            <ui:VisualElement class="top-right-container" style="position: absolute; right: 0; top: 0; flex-direction: row; align-items: flex-end;">
+                <ui:VisualElement class="speed-wrapper" style="margin-right: 15px; margin-left: 0;">
+                    <ui:Label text="CÁMARA" class="speed-label" style="font-size: 22px; margin-top: -5px; margin-bottom: -3px;"/>
+                    <ui:Button name="LockCameraButton" text="LIBRE" class="speed-btn" style="width: 85px; font-size: 22px;"/>
+                </ui:VisualElement>
+                <ui:Button name="OptionsButton" text="" class="options-btn-small" style="position: relative; margin-bottom: 10px; border-left-color: rgb(241, 196, 15); border-right-color: rgb(241, 196, 15); border-top-color: rgb(241, 196, 15); border-bottom-color: rgb(241, 196, 15);"/>
+            </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Button name="StartWaveButton" text="EMPEZAR OLEADA" class="unity-button start-wave-btn"/>
-        <ui:VisualElement class="bottom-bar" style="height: 115px;">
+        <ui:Button name="StartWaveButton" text="▶ EMPEZAR OLEADA" class="unity-button start-wave-btn"/>
+        <ui:Button name="NextBoardButton" text="CAMBIAR TABLERO" class="unity-button next-board-btn" style="display: none;"/>
+        <ui:VisualElement class="bottom-bar" style="height: 135px;">
             <ui:VisualElement style="flex: 1; flex-basis: 0; min-width: 300px;"/>
-            <ui:VisualElement class="abilities-container">
-                <ui:Button name="Ability1" class="ability-slot locked" style="background-image: url(&quot;project://database/Assets/_Custom/Models/PowerUps/Bomb/BombaIcono.png?fileID=2800000&amp;guid=7c0517bb66c43d44191132a2ea3d1da4&amp;type=3#BombaIcono&quot;); background-size: 70% 70%; -unity-background-scale-mode: scale-to-fit;">
+            <ui:VisualElement style="flex-direction: column; align-items: center;">
+                <ui:Label text="HABILIDADES" style="color: rgb(241, 196, 15); -unity-font-style: bold; font-size: 24px; margin-bottom: -15px; -unity-text-outline-width: 1px; -unity-text-outline-color: rgb(0, 0, 0); z-index: 10;"/>
+                <ui:VisualElement class="abilities-container">
+                    <ui:Button name="Ability1" class="ability-slot locked" style="background-image: url(&quot;project://database/Assets/_Custom/Models/PowerUps/Bomb/BombaIcono.png?fileID=2800000&amp;guid=7c0517bb66c43d44191132a2ea3d1da4&amp;type=3#BombaIcono&quot;); background-size: 70% 70%; -unity-background-scale-mode: scale-to-fit;">
                     <ui:Label text="1" class="ability-hotkey"/>
                     <ui:VisualElement class="lock-overlay">
                         <ui:VisualElement name="Ability1LockIcon" class="lock-icon" picking-mode="Ignore"/>
@@ -97,6 +106,7 @@
                     <ui:VisualElement name="Ability5CooldownOverlay" picking-mode="Ignore" class="cooldown-overlay"/>
                     <ui:Label text="" name="Ability5UsesLabel" class="uses-label"/>
                 </ui:Button>
+            </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement style="flex: 1; flex-basis: 0; min-width: 300px; align-items: flex-end; justify-content: center;">
                 <ui:Button name="BuyTowerButton" class="unity-button buy-tower-btn" style="display: flex;">

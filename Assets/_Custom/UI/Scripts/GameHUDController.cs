@@ -39,8 +39,10 @@ namespace Custom.UI
         private Label _waveText;
         private Label _waveSubtitleText;
         private Button _optionsButton;
+        private Button _lockCameraButton;
         private Button _startWaveButton;
         private Button _buyTowerButton;
+        private Button _nextBoardButton;
         // Candado dibujado a mano (Painter2D): los emojis (🔒⚡💨🔧🔓) se ven
         // en el Editor porque Windows les busca una fuente de respaldo, pero
         // en un build (WebGL incluido) no hay ese respaldo y no se dibuja
@@ -217,6 +219,9 @@ namespace Custom.UI
 
         private VisualElement _fadeOverlay;
 
+        private bool _canChangeBoard = false;
+        private CameraEdgePan _cameraPan;
+
         #region Unity Lifecycle
         private void OnEnable()
         {
@@ -244,11 +249,22 @@ namespace Custom.UI
             _waveText = root.Q<Label>("WaveText");
             _waveSubtitleText = root.Q<Label>("WaveSubtitleText");
             _optionsButton = root.Q<Button>("OptionsButton");
+            _lockCameraButton = root.Q<Button>("LockCameraButton");
             _startWaveButton = root.Q<Button>("StartWaveButton");
             _startWaveButton.BringToFront();
             _buyTowerButton = root.Q<Button>("BuyTowerButton");
+            _nextBoardButton = root.Q<Button>("NextBoardButton");
             _speed1xButton = root.Q<Button>("Speed1xButton");
             _speed2xButton = root.Q<Button>("Speed2xButton");
+
+            if (_nextBoardButton != null)
+            {
+                BoardSelector selector = FindFirstObjectByType<BoardSelector>();
+                _canChangeBoard = (selector != null && selector.BoardCount > 1);
+                _nextBoardButton.style.display = _canChangeBoard ? DisplayStyle.Flex : DisplayStyle.None;
+                
+                _nextBoardButton.BringToFront();
+            }
 
             _bigAnnouncerContainer = root.Q<VisualElement>("BigAnnouncerContainer");
             _bigAnnouncerText = root.Q<Label>("BigAnnouncerText");
@@ -286,10 +302,18 @@ namespace Custom.UI
             _ability4 = root.Q<Button>("Ability4");
             _ability5 = root.Q<Button>("Ability5");
 
+            _cameraPan = FindFirstObjectByType<CameraEdgePan>();
             if (_optionsButton != null)
             {
                 _optionsButton.clicked += OnOptionsClicked;
                 _optionsButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+
+            if (_lockCameraButton != null)
+            {
+                _lockCameraButton.clicked += OnLockCameraClicked;
+                _lockCameraButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+                RefreshLockCameraVisuals();
             }
 
             if (_startWaveButton != null)
@@ -302,6 +326,17 @@ namespace Custom.UI
             {
                 _buyTowerButton.clicked += OnBuyTowerClicked;
                 _buyTowerButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+
+            if (_nextBoardButton != null)
+            {
+                _nextBoardButton.clicked += OnNextBoardClicked;
+                _nextBoardButton.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+
+            if (_waveSubtitleText != null)
+            {
+                _waveSubtitleText.schedule.Execute(() => _waveSubtitleText.ToggleInClassList("breathe")).Every(1000);
             }
 
             _buyTowerLockIcon = root.Q<VisualElement>("BuyTowerLockIcon");
@@ -431,6 +466,11 @@ namespace Custom.UI
                 _optionsButton.clicked -= OnOptionsClicked;
                 _optionsButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
             }
+            if (_lockCameraButton != null)
+            {
+                _lockCameraButton.clicked -= OnLockCameraClicked;
+                _lockCameraButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
             if (_startWaveButton != null)
             {
                 _startWaveButton.clicked -= OnStartWaveClicked;
@@ -441,6 +481,13 @@ namespace Custom.UI
                 _buyTowerButton.clicked -= OnBuyTowerClicked;
                 _buyTowerButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
             }
+
+            if (_nextBoardButton != null)
+            {
+                _nextBoardButton.clicked -= OnNextBoardClicked;
+                _nextBoardButton.UnregisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+
             if (_buyTowerLockIcon != null && _buyTowerLockIconDrawCallback != null)
                 _buyTowerLockIcon.generateVisualContent -= _buyTowerLockIconDrawCallback;
             if (_speed1xButton != null)
@@ -582,7 +629,7 @@ namespace Custom.UI
         {
             if (_healthText != null)
             {
-                _healthText.text = $"{currentHealth}/{maxHealth}";
+                _healthText.text = $"❤️ {currentHealth}/{maxHealth}";
             }
             if (_healthBarFill != null)
             {
@@ -618,6 +665,10 @@ namespace Custom.UI
             if (_startWaveButton != null)
             {
                 _startWaveButton.style.display = isActive ? DisplayStyle.None : DisplayStyle.Flex;
+            }
+            if (_nextBoardButton != null)
+            {
+                _nextBoardButton.style.display = (isActive || !_canChangeBoard) ? DisplayStyle.None : DisplayStyle.Flex;
             }
             if (_waveSubtitleText != null)
             {
@@ -766,6 +817,7 @@ namespace Custom.UI
                     AudioManager.Instance.PlaySFX(abilityUnlockFailedSound);
 
                 Debug.LogWarning($"Oro insuficiente para desbloquear {abilityButton.name} ({cost} necesarios).");
+                ShakeElement(abilityButton);
             }
         }
 
@@ -1307,11 +1359,35 @@ namespace Custom.UI
             PlayClickSound();
             if (towerShop != null)
             {
-                towerShop.TryBuyTower();
+                if (!towerShop.TryBuyTower())
+                {
+                    ShakeElement(_buyTowerButton);
+                }
             }
             else
             {
                 Debug.LogWarning("TowerShop no encontrado en la escena. La torre no se comprara.", this);
+            }
+        }
+
+        private void ShakeElement(VisualElement element)
+        {
+            if (element == null) return;
+            var seq = element.schedule;
+            seq.Execute(() => element.style.translate = new Translate(new Length(-8, LengthUnit.Pixel), 0, 0)).StartingIn(0);
+            seq.Execute(() => element.style.translate = new Translate(new Length(8, LengthUnit.Pixel), 0, 0)).StartingIn(50);
+            seq.Execute(() => element.style.translate = new Translate(new Length(-8, LengthUnit.Pixel), 0, 0)).StartingIn(100);
+            seq.Execute(() => element.style.translate = new Translate(new Length(8, LengthUnit.Pixel), 0, 0)).StartingIn(150);
+            seq.Execute(() => element.style.translate = new StyleTranslate(StyleKeyword.Null)).StartingIn(200);
+        }
+
+        private void OnNextBoardClicked()
+        {
+            PlayClickSound();
+            BoardSelector selector = FindFirstObjectByType<BoardSelector>();
+            if (selector != null)
+            {
+                selector.SelectNext();
             }
         }
 
@@ -1431,6 +1507,32 @@ namespace Custom.UI
         {
             if (AudioManager.Instance != null && clickSound != null)
                 AudioManager.Instance.PlaySFX(clickSound);
+        }
+
+        private void OnLockCameraClicked()
+        {
+            PlayClickSound();
+            if (_cameraPan != null)
+            {
+                _cameraPan.panEnabled = !_cameraPan.panEnabled;
+                RefreshLockCameraVisuals();
+            }
+        }
+
+        private void RefreshLockCameraVisuals()
+        {
+            if (_lockCameraButton == null || _cameraPan == null) return;
+            
+            if (_cameraPan.panEnabled)
+            {
+                _lockCameraButton.text = "LIBRE";
+                _lockCameraButton.RemoveFromClassList("speed-btn-selected");
+            }
+            else
+            {
+                _lockCameraButton.text = "FIJA";
+                _lockCameraButton.AddToClassList("speed-btn-selected");
+            }
         }
 
         private void OnOptionsClicked()
