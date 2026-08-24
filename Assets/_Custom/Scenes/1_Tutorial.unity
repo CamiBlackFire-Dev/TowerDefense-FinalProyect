@@ -2189,6 +2189,12 @@ MonoBehaviour:
   enemyHealth: 10
   enemyReward: 10
   enemySpeed: 2
+  bossPrefab: {fileID: 0}
+  bossWave: 5
+  bossHealth: 400
+  bossReward: 200
+  bossSpeed: 1.2
+  bossSourceIndex: 0
   healthGrowthPerWave: 0.15
   speedGrowthPerWave: 0.05
   shooterDamageGrowthPerWave: 0.1
@@ -6485,6 +6491,7 @@ MonoBehaviour:
   economy: {fileID: 1085780038}
   inputController: {fileID: 1260824858}
   spawner: {fileID: 0}
+  boardSelector: {fileID: 0}
   towerCost: 50
   purchaseSound: {fileID: 8300000, guid: 7fbfc3f08b3d83e4399db0c20bde55ad, type: 3}
   failureSound: {fileID: 8300000, guid: b3eafbfdcbddebe45a696438dd01ff3d, type: 3}
@@ -6638,7 +6645,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 367526c1a36ca314182b4326a7c54af9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraEdgePan
-  panEnabled: 1
+  panEnabled: 0
   edgeThickness: 40
   panSpeed: 18
   limitMin: {x: -13.797, y: -18.283905}
@@ -7247,8 +7254,8 @@ MonoBehaviour:
   ability3Cost: 300
   ability4Cost: 400
   ability5Cost: 500
-  hoverSound: {fileID: 0}
-  clickSound: {fileID: 0}
+  hoverSound: {fileID: 8300000, guid: 21b8e6442491e294bbf7e06a0cc5c99e, type: 3}
+  clickSound: {fileID: 8300000, guid: 323630857d9b9314ca940e1ee46dcff0, type: 3}
   waveAnnouncerSound: {fileID: 0}
   defeatSound: {fileID: 8300000, guid: f4ca7beafba3327489e4244c9894dc39, type: 3}
   boardUnlockSound: {fileID: 8300000, guid: 3f74253daf7cdeb4aa2ab8434a67736a, type: 3}
@@ -7514,6 +7521,12 @@ MonoBehaviour:
   enemyHealth: 20
   enemyReward: 10
   enemySpeed: 2
+  bossPrefab: {fileID: 0}
+  bossWave: 5
+  bossHealth: 400
+  bossReward: 200
+  bossSpeed: 1.2
+  bossSourceIndex: 0
   healthGrowthPerWave: 0.15
   speedGrowthPerWave: 0.05
   shooterDamageGrowthPerWave: 0.1

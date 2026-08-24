@@ -61,30 +61,26 @@
     height: 40px;
     font-size: 24px;
     -unity-font-style: bold;
-    color: white;
-    background-color: rgb(80, 80, 80);
+    color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(50, 50, 50, 0.5);
     background-image: none;
     border-radius: 8px;
     border-width: 2px;
-    border-color: rgb(120, 120, 120);
+    border-color: rgba(100, 100, 100, 0.5);
     margin: 0 4px;
     -unity-text-align: middle-center;
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: black;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
+    -unity-text-outline-width: 0;
     transition-duration: 0.1s;
     transition-property: scale, background-color, color;
 }
 
 .speed-btn:hover {
-    color: rgb(255, 235, 100);
-    background-color: rgb(100, 100, 100);
+    color: white;
+    background-color: rgba(80, 80, 80, 0.8);
     scale: 1.05;
 }
 
 .speed-btn:active {
-    color: rgb(230, 126, 34);
-    background-color: rgb(60, 60, 60);
     scale: 0.95;
 }
 
@@ -92,11 +88,11 @@
     background-color: var(--color-accent);
     border-color: rgb(255, 224, 130);
     color: rgb(40, 30, 10);
-    text-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    -unity-text-outline-width: 0;
 }
 
 .speed-btn-selected:hover {
-    background-color: var(--color-accent);
+    background-color: rgb(255, 224, 130);
     color: rgb(40, 30, 10);
 }
 
@@ -159,8 +155,8 @@
 }
 
 .options-btn-small {
-    width: 90px;
-    height: 90px;
+    width: 75px;
+    height: 75px;
     position: absolute;
     right: 0;
     top: 0;
@@ -228,33 +224,59 @@
 
 .start-wave-btn {
     position: absolute;
-    bottom: 150px;
-    right: 65px;
-    background-color: rgb(39, 174, 96);
-    background-image: none;
-    border-color: rgb(46, 204, 113);
-    border-width: 4px;
-    padding: 15px 30px;
+    bottom: 155px;
+    right: 15px;
+    padding: 10px 20px;
     font-size: 28px;
-    border-radius: 15px;
-    color: white;
+    color: rgb(240, 255, 240);
     -unity-font-style: bold;
-    height: 100px;
-    width: 250px;
-    border-left-color: rgb(241, 196, 15);
-    border-right-color: rgb(241, 196, 15);
-    border-top-color: rgb(241, 196, 15);
-    border-bottom-color: rgb(241, 196, 15);
+    height: 140px;
+    width: 360px;
+    margin: 0;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+    -unity-background-image-tint-color: rgb(100, 255, 120);
+    background-color: transparent;
+    border-width: 0;
 }
 
 .start-wave-btn:hover {
-    background-color: rgb(46, 204, 113);
     scale: 1.05;
+    -unity-background-image-tint-color: rgb(140, 255, 160);
 }
 
 .start-wave-btn:active {
     scale: 0.95;
-    background-color: rgb(30, 132, 73);
+    -unity-background-image-tint-color: rgb(80, 200, 100);
+}
+
+.next-board-btn {
+    position: absolute;
+    bottom: 155px;
+    left: 15px;
+    padding: 10px 20px;
+    font-size: 28px;
+    color: white;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    height: 140px;
+    width: 360px;
+    margin: 0;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(0, 0, 0);
+    -unity-background-image-tint-color: rgb(100, 160, 200);
+    background-color: transparent;
+    border-width: 0;
+}
+
+.next-board-btn:hover {
+    scale: 1.05;
+    -unity-background-image-tint-color: rgb(120, 180, 220);
+}
+
+.next-board-btn:active {
+    scale: 0.95;
+    -unity-background-image-tint-color: rgb(80, 140, 180);
 }
 
 .big-announcer-container {
@@ -299,8 +321,8 @@
     padding: 0;
     position: relative;
     overflow: hidden;
-    transition-duration: 0.1s;
-    transition-property: scale;
+    transition-duration: 0.1s, 0.05s;
+    transition-property: scale, translate;
     background-image: none;
 }
 
@@ -354,7 +376,7 @@
 }
 
 .lock-price {
-    font-size: 20px;
+    font-size: 26px;
     color: rgb(241, 196, 15);
     -unity-font-style: bold;
     -unity-text-outline-width: 1px;
@@ -370,6 +392,8 @@
     padding: 10px;
     right: auto;
     bottom: auto;
+    transition-property: translate;
+    transition-duration: 0.05s;
 }
 
 .buy-tower-title {
@@ -430,9 +454,16 @@
 }
 
 .wave-subtitle-text {
-    transition-property: opacity;
-    transition-duration: 0.5s;
+    transition-property: opacity, scale;
+    transition-duration: 0.5s, 1s;
+    transition-timing-function: ease-in-out;
     opacity: 1;
+    scale: 1;
+}
+
+.wave-subtitle-text.breathe {
+    scale: 1.1;
+    opacity: 0.8;
 }
 
 .wave-subtitle-text.fade-out {
