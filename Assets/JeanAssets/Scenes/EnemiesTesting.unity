@@ -394,9 +394,8 @@ MonoBehaviour:
   attackRate: 1
   projectilePrefab: {fileID: 5175319666275068441, guid: 4a1e8296c170a6647b9e4be22295154c, type: 3}
   projectileSpeed: 8
-  muzzleHeight: 1
+  projectileHeight: 1
   popupPrefab: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
-  impactEffect: {fileID: 7634420434017284396, guid: b9ed127bfed05be4db493ca51e744a76, type: 3}
 --- !u!114 &336881024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -995,6 +994,8 @@ MonoBehaviour:
   muzzleHeight: 1.2
   impactEffect: {fileID: 0}
   popupPrefab: {fileID: 0}
+  shootSound: {fileID: 0}
+  impactSound: {fileID: 0}
 --- !u!4 &807493111 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8062146952073417668, guid: c0b549c38bc8f4e4aadcae15da5a6c5a, type: 3}
@@ -1175,9 +1176,8 @@ MonoBehaviour:
   attackRate: 1
   projectilePrefab: {fileID: 3894563636541966133, guid: c27fac790990ed84f8ffc7736dd4b189, type: 3}
   projectileSpeed: 0.1
-  muzzleHeight: 1
+  projectileHeight: 1
   popupPrefab: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
-  impactEffect: {fileID: 7634420434017284396, guid: b9ed127bfed05be4db493ca51e744a76, type: 3}
 --- !u!114 &947060515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1413,9 +1413,8 @@ MonoBehaviour:
   attackRate: 1
   projectilePrefab: {fileID: 5724093481334579524, guid: eb24c3da2a84b7b4ca5d850dd712182b, type: 3}
   projectileSpeed: 8
-  muzzleHeight: 1
+  projectileHeight: 1
   popupPrefab: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
-  impactEffect: {fileID: 7634420434017284396, guid: b9ed127bfed05be4db493ca51e744a76, type: 3}
 --- !u!114 &1283652686
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1735,7 +1734,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 9452ae1262a74094f8a68013fbcd1834, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1888,6 +1887,8 @@ MonoBehaviour:
   muzzleHeight: 1.2
   impactEffect: {fileID: 0}
   popupPrefab: {fileID: 0}
+  shootSound: {fileID: 0}
+  impactSound: {fileID: 0}
 --- !u!4 &1944313196 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2532354093489919486, guid: a990ee188f097314fa7eace0645e766d, type: 3}
@@ -1969,6 +1970,8 @@ MonoBehaviour:
   muzzleHeight: 1.2
   impactEffect: {fileID: 0}
   popupPrefab: {fileID: 0}
+  shootSound: {fileID: 0}
+  impactSound: {fileID: 0}
 --- !u!4 &1952917999 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8062146952073417668, guid: c0b549c38bc8f4e4aadcae15da5a6c5a, type: 3}

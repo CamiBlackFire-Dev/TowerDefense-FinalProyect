@@ -2484,7 +2484,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb487debded23114db8ef9914ab5b9c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TowerDefense.BoardManager
+  mode: 0
   initialBoard: 0,0,0,0|0,0,0,0|0,0,2,0|0,0,0,0
+  boardWidth: 4
+  boardHeight: 4
+  anchoredCells: []
   cellSize: 2
   cellThickness: 0.1
   cellMesh: {fileID: -8603930918978254004, guid: fbfffd160a2e62e4f836da65f5a488fd, type: 3}
@@ -2506,9 +2510,12 @@ MonoBehaviour:
   - {r: 0.8, g: 0.4, b: 1, a: 1}
   - {r: 1, g: 1, b: 1, a: 1}
   towersAttack: 1
+  towerTargetRadius: 0.5
   towerCatalog: {fileID: 0}
   projectilePrefab: {fileID: 4570541557667802443, guid: fd26bfe326f4783428bcf130c003beab, type: 3}
   damagePopup: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
+  towerShootSound: {fileID: 0}
+  towerImpactSound: {fileID: 0}
   moveDuration: 0.14
   mergeFeedbackDuration: 0.22
   moveCurve:
@@ -2546,7 +2553,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   maxBufferedMoves: 8
   inputController: {fileID: 106350556}
+  acceptsInput: 1
   spawner: {fileID: 0}
+  temporaryUnlockDuration: 30
 --- !u!4 &946215461
 Transform:
   m_ObjectHideFlags: 0
@@ -2752,7 +2761,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 9452ae1262a74094f8a68013fbcd1834, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2853,7 +2862,11 @@ MonoBehaviour:
   board: {fileID: 946215460}
   economy: {fileID: 1260814684}
   inputController: {fileID: 106350556}
+  spawner: {fileID: 0}
+  boardSelector: {fileID: 0}
   towerCost: 50
+  purchaseSound: {fileID: 0}
+  failureSound: {fileID: 0}
 --- !u!4 &1171556607
 Transform:
   m_ObjectHideFlags: 0
@@ -2941,9 +2954,49 @@ MonoBehaviour:
   economy: {fileID: 0}
   playerBase: {fileID: 0}
   towerShop: {fileID: 0}
+  bombAbility: {fileID: 0}
+  empAbility: {fileID: 0}
+  repulsionAbility: {fileID: 0}
+  repairAbility: {fileID: 0}
+  boardManager: {fileID: 0}
+  gameFlow: {fileID: 0}
+  ability1Cooldown:
+    cooldownSeconds: 6
+    usageLimitMode: 0
+    maxUses: 3
+  ability2Cooldown:
+    cooldownSeconds: 8
+    usageLimitMode: 0
+    maxUses: 3
+  ability3Cooldown:
+    cooldownSeconds: 10
+    usageLimitMode: 0
+    maxUses: 3
+  ability4Cooldown:
+    cooldownSeconds: 12
+    usageLimitMode: 0
+    maxUses: 3
+  ability5Cooldown:
+    cooldownSeconds: 30
+    usageLimitMode: 2
+    maxUses: 1
+  cooldownWipeColor: {r: 0, g: 0, b: 0, a: 0.65}
+  ability1Cost: 100
+  ability2Cost: 200
+  ability3Cost: 300
+  ability4Cost: 400
+  ability5Cost: 500
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
   waveAnnouncerSound: {fileID: 0}
+  defeatSound: {fileID: 0}
+  boardUnlockSound: {fileID: 0}
+  abilityUnlockFailedSound: {fileID: 0}
+  ability1UnlockSound: {fileID: 0}
+  ability2UnlockSound: {fileID: 0}
+  ability3UnlockSound: {fileID: 0}
+  ability4UnlockSound: {fileID: 0}
+  ability5UnlockSound: {fileID: 0}
   debugKeys: 1
 --- !u!1 &1241511485
 GameObject:
@@ -3059,13 +3112,37 @@ MonoBehaviour:
   pathBuilder: {fileID: 0}
   economy: {fileID: 0}
   playerBase: {fileID: 0}
+  castleTransform: {fileID: 0}
+  goldPopupPrefab: {fileID: 0}
   damagePerEnemy: 1
   spawnOnStart: 0
   startDelay: 2
   spawnInterval: 2
   enemiesPerWave: 8
+  spawnWaypointIndex: 0
+  spawnSources: []
+  waveSurvivalGold: 50
   enemyHealth: 20
   enemyReward: 10
+  enemySpeed: 2
+  bossPrefab: {fileID: 0}
+  bossWave: 5
+  bossHealth: 400
+  bossReward: 200
+  bossSpeed: 1.2
+  bossSourceIndex: 0
+  healthGrowthPerWave: 0.15
+  speedGrowthPerWave: 0.05
+  shooterDamageGrowthPerWave: 0.1
+  enemiesGrowthPerWave: 2
+  shooterChanceGrowthPerWave: 0.05
+  shooterChance: 0.35
+  shooterRange: 5
+  shooterDamage: 4
+  shooterAttackRate: 0.5
+  shooterProjectilePrefab: {fileID: 0}
+  shooterProjectileSpeed: 8
+  shooterPopupPrefab: {fileID: 0}
 --- !u!1 &1260814683
 GameObject:
   m_ObjectHideFlags: 0
@@ -3738,7 +3815,9 @@ GameObject:
   - component: {fileID: 1455795529}
   - component: {fileID: 1455795528}
   - component: {fileID: 1455795527}
-  m_Layer: 0
+  - component: {fileID: 1455795532}
+  - component: {fileID: 1455795531}
+  m_Layer: 7
   m_Name: Tower 2,2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3785,6 +3864,8 @@ MonoBehaviour:
   muzzleHeight: 1.2
   impactEffect: {fileID: 0}
   popupPrefab: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
+  shootSound: {fileID: 0}
+  impactSound: {fileID: 0}
 --- !u!114 &1455795528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3872,6 +3953,42 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower
   level: 2
+--- !u!135 &1455795531
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1455795525}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &1455795532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1455795525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e706ae7d19694ba4486c612a18aa5237, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerHealth
+  catalog: {fileID: 0}
+  maxHealth: 20
+  showHealthBar: 1
 --- !u!1 &1460982301
 GameObject:
   m_ObjectHideFlags: 0
