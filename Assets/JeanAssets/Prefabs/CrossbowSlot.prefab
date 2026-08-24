@@ -1,0 +1,584 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2152243416373465004
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8005418970130216395}
+  - component: {fileID: 5045973700507972707}
+  - component: {fileID: 5385472843211967527}
+  m_Layer: 0
+  m_Name: ArrowVisual
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8005418970130216395
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2152243416373465004}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2769002131913424352}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5045973700507972707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2152243416373465004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aca8265d1ab4b545b823a2bae0c1445, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CrossbowArrowVisual
+  spriteRenderer: {fileID: 5385472843211967527}
+  normalSprite: {fileID: -829385230, guid: d9c8813b2bd9263488f809ec00ca400c, type: 3}
+  fireSprite: {fileID: 874687510, guid: d9c8813b2bd9263488f809ec00ca400c, type: 3}
+  iceSprite: {fileID: -790683206, guid: d9c8813b2bd9263488f809ec00ca400c, type: 3}
+  poisonSprite: {fileID: -405062101, guid: d9c8813b2bd9263488f809ec00ca400c, type: 3}
+--- !u!212 &5385472843211967527
+SpriteRenderer:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2152243416373465004}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 0
+  m_SpriteSortPoint: 0
+--- !u!1 &2628708887481831684
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8446421566591465571}
+  - component: {fileID: 1693499342568958760}
+  m_Layer: 0
+  m_Name: NormalSlot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8446421566591465571
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2628708887481831684}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7695858283227982551}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1693499342568958760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2628708887481831684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8b432dcbfc247740b28d5407d602389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CrossbowArrowSlot
+  arrowData: {fileID: 11400000, guid: d8dcbbe73fd24704baf9ca84151a33d6, type: 2}
+  lockedVisual: {fileID: 0}
+  unlockedVisual: {fileID: 0}
+  selectedVisual: {fileID: 0}
+--- !u!1 &2849789177530979231
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1311739898738948817}
+  - component: {fileID: 3036541071713396916}
+  m_Layer: 0
+  m_Name: CrossbowSlot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1311739898738948817
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2849789177530979231}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.99326, y: 5.01849, z: 10.82398}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2769002131913424352}
+  - {fileID: 7695858283227982551}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3036541071713396916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2849789177530979231}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05caae8538fc6c543812e1094a9f9480, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CrossbowSlot
+  crossbow: {fileID: 3253472946463696730}
+  arrowSelector: {fileID: 2864923287954600437}
+--- !u!1 &3521515465641122024
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4918928826651818275}
+  - component: {fileID: 857562602146821928}
+  m_Layer: 0
+  m_Name: IceSlot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4918928826651818275
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3521515465641122024}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7695858283227982551}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &857562602146821928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3521515465641122024}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8b432dcbfc247740b28d5407d602389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CrossbowArrowSlot
+  arrowData: {fileID: 11400000, guid: 38bcd3e78c9d9854cbb81a06e6775837, type: 2}
+  lockedVisual: {fileID: 0}
+  unlockedVisual: {fileID: 0}
+  selectedVisual: {fileID: 0}
+--- !u!1 &4462012641655297509
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5340380208529658497}
+  - component: {fileID: 1286526596799431548}
+  m_Layer: 0
+  m_Name: FireSlot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5340380208529658497
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4462012641655297509}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7695858283227982551}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1286526596799431548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4462012641655297509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8b432dcbfc247740b28d5407d602389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CrossbowArrowSlot
+  arrowData: {fileID: 11400000, guid: a2bb7c646857e3648b803b92b94f8cdb, type: 2}
+  lockedVisual: {fileID: 0}
+  unlockedVisual: {fileID: 0}
+  selectedVisual: {fileID: 0}
+--- !u!1 &4598939335348347104
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7695858283227982551}
+  - component: {fileID: 2864923287954600437}
+  m_Layer: 0
+  m_Name: ArrowSelector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7695858283227982551
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4598939335348347104}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8446421566591465571}
+  - {fileID: 5340380208529658497}
+  - {fileID: 4918928826651818275}
+  - {fileID: 2195408114067848029}
+  m_Father: {fileID: 1311739898738948817}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2864923287954600437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4598939335348347104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1e5cb38b0107024a9bb69dea513d9e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CrossbowArrowSelector
+  crossbow: {fileID: 2097040646031744436}
+  arrowSlots:
+  - {fileID: 1693499342568958760}
+  - {fileID: 1286526596799431548}
+  - {fileID: 857562602146821928}
+  - {fileID: 8598823245903511091}
+  normalArrowVisual: {fileID: 2628708887481831684}
+  fireArrowVisual: {fileID: 4462012641655297509}
+  iceArrowVisual: {fileID: 3521515465641122024}
+  poisonArrowVisual: {fileID: 8743974541653095213}
+--- !u!1 &8743974541653095213
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2195408114067848029}
+  - component: {fileID: 8598823245903511091}
+  m_Layer: 0
+  m_Name: PoisonSlot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2195408114067848029
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8743974541653095213}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7695858283227982551}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8598823245903511091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8743974541653095213}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8b432dcbfc247740b28d5407d602389, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CrossbowArrowSlot
+  arrowData: {fileID: 11400000, guid: 5b231d0e9da60e14cbc22a30e1a8c1f6, type: 2}
+  lockedVisual: {fileID: 0}
+  unlockedVisual: {fileID: 0}
+  selectedVisual: {fileID: 0}
+--- !u!1001 &2443134326813153803
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1311739898738948817}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.00674
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -4.51849
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.22398
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.0000002533197
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -3868710468543803471, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_Name
+      value: Arrow
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_Name
+      value: Crossbow
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329380249762036386, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.0000000011132214
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329380249762036386, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.35999966
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329380249762036386, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.0021972656
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329380249762036386, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.96592575
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329380249762036386, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.25881952
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329380249762036386, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 2.842171e-14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329380249762036386, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -7.1054274e-15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1329380249762036386, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -30
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8005418970130216395}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9125896918034299235}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2097040646031744436}
+  m_SourcePrefab: {fileID: 100100000, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+--- !u!4 &2769002131913424352 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+  m_PrefabInstance: {fileID: 2443134326813153803}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &3253472946463696730 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+  m_PrefabInstance: {fileID: 2443134326813153803}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9125896918034299235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3253472946463696730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0274347599f27b4082b12bf51d5cfd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TowerTargetDetector
+  detectionRange: 20
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 8
+--- !u!114 &2097040646031744436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3253472946463696730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dfc406d5a7f0ea48990ff0dee4c9a8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CrossbowRainAttack
+  arrowData: {fileID: 11400000, guid: d8dcbbe73fd24704baf9ca84151a33d6, type: 2}
+  firePoint: {fileID: 3716923190820118697}
+  arrowsPerShot: 3
+  burstCount: 3
+  burstInterval: 0.5
+  attackCooldown: 8
+  predictionTime: 0.2
+  maxPredictionDistance: 1.5
+  targetSearchRadius: 10
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  arrowVisual: {fileID: 5045973700507972707}
+  unlockEffect: {fileID: 3871730096559169795, guid: 83c08c075459659428032d0f6dbf1f7a, type: 3}
+--- !u!4 &3716923190820118697 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1329380249762036386, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+  m_PrefabInstance: {fileID: 2443134326813153803}
+  m_PrefabAsset: {fileID: 0}
