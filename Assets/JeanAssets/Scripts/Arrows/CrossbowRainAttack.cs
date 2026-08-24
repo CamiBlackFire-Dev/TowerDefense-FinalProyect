@@ -37,8 +37,6 @@ public class CrossbowRainAttack : MonoBehaviour
     {
         detector = GetComponent<TowerTargetDetector>();
 
-        detector = GetComponent<TowerTargetDetector>();
-
         if (arrowVisual != null && arrowData != null)
         {
             arrowVisual.UpdateVisual(arrowData);
@@ -93,11 +91,16 @@ public class CrossbowRainAttack : MonoBehaviour
     {
         List<Transform> targets = new List<Transform>();
 
-        Collider[] enemies = Physics.OverlapSphere(transform.position, targetSearchRadius, enemyLayer);
+        Collider[] enemies = Physics.OverlapSphere(
+            transform.position,
+            targetSearchRadius,
+            enemyLayer
+        );
 
         foreach (Collider enemy in enemies)
         {
-            Transform target = enemy.GetComponentInParent<EnemyHealth>()?.transform;
+            Transform target =
+                enemy.GetComponentInParent<EnemyHealth>()?.transform;
 
             if (target == null)
                 continue;
@@ -127,10 +130,11 @@ public class CrossbowRainAttack : MonoBehaviour
 
     private void FireArrow(Transform target)
     {
-        if (arrowData == null ||
-            arrowData.prefab == null)
+        if (arrowData == null || arrowData.prefab == null)
         {
-            Debug.LogWarning("CrossbowRainAttack: ArrowData o prefab de flecha no asignado.");
+            Debug.LogWarning(
+                "CrossbowRainAttack: ArrowData o prefab de flecha no asignado."
+            );
 
             return;
         }
@@ -144,19 +148,30 @@ public class CrossbowRainAttack : MonoBehaviour
 
         Quaternion rotation = Quaternion.LookRotation(direction);
 
-        GameObject arrow = Instantiate(arrowData.prefab, GetFirePosition(), rotation);
+        GameObject arrow = Instantiate(
+            arrowData.prefab,
+            GetFirePosition(),
+            rotation
+        );
 
-        CrossbowProjectile projectile = arrow.GetComponent<CrossbowProjectile>();
+        CrossbowProjectile projectile =
+            arrow.GetComponent<CrossbowProjectile>();
 
         if (projectile == null)
         {
-            Debug.LogError("El prefab de flecha necesita el componente CrossbowProjectile.");
+            Debug.LogError(
+                "El prefab de flecha necesita el componente CrossbowProjectile."
+            );
 
             Destroy(arrow);
             return;
         }
 
-        projectile.Setup(target, arrowData, predictedPosition);
+        projectile.Setup(
+            target,
+            arrowData,
+            predictedPosition
+        );
     }
 
     private Vector3 GetFirePosition()
@@ -171,7 +186,8 @@ public class CrossbowRainAttack : MonoBehaviour
     {
         Vector3 velocity = Vector3.zero;
 
-        TestEnemyMovement movement = target.GetComponentInParent<TestEnemyMovement>();
+        TestEnemyMovement movement =
+            target.GetComponentInParent<TestEnemyMovement>();
 
         if (movement != null)
         {
@@ -180,7 +196,10 @@ public class CrossbowRainAttack : MonoBehaviour
 
         Vector3 prediction = velocity * predictionTime;
 
-        prediction = Vector3.ClampMagnitude(prediction, maxPredictionDistance);
+        prediction = Vector3.ClampMagnitude(
+            prediction,
+            maxPredictionDistance
+        );
 
         return target.position + prediction;
     }
@@ -189,14 +208,9 @@ public class CrossbowRainAttack : MonoBehaviour
     {
         if (newArrowData == null)
         {
-            Debug.LogWarning("CrossbowRainAttack: ArrowData no puede ser null.");
-
-            return false;
-        }
-
-        if (isAttacking)
-        {
-            Debug.LogWarning("CrossbowRainAttack: no se puede cambiar la flecha durante el ataque.");
+            Debug.LogWarning(
+                "CrossbowRainAttack: ArrowData no puede ser null."
+            );
 
             return false;
         }
@@ -208,7 +222,9 @@ public class CrossbowRainAttack : MonoBehaviour
             arrowVisual.UpdateVisual(arrowData);
         }
 
-        Debug.Log($"CrossbowRainAttack: flecha seleccionada -> {arrowData.arrowName}");
+        Debug.Log(
+            $"CrossbowRainAttack: flecha seleccionada -> {arrowData.arrowName}"
+        );
 
         return true;
     }
@@ -225,6 +241,9 @@ public class CrossbowRainAttack : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.DrawWireSphere(transform.position, targetSearchRadius);
+        Gizmos.DrawWireSphere(
+            transform.position,
+            targetSearchRadius
+        );
     }
 }
