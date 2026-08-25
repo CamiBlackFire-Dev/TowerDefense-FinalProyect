@@ -116,6 +116,7 @@ namespace Custom.UI
         private AbilitySlot _draggingSlot;
 
         [Header("Ballesta")]
+        public bool instantBallistaPlacement = false;
         public BallistaDragAbility ballistaAbility;
         public int ballistaCost = 100;
         public int arrowUnlockCost = 150;
@@ -395,7 +396,7 @@ namespace Custom.UI
                 var slots = FindObjectsByType<CrossbowSlot>(FindObjectsSortMode.None);
                 if (slots.Length == 0)
                 {
-                    ballistaContainer.style.display = DisplayStyle.None;
+                    ballistaContainer.style.visibility = Visibility.Hidden;
                 }
             }
 
@@ -1761,18 +1762,64 @@ namespace Custom.UI
         #region Ballista Logic
         private void OnBallistaBuyClicked()
         {
-            if (economy != null && economy.Money >= ballistaCost)
+            if (instantBallistaPlacement)
             {
-                economy.TrySpend(ballistaCost);
-                _ballistaCount++;
-                UpdateBallistaUI();
-                PlayClickSound();
+                CrossbowSlot emptySlot = null;
+                var allSlots = FindObjectsByType<CrossbowSlot>(FindObjectsSortMode.None);
+                foreach (var slot in allSlots)
+                {
+                    if (!slot.IsUnlocked)
+                    {
+                        emptySlot = slot;
+                        break;
+                    }
+                }
+
+                if (emptySlot == null)
+                {
+                    // No hay slots vacios
+                    if (AudioManager.Instance != null && abilityUnlockFailedSound != null)
+                        AudioManager.Instance.PlaySFX(abilityUnlockFailedSound);
+                    ShakeElement(_ballistaBuyBtn);
+                    return;
+                }
+
+                if (economy != null && economy.Money >= ballistaCost)
+                {
+                    economy.TrySpend(ballistaCost);
+
+                    emptySlot.Unlock();
+                    if (_currentGlobalArrow != null)
+                    {
+                        emptySlot.UnlockArrow(_currentGlobalArrow);
+                        emptySlot.SelectArrow(_currentGlobalArrow);
+                    }
+
+                    PlayClickSound();
+                    UpdateBallistaUI();
+                }
+                else
+                {
+                    if (AudioManager.Instance != null && abilityUnlockFailedSound != null)
+                        AudioManager.Instance.PlaySFX(abilityUnlockFailedSound);
+                    ShakeElement(_ballistaBuyBtn);
+                }
             }
             else
             {
-                if (AudioManager.Instance != null && abilityUnlockFailedSound != null)
-                    AudioManager.Instance.PlaySFX(abilityUnlockFailedSound);
-                ShakeElement(_ballistaBuyBtn);
+                if (economy != null && economy.Money >= ballistaCost)
+                {
+                    economy.TrySpend(ballistaCost);
+                    _ballistaCount++;
+                    UpdateBallistaUI();
+                    PlayClickSound();
+                }
+                else
+                {
+                    if (AudioManager.Instance != null && abilityUnlockFailedSound != null)
+                        AudioManager.Instance.PlaySFX(abilityUnlockFailedSound);
+                    ShakeElement(_ballistaBuyBtn);
+                }
             }
         }
 
@@ -1917,7 +1964,17 @@ namespace Custom.UI
         private void UpdateBallistaUI()
         {
             if (_ballistaCountLabel != null)
-                _ballistaCountLabel.text = _ballistaCount.ToString();
+            {
+                if (instantBallistaPlacement)
+                {
+                    _ballistaCountLabel.style.display = DisplayStyle.None;
+                }
+                else
+                {
+                    _ballistaCountLabel.style.display = DisplayStyle.Flex;
+                    _ballistaCountLabel.text = _ballistaCount.ToString();
+                }
+            }
 
             var goldColor = new StyleColor(new Color32(241, 196, 15, 255));
             var grayColor = new StyleColor(Color.gray);

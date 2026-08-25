@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -223,6 +223,39 @@ public class BallistaDragAbility : MonoBehaviour, IDragAbility
 
     private void EnsureVisuals()
     {
+        if (_previewInstance == null && ballistaPreviewPrefab == null)
+        {
+            CrossbowSlot existingSlot = UnityEngine.Object.FindFirstObjectByType<CrossbowSlot>();
+            if (existingSlot != null)
+            {
+                Transform visualToClone = existingSlot.transform.Find("NormalSlot");
+                if (visualToClone == null && existingSlot.transform.childCount > 0)
+                {
+                    visualToClone = existingSlot.transform.GetChild(0);
+                }
+
+                if (visualToClone != null)
+                {
+                    _previewInstance = Instantiate(visualToClone.gameObject, transform);
+                    _previewInstance.name = "HeldBallistaPreview";
+                    _previewInstance.transform.localPosition = Vector3.zero;
+
+                    MonoBehaviour[] behaviours = _previewInstance.GetComponentsInChildren<MonoBehaviour>();
+                    foreach (var b in behaviours)
+                    {
+                        b.enabled = false;
+                    }
+                    Collider[] colliders = _previewInstance.GetComponentsInChildren<Collider>();
+                    foreach (var c in colliders)
+                    {
+                        c.enabled = false;
+                    }
+
+                    _previewInstance.SetActive(false);
+                }
+            }
+        }
+
         if (_previewInstance == null && ballistaPreviewPrefab != null)
         {
             _previewInstance = Instantiate(ballistaPreviewPrefab, transform);

@@ -41,8 +41,8 @@
             <ui:VisualElement name="BallistaContainer" style="flex: 1; flex-basis: 0; min-width: 300px; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 2px;">
                 <ui:Label text="BALLESTA" style="color: rgb(241, 196, 15); -unity-font-style: bold; font-size: 24px; margin-bottom: -15px; -unity-text-outline-width: 1px; -unity-text-outline-color: rgb(0, 0, 0); z-index: 10;"/>
                 <ui:VisualElement style="flex-direction: row; align-items: flex-end;">
-                    <ui:Button name="BallistaBuyButton" class="ability-slot ballista-slot" style="width: 110px; height: 110px; -unity-background-scale-mode: scale-to-fit; background-color: rgba(0,0,0,0.5); margin-right: 0; border-right-width: 0; border-top-right-radius: 0; border-bottom-right-radius: 0;">
-                        <ui:Label text="0" name="BallistaCountLabel" class="ability-hotkey" style="right: auto; left: 5px; top: 5px; font-size: 24px;"/>
+                    <ui:Button name="BallistaBuyButton" class="ability-slot ballista-slot" style="width: 110px; height: 110px; -unity-background-scale-mode: scale-to-fit; background-color: rgba(0,0,0,0.5); margin-right: 0; border-right-width: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/BallistaIcon.jpg?fileID=2800000&amp;guid=a20be68a26594e7d8bf0e7ea50368b62&amp;type=3#BallistaIcon&quot;);">
+                        <ui:Label text="0" name="BallistaCountLabel" class="ability-hotkey" style="left: auto; right: 5px; top: 5px; font-size: 24px;"/>
                         <ui:VisualElement style="flex-direction: row; align-items: center; position: absolute; bottom: 5px; left: 50%; translate: -50% 0;">
                             <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
                             <ui:Label text="100" class="lock-price"/>

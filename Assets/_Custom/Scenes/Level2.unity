@@ -6029,6 +6029,7 @@ MonoBehaviour:
   repairAbility: {fileID: 0}
   boardManager: {fileID: 0}
   gameFlow: {fileID: 11400000, guid: e5c8d12d4aa65284e83777bce081ca71, type: 2}
+  instantBallistaPlacement: 0
   ballistaAbility: {fileID: 0}
   ballistaCost: 100
   arrowUnlockCost: 150
