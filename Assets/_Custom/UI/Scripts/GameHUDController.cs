@@ -243,11 +243,7 @@ namespace Custom.UI
         public AudioClip ability4UnlockSound;
         public AudioClip ability5UnlockSound;
 
-        [Header("Debug")]
-        // Teclas de prueba V, C, F y Espacio. Escape (pausa) nunca se desactiva.
-        // La derrota no tiene tecla de prueba: solo la dispara PlayerBase.Defeated
-        // al llegar a 0 vidas (ademas D ya se usa para mover torres a la derecha).
-        public bool debugKeys = true;
+
 
         private int _currentCurrency = 0;
         #endregion
@@ -711,23 +707,7 @@ namespace Custom.UI
                 HandleEscapePressed();
             }
 
-            if (!debugKeys) return;
 
-            if (keyboard.vKey.wasPressedThisFrame)
-            {
-                if (_victoryOverlay != null && _victoryOverlay.style.display == DisplayStyle.Flex) { _victoryOverlay.style.display = DisplayStyle.None; GameSpeedController.ApplyCurrentSpeed(); }
-                else ShowVictoryScreen(false);
-            }
-            if (keyboard.cKey.wasPressedThisFrame)
-            {
-                if (_creditsOverlay != null && _creditsOverlay.style.display == DisplayStyle.Flex) { _creditsOverlay.style.display = DisplayStyle.None; }
-                else ShowCreditsScreen();
-            }
-            if (keyboard.fKey.wasPressedThisFrame)
-            {
-                if (_gameCompleteOverlay != null && _gameCompleteOverlay.style.display == DisplayStyle.Flex) { _gameCompleteOverlay.style.display = DisplayStyle.None; GameSpeedController.ApplyCurrentSpeed(); }
-                else ShowVictoryScreen(true);
-            }
 
             if (keyboard.spaceKey.wasPressedThisFrame)
             {
