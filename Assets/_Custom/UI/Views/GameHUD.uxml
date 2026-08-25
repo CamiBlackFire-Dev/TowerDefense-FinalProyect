@@ -45,7 +45,7 @@
                         <ui:Label text="0" name="BallistaCountLabel" class="ability-hotkey" style="left: auto; right: 5px; top: 5px; font-size: 24px;"/>
                         <ui:VisualElement style="flex-direction: row; align-items: center; position: absolute; bottom: 5px; left: 50%; translate: -50% 0;">
                             <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
-                            <ui:Label text="100" class="lock-price"/>
+                            <ui:Label text="100" name="BallistaPriceText" class="lock-price"/>
                         </ui:VisualElement>
                     </ui:Button>
                     <ui:VisualElement style="position: relative;">
@@ -153,7 +153,7 @@
             <ui:VisualElement style="flex: 1; flex-basis: 0; min-width: 300px; align-items: flex-end; justify-content: center;">
                 <ui:Button name="BuyTowerButton" class="unity-button buy-tower-btn" style="display: flex;">
                     <ui:Label text="COMPRAR TORRE" class="buy-tower-title"/>
-                    <ui:Label text="(50 ORO)" class="buy-tower-price"/>
+                    <ui:Label text="(50 ORO)" name="BuyTowerPriceText" class="buy-tower-price"/>
                     <ui:VisualElement picking-mode="Ignore" class="lock-overlay" style="bottom: 0; right: 0; width: 203px; left: 23px; top: 34px; height: 105px; border-top-left-radius: 15px; border-top-right-radius: 15px; border-bottom-right-radius: 15px; border-bottom-left-radius: 15px; border-top-width: 10px; border-right-width: 10px; border-bottom-width: 10px; border-left-width: 10px;">
                         <ui:VisualElement name="BuyTowerLockIcon" picking-mode="Ignore" class="lock-icon" style="display: flex;"/>
                     </ui:VisualElement>

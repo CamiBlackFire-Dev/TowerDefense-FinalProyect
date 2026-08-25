@@ -47,6 +47,7 @@ namespace Custom.UI
         // en el Editor porque Windows les busca una fuente de respaldo, pero
         // en un build (WebGL incluido) no hay ese respaldo y no se dibuja
         // nada. Dibujar el icono con vectores evita depender de una fuente.
+        private Label _buyTowerPriceText;
         private VisualElement _buyTowerLockIcon;
         private Action<MeshGenerationContext> _buyTowerLockIconDrawCallback;
         private Button _speed1xButton;
@@ -134,6 +135,7 @@ namespace Custom.UI
 
         private Button _ballistaBuyBtn;
         private Label _ballistaCountLabel;
+        private Label _ballistaPriceText;
         private Button _ballistaUpgradeBtn;
         private VisualElement _ballistaUpgradePopup;
         private Button _arrowNormalBtn;
@@ -297,6 +299,7 @@ namespace Custom.UI
             _startWaveButton = root.Q<Button>("StartWaveButton");
             _startWaveButton.BringToFront();
             _buyTowerButton = root.Q<Button>("BuyTowerButton");
+            _buyTowerPriceText = root.Q<Label>("BuyTowerPriceText");
             _nextBoardButton = root.Q<Button>("NextBoardButton");
             _speed1xButton = root.Q<Button>("Speed1xButton");
             _speed2xButton = root.Q<Button>("Speed2xButton");
@@ -348,6 +351,7 @@ namespace Custom.UI
 
             _ballistaBuyBtn = root.Q<Button>("BallistaBuyButton");
             _ballistaCountLabel = root.Q<Label>("BallistaCountLabel");
+            _ballistaPriceText = root.Q<Label>("BallistaPriceText");
             _ballistaUpgradeBtn = root.Q<Button>("BallistaUpgradeButton");
             _ballistaUpgradePopup = root.Q<VisualElement>("BallistaUpgradePopup");
             _arrowNormalBtn = root.Q<Button>("ArrowNormalBtn");
@@ -388,6 +392,11 @@ namespace Custom.UI
             if (_arrowPoisonBtn != null) _arrowPoisonBtn.clicked += () => OnArrowUpgradeClicked(ArrowEffectType.Poison);
 
             UpdateBallistaUI();
+            
+            if (_buyTowerPriceText != null && towerShop != null)
+            {
+                _buyTowerPriceText.text = $"({towerShop.TowerCost} ORO)";
+            }
 
             // Ocultar sección de ballestas si no hay spots en la escena
             var ballistaContainer = root.Q<VisualElement>("BallistaContainer");
@@ -1109,6 +1118,12 @@ namespace Custom.UI
                 RemainingCooldown = 0f,
                 UsesRemaining = config != null && config.usageLimitMode != PowerUpUsageLimitMode.Unlimited ? config.maxUses : -1
             };
+
+            var priceLabel = button.Q<Label>(className: "lock-price");
+            if (priceLabel != null)
+            {
+                priceLabel.text = cost.ToString();
+            }
 
             if (slot.CooldownOverlay != null)
             {
@@ -1974,6 +1989,11 @@ namespace Custom.UI
                     _ballistaCountLabel.style.display = DisplayStyle.Flex;
                     _ballistaCountLabel.text = _ballistaCount.ToString();
                 }
+            }
+
+            if (_ballistaPriceText != null)
+            {
+                _ballistaPriceText.text = ballistaCost.ToString();
             }
 
             var goldColor = new StyleColor(new Color32(241, 196, 15, 255));
