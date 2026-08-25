@@ -13,7 +13,3 @@
     --border-radius-panel: 20px;
     -unity-font-definition: url("project://database/Assets/_Custom/UI/Fonts/Bangers-Regular.ttf?fileID=12800000&guid=5cc4a18f6681fb04e8882d2de18e9e44&type=3#Bangers-Regular");
 }
-
-
-
-

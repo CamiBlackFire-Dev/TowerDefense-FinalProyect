@@ -6029,6 +6029,14 @@ MonoBehaviour:
   repairAbility: {fileID: 0}
   boardManager: {fileID: 0}
   gameFlow: {fileID: 11400000, guid: e5c8d12d4aa65284e83777bce081ca71, type: 2}
+  ballistaAbility: {fileID: 0}
+  ballistaCost: 100
+  arrowUnlockCost: 150
+  arrowSwitchCost: 50
+  arrowNormalData: {fileID: 11400000, guid: d8dcbbe73fd24704baf9ca84151a33d6, type: 2}
+  arrowFireData: {fileID: 11400000, guid: a2bb7c646857e3648b803b92b94f8cdb, type: 2}
+  arrowIceData: {fileID: 11400000, guid: 38bcd3e78c9d9854cbb81a06e6775837, type: 2}
+  arrowPoisonData: {fileID: 11400000, guid: 5b231d0e9da60e14cbc22a30e1a8c1f6, type: 2}
   ability1Cooldown:
     cooldownSeconds: 6
     usageLimitMode: 0

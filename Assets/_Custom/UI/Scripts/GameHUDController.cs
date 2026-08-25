@@ -115,6 +115,38 @@ namespace Custom.UI
         // Ranura que se esta arrastrando ahora mismo (null si ninguna).
         private AbilitySlot _draggingSlot;
 
+        [Header("Ballesta")]
+        public BallistaDragAbility ballistaAbility;
+        public int ballistaCost = 100;
+        public int arrowUnlockCost = 150;
+        public int arrowSwitchCost = 50;
+        public ArrowData arrowNormalData;
+        public ArrowData arrowFireData;
+        public ArrowData arrowIceData;
+        public ArrowData arrowPoisonData;
+
+        private int _ballistaCount = 0;
+        private bool _fireUnlocked = false;
+        private bool _iceUnlocked = false;
+        private bool _poisonUnlocked = false;
+        private ArrowData _currentGlobalArrow;
+
+        private Button _ballistaBuyBtn;
+        private Label _ballistaCountLabel;
+        private Button _ballistaUpgradeBtn;
+        private VisualElement _ballistaUpgradePopup;
+        private Button _arrowNormalBtn;
+        private Button _arrowFireBtn;
+        private Button _arrowIceBtn;
+        private Button _arrowPoisonBtn;
+        private VisualElement _firePriceContainer;
+        private VisualElement _icePriceContainer;
+        private VisualElement _poisonPriceContainer;
+        private Label _firePriceText;
+        private Label _icePriceText;
+        private Label _poisonPriceText;
+        private bool _isBallistaDragging = false;
+
         [Header("Cooldown y usos de habilidades")]
         // Cada ranura tiene su propio cooldown y, si se quiere, un limite de
         // usos (fijo por partida o recargable cada oleada). Todo editable
@@ -227,6 +259,17 @@ namespace Custom.UI
         {
             _uiDocument = GetComponent<UIDocument>();
             var root = _uiDocument.rootVisualElement;
+            if (arrowNormalData == null) arrowNormalData = Resources.Load<ArrowData>("Arrows/NormalArrow");
+            if (arrowFireData == null) arrowFireData = Resources.Load<ArrowData>("Arrows/FireArrow");
+            if (arrowIceData == null) arrowIceData = Resources.Load<ArrowData>("Arrows/IceArrow");
+            if (arrowPoisonData == null) arrowPoisonData = Resources.Load<ArrowData>("Arrows/PoisonArrow");
+
+#if UNITY_EDITOR
+            if (arrowNormalData == null) arrowNormalData = UnityEditor.AssetDatabase.LoadAssetAtPath<ArrowData>("Assets/JeanAssets/ScriptableObjects/Arrow_Normal.asset");
+            if (arrowFireData == null) arrowFireData = UnityEditor.AssetDatabase.LoadAssetAtPath<ArrowData>("Assets/JeanAssets/ScriptableObjects/Arrow_Fire.asset");
+            if (arrowIceData == null) arrowIceData = UnityEditor.AssetDatabase.LoadAssetAtPath<ArrowData>("Assets/JeanAssets/ScriptableObjects/Arrow_Ice.asset");
+            if (arrowPoisonData == null) arrowPoisonData = UnityEditor.AssetDatabase.LoadAssetAtPath<ArrowData>("Assets/JeanAssets/ScriptableObjects/Arrow_Poison.asset");
+#endif
             if (root == null) return;
 
             _fadeOverlay = new VisualElement();
@@ -262,7 +305,7 @@ namespace Custom.UI
                 BoardSelector selector = FindFirstObjectByType<BoardSelector>();
                 _canChangeBoard = (selector != null && selector.BoardCount > 1);
                 _nextBoardButton.style.display = _canChangeBoard ? DisplayStyle.Flex : DisplayStyle.None;
-                
+
                 _nextBoardButton.BringToFront();
             }
 
@@ -301,6 +344,61 @@ namespace Custom.UI
             _ability3 = root.Q<Button>("Ability3");
             _ability4 = root.Q<Button>("Ability4");
             _ability5 = root.Q<Button>("Ability5");
+
+            _ballistaBuyBtn = root.Q<Button>("BallistaBuyButton");
+            _ballistaCountLabel = root.Q<Label>("BallistaCountLabel");
+            _ballistaUpgradeBtn = root.Q<Button>("BallistaUpgradeButton");
+            _ballistaUpgradePopup = root.Q<VisualElement>("BallistaUpgradePopup");
+            _arrowNormalBtn = root.Q<Button>("ArrowNormalBtn");
+            _arrowFireBtn = root.Q<Button>("ArrowFireBtn");
+            _arrowIceBtn = root.Q<Button>("ArrowIceBtn");
+            _arrowPoisonBtn = root.Q<Button>("ArrowPoisonBtn");
+            _firePriceContainer = root.Q<VisualElement>("FirePriceContainer");
+            _icePriceContainer = root.Q<VisualElement>("IcePriceContainer");
+            _poisonPriceContainer = root.Q<VisualElement>("PoisonPriceContainer");
+            _firePriceText = root.Q<Label>("FirePriceText");
+            _icePriceText = root.Q<Label>("IcePriceText");
+            _poisonPriceText = root.Q<Label>("PoisonPriceText");
+
+            if (_ballistaBuyBtn != null)
+            {
+                _ballistaBuyBtn.RegisterCallback<PointerDownEvent>(OnBallistaPointerDown, TrickleDown.TrickleDown);
+                _ballistaBuyBtn.RegisterCallback<PointerUpEvent>(OnBallistaPointerUp);
+                _ballistaBuyBtn.clicked += OnBallistaBuyClicked;
+                _ballistaBuyBtn.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+            if (_ballistaUpgradeBtn != null)
+            {
+                _ballistaUpgradeBtn.clicked += () =>
+                {
+                    PlayClickSound();
+                    if (_ballistaUpgradePopup != null)
+                    {
+                        bool isVisible = _ballistaUpgradePopup.resolvedStyle.display == DisplayStyle.Flex;
+                        _ballistaUpgradePopup.style.display = isVisible ? DisplayStyle.None : DisplayStyle.Flex;
+                    }
+                };
+                _ballistaUpgradeBtn.RegisterCallback<PointerEnterEvent>(OnButtonHover);
+            }
+
+            if (_arrowNormalBtn != null) _arrowNormalBtn.clicked += () => OnArrowUpgradeClicked(ArrowEffectType.Normal);
+            if (_arrowFireBtn != null) _arrowFireBtn.clicked += () => OnArrowUpgradeClicked(ArrowEffectType.Fire);
+            if (_arrowIceBtn != null) _arrowIceBtn.clicked += () => OnArrowUpgradeClicked(ArrowEffectType.Ice);
+            if (_arrowPoisonBtn != null) _arrowPoisonBtn.clicked += () => OnArrowUpgradeClicked(ArrowEffectType.Poison);
+
+            UpdateBallistaUI();
+
+            // Ocultar sección de ballestas si no hay spots en la escena
+            var ballistaContainer = root.Q<VisualElement>("BallistaContainer");
+            if (ballistaContainer != null)
+            {
+                var slots = FindObjectsByType<CrossbowSlot>(FindObjectsSortMode.None);
+                if (slots.Length == 0)
+                {
+                    ballistaContainer.style.display = DisplayStyle.None;
+                }
+            }
+
 
             _cameraPan = FindFirstObjectByType<CameraEdgePan>();
             if (_optionsButton != null)
@@ -408,6 +506,9 @@ namespace Custom.UI
                 }
             }
 
+            if (ballistaAbility != null)
+                ballistaAbility.OnBallistaPlaced -= HandleBallistaPlaced;
+
             if (spawner == null)
                 spawner = FindFirstObjectByType<EnemySpawner>();
             if (economy == null)
@@ -426,6 +527,17 @@ namespace Custom.UI
                 repairAbility = FindFirstObjectByType<RepairDragAbility>();
             if (boardManager == null)
                 boardManager = FindFirstObjectByType<BoardManager>();
+            if (ballistaAbility == null)
+            {
+                ballistaAbility = FindFirstObjectByType<BallistaDragAbility>();
+                if (ballistaAbility == null)
+                {
+                    GameObject ballistaObj = new GameObject("BallistaDragAbility");
+                    ballistaAbility = ballistaObj.AddComponent<BallistaDragAbility>();
+                }
+                ballistaAbility.OnBallistaPlaced -= HandleBallistaPlaced;
+                ballistaAbility.OnBallistaPlaced += HandleBallistaPlaced;
+            }
 
             // Las ranuras se arman aca (y no antes) porque necesitan los
             // powerups ya resueltos.
@@ -456,6 +568,15 @@ namespace Custom.UI
                 playerBase.LivesChanged += OnLivesChanged;
                 playerBase.Defeated += OnPlayerDefeated;
                 UpdateHealth(playerBase.Lives, playerBase.maxLives);
+            }
+        }
+
+        private void HandleBallistaPlaced(CrossbowSlot slot)
+        {
+            if (_currentGlobalArrow != null)
+            {
+                slot.UnlockArrow(_currentGlobalArrow);
+                slot.SelectArrow(_currentGlobalArrow);
             }
         }
 
@@ -547,6 +668,9 @@ namespace Custom.UI
                 playerBase.LivesChanged -= OnLivesChanged;
                 playerBase.Defeated -= OnPlayerDefeated;
             }
+
+            if (ballistaAbility != null)
+                ballistaAbility.OnBallistaPlaced -= HandleBallistaPlaced;
         }
 
         private void Update()
@@ -559,6 +683,12 @@ namespace Custom.UI
                 var pointer = UnityEngine.InputSystem.Pointer.current;
                 if (pointer != null)
                     _draggingSlot.DragAbility.UpdateDrag(pointer.position.ReadValue());
+            }
+            if (_isBallistaDragging && ballistaAbility != null)
+            {
+                var pointer = UnityEngine.InputSystem.Pointer.current;
+                if (pointer != null)
+                    ballistaAbility.UpdateDrag(pointer.position.ReadValue());
             }
 
             TickAbilityCooldowns();
@@ -1522,7 +1652,7 @@ namespace Custom.UI
         private void RefreshLockCameraVisuals()
         {
             if (_lockCameraButton == null || _cameraPan == null) return;
-            
+
             if (_cameraPan.panEnabled)
             {
                 _lockCameraButton.text = "LIBRE";
@@ -1627,6 +1757,274 @@ namespace Custom.UI
             PlayClickSound();
             Application.OpenURL("https://github.com/CamiBlackFire-Dev/TowerDefense-FinalProyect");
         }
+
+        #region Ballista Logic
+        private void OnBallistaBuyClicked()
+        {
+            if (economy != null && economy.Money >= ballistaCost)
+            {
+                economy.TrySpend(ballistaCost);
+                _ballistaCount++;
+                UpdateBallistaUI();
+                PlayClickSound();
+            }
+            else
+            {
+                if (AudioManager.Instance != null && abilityUnlockFailedSound != null)
+                    AudioManager.Instance.PlaySFX(abilityUnlockFailedSound);
+                ShakeElement(_ballistaBuyBtn);
+            }
+        }
+
+        private void OnBallistaPointerDown(PointerDownEvent evt)
+        {
+            if (_ballistaCount <= 0 || ballistaAbility == null)
+                return;
+
+            PlayClickSound();
+            _isBallistaDragging = true;
+            _ballistaBuyBtn.CapturePointer(evt.pointerId);
+            ballistaAbility.BeginDrag();
+        }
+
+        private void OnBallistaPointerUp(PointerUpEvent evt)
+        {
+            if (!_isBallistaDragging || ballistaAbility == null)
+                return;
+
+            _isBallistaDragging = false;
+            if (_ballistaBuyBtn.HasPointerCapture(evt.pointerId))
+                _ballistaBuyBtn.ReleasePointer(evt.pointerId);
+
+            ballistaAbility.EndDrag();
+
+            if (ballistaAbility.HasValidTarget)
+            {
+                _ballistaCount--;
+                UpdateBallistaUI();
+
+                // Si hay una flecha global seleccionada, aplicarla al nuevo slot
+                if (_currentGlobalArrow != null)
+                {
+                    ApplyGlobalArrowToAllSlots();
+                }
+            }
+        }
+
+        private void OnArrowUpgradeClicked(ArrowEffectType type)
+        {
+            bool isUnlocked = false;
+            ArrowData dataToUse = null;
+
+            switch (type)
+            {
+                case ArrowEffectType.Normal:
+                    isUnlocked = true;
+                    dataToUse = arrowNormalData;
+                    break;
+                case ArrowEffectType.Fire:
+                    isUnlocked = _fireUnlocked;
+                    dataToUse = arrowFireData;
+                    break;
+                case ArrowEffectType.Ice:
+                    isUnlocked = _iceUnlocked;
+                    dataToUse = arrowIceData;
+                    break;
+                case ArrowEffectType.Poison:
+                    isUnlocked = _poisonUnlocked;
+                    dataToUse = arrowPoisonData;
+                    break;
+            }
+
+            if (!isUnlocked)
+            {
+                // Try to unlock
+                if (economy != null && economy.Money >= arrowUnlockCost)
+                {
+                    economy.TrySpend(arrowUnlockCost);
+
+                    switch (type)
+                    {
+                        case ArrowEffectType.Fire: _fireUnlocked = true; break;
+                        case ArrowEffectType.Ice: _iceUnlocked = true; break;
+                        case ArrowEffectType.Poison: _poisonUnlocked = true; break;
+                    }
+
+                    SelectGlobalArrow(dataToUse);
+                    PlayClickSound();
+                }
+                else
+                {
+                    if (AudioManager.Instance != null && abilityUnlockFailedSound != null)
+                        AudioManager.Instance.PlaySFX(abilityUnlockFailedSound);
+
+                    if (type == ArrowEffectType.Fire) ShakeElement(_arrowFireBtn);
+                    if (type == ArrowEffectType.Ice) ShakeElement(_arrowIceBtn);
+                    if (type == ArrowEffectType.Poison) ShakeElement(_arrowPoisonBtn);
+                }
+            }
+            else
+            {
+                // Already unlocked, try to switch
+                if (_currentGlobalArrow != dataToUse)
+                {
+                    int cost = (type == ArrowEffectType.Normal) ? 0 : arrowSwitchCost;
+
+                    if (economy != null && economy.Money >= cost)
+                    {
+                        if (cost > 0) economy.TrySpend(cost);
+                        SelectGlobalArrow(dataToUse);
+                        PlayClickSound();
+                    }
+                    else
+                    {
+                        if (AudioManager.Instance != null && abilityUnlockFailedSound != null)
+                            AudioManager.Instance.PlaySFX(abilityUnlockFailedSound);
+
+                        if (type == ArrowEffectType.Normal) ShakeElement(_arrowNormalBtn);
+                        if (type == ArrowEffectType.Fire) ShakeElement(_arrowFireBtn);
+                        if (type == ArrowEffectType.Ice) ShakeElement(_arrowIceBtn);
+                        if (type == ArrowEffectType.Poison) ShakeElement(_arrowPoisonBtn);
+                    }
+                }
+            }
+
+            UpdateBallistaUI();
+        }
+
+        private void SelectGlobalArrow(ArrowData data)
+        {
+            if (data == null) return;
+            _currentGlobalArrow = data;
+            ApplyGlobalArrowToAllSlots();
+        }
+
+        private void ApplyGlobalArrowToAllSlots()
+        {
+            if (_currentGlobalArrow == null) return;
+
+            CrossbowSlot[] allSlots = FindObjectsByType<CrossbowSlot>(FindObjectsSortMode.None);
+            foreach (var slot in allSlots)
+            {
+                if (slot.IsUnlocked)
+                {
+                    slot.UnlockArrow(_currentGlobalArrow);
+                    slot.SelectArrow(_currentGlobalArrow);
+                }
+            }
+        }
+
+        private void UpdateBallistaUI()
+        {
+            if (_ballistaCountLabel != null)
+                _ballistaCountLabel.text = _ballistaCount.ToString();
+
+            var goldColor = new StyleColor(new Color32(241, 196, 15, 255));
+            var grayColor = new StyleColor(Color.gray);
+
+            if (_arrowFireBtn != null)
+            {
+                _arrowFireBtn.RemoveFromClassList("locked");
+                _arrowFireBtn.RemoveFromClassList("selected");
+                _arrowFireBtn.style.borderTopColor = grayColor;
+                _arrowFireBtn.style.borderBottomColor = grayColor;
+                _arrowFireBtn.style.borderLeftColor = grayColor;
+                _arrowFireBtn.style.borderRightColor = grayColor;
+
+                if (!_fireUnlocked) _arrowFireBtn.AddToClassList("locked");
+                else if (_currentGlobalArrow == arrowFireData)
+                {
+                    _arrowFireBtn.AddToClassList("selected");
+                    _arrowFireBtn.style.borderTopColor = goldColor;
+                    _arrowFireBtn.style.borderBottomColor = goldColor;
+                    _arrowFireBtn.style.borderLeftColor = goldColor;
+                    _arrowFireBtn.style.borderRightColor = goldColor;
+                }
+
+                if (_firePriceContainer != null)
+                {
+                    bool isSelected = (_currentGlobalArrow == arrowFireData);
+                    _firePriceContainer.style.display = isSelected ? DisplayStyle.None : DisplayStyle.Flex;
+                    var priceLabel = _firePriceContainer.Q<Label>("FirePriceText");
+                    if (priceLabel != null) priceLabel.text = _fireUnlocked ? arrowSwitchCost.ToString() : arrowUnlockCost.ToString();
+                }
+            }
+
+            if (_arrowIceBtn != null)
+            {
+                _arrowIceBtn.RemoveFromClassList("locked");
+                _arrowIceBtn.RemoveFromClassList("selected");
+                _arrowIceBtn.style.borderTopColor = grayColor;
+                _arrowIceBtn.style.borderBottomColor = grayColor;
+                _arrowIceBtn.style.borderLeftColor = grayColor;
+                _arrowIceBtn.style.borderRightColor = grayColor;
+
+                if (!_iceUnlocked) _arrowIceBtn.AddToClassList("locked");
+                else if (_currentGlobalArrow == arrowIceData)
+                {
+                    _arrowIceBtn.AddToClassList("selected");
+                    _arrowIceBtn.style.borderTopColor = goldColor;
+                    _arrowIceBtn.style.borderBottomColor = goldColor;
+                    _arrowIceBtn.style.borderLeftColor = goldColor;
+                    _arrowIceBtn.style.borderRightColor = goldColor;
+                }
+
+                if (_icePriceContainer != null)
+                {
+                    bool isSelected = (_currentGlobalArrow == arrowIceData);
+                    _icePriceContainer.style.display = isSelected ? DisplayStyle.None : DisplayStyle.Flex;
+                    var priceLabel = _icePriceContainer.Q<Label>("IcePriceText");
+                    if (priceLabel != null) priceLabel.text = _iceUnlocked ? arrowSwitchCost.ToString() : arrowUnlockCost.ToString();
+                }
+            }
+
+            if (_arrowPoisonBtn != null)
+            {
+                _arrowPoisonBtn.RemoveFromClassList("locked");
+                _arrowPoisonBtn.RemoveFromClassList("selected");
+                _arrowPoisonBtn.style.borderTopColor = grayColor;
+                _arrowPoisonBtn.style.borderBottomColor = grayColor;
+                _arrowPoisonBtn.style.borderLeftColor = grayColor;
+                _arrowPoisonBtn.style.borderRightColor = grayColor;
+
+                if (!_poisonUnlocked) _arrowPoisonBtn.AddToClassList("locked");
+                else if (_currentGlobalArrow == arrowPoisonData)
+                {
+                    _arrowPoisonBtn.AddToClassList("selected");
+                    _arrowPoisonBtn.style.borderTopColor = goldColor;
+                    _arrowPoisonBtn.style.borderBottomColor = goldColor;
+                    _arrowPoisonBtn.style.borderLeftColor = goldColor;
+                    _arrowPoisonBtn.style.borderRightColor = goldColor;
+                }
+
+                if (_poisonPriceContainer != null)
+                {
+                    bool isSelected = (_currentGlobalArrow == arrowPoisonData);
+                    _poisonPriceContainer.style.display = isSelected ? DisplayStyle.None : DisplayStyle.Flex;
+                    var priceLabel = _poisonPriceContainer.Q<Label>("PoisonPriceText");
+                    if (priceLabel != null) priceLabel.text = _poisonUnlocked ? arrowSwitchCost.ToString() : arrowUnlockCost.ToString();
+                }
+            }
+
+            if (_arrowNormalBtn != null)
+            {
+                _arrowNormalBtn.RemoveFromClassList("selected");
+                _arrowNormalBtn.style.borderTopColor = grayColor;
+                _arrowNormalBtn.style.borderBottomColor = grayColor;
+                _arrowNormalBtn.style.borderLeftColor = grayColor;
+                _arrowNormalBtn.style.borderRightColor = grayColor;
+
+                if (_currentGlobalArrow == null || _currentGlobalArrow == arrowNormalData)
+                {
+                    _arrowNormalBtn.AddToClassList("selected");
+                    _arrowNormalBtn.style.borderTopColor = goldColor;
+                    _arrowNormalBtn.style.borderBottomColor = goldColor;
+                    _arrowNormalBtn.style.borderLeftColor = goldColor;
+                    _arrowNormalBtn.style.borderRightColor = goldColor;
+                }
+            }
+        }
+        #endregion
         #endregion
     }
 }

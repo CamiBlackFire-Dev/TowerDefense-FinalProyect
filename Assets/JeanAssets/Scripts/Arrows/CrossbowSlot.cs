@@ -12,6 +12,15 @@ public class CrossbowSlot : MonoBehaviour
 
     public bool IsUnlocked => isUnlocked;
 
+    public Vector3 VisualPosition 
+    {
+        get 
+        {
+            if (crossbow != null) return crossbow.transform.position;
+            return transform.position;
+        }
+    }
+
     private void Awake()
     {
         if (crossbow != null)

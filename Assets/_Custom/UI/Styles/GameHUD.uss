@@ -3,14 +3,12 @@
     justify-content: space-between;
     padding: 20px;
 }
-
 .top-bar {
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
     width: 100%;
 }
-
 .top-left-container {
     position: absolute;
     left: 0;
@@ -18,7 +16,6 @@
     flex-direction: row;
     align-items: center;
 }
-
 .currency-container {
     flex-direction: row;
     align-items: center;
@@ -28,7 +25,6 @@
     border-width: 4px;
     border-color: var(--color-accent);
 }
-
 .speed-wrapper {
     flex-direction: column;
     align-items: center;
@@ -40,7 +36,6 @@
     border-color: var(--color-accent);
     margin-left: 10px;
 }
-
 .speed-label {
     font-size: 16px;
     color: rgb(240, 240, 240);
@@ -50,12 +45,10 @@
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
     margin-bottom: 5px;
 }
-
 .speed-controls-container {
     flex-direction: row;
     align-items: center;
 }
-
 .speed-btn {
     width: 60px;
     height: 40px;
@@ -73,34 +66,28 @@
     transition-duration: 0.1s;
     transition-property: scale, background-color, color;
 }
-
 .speed-btn:hover {
     color: white;
     background-color: rgba(80, 80, 80, 0.8);
     scale: 1.05;
 }
-
 .speed-btn:active {
     scale: 0.95;
 }
-
 .speed-btn-selected {
     background-color: var(--color-accent);
     border-color: rgb(255, 224, 130);
     color: rgb(40, 30, 10);
     -unity-text-outline-width: 0;
 }
-
 .speed-btn-selected:hover {
     background-color: rgb(255, 224, 130);
     color: rgb(40, 30, 10);
 }
-
 .center-container {
     align-items: center;
     justify-content: flex-start;
 }
-
 .health-bar-container {
     width: 500px;
     height: 45px;
@@ -114,7 +101,6 @@
     justify-content: center;
     align-items: center;
 }
-
 .health-bar-fill {
     position: absolute;
     left: 0;
@@ -124,7 +110,6 @@
     transition-duration: 0.2s, 0.5s;
     transition-property: width, background-color;
 }
-
 .health-bar-text {
     position: absolute;
     font-size: 26px;
@@ -132,7 +117,6 @@
     -unity-font-style: bold;
     text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
 }
-
 .currency-icon {
     width: 60px;
     height: 60px;
@@ -140,20 +124,17 @@
     border-radius: 20px;
     margin-right: 15px;
 }
-
 .currency-icon-small {
     width: 20px;
     height: 20px;
     margin-right: 5px;
     -unity-background-scale-mode: scale-to-fit;
 }
-
 .currency-text {
     font-size: 45px;
     color: white;
     -unity-font-style: bold;
 }
-
 .options-btn-small {
     width: 75px;
     height: 75px;
@@ -175,17 +156,14 @@
     border-right-width: 4px;
     background-size: 90% 90%;
 }
-
 .options-btn-small:hover {
     scale: 1.1;
     background-color: rgba(255, 255, 255, 0.2);
 }
-
 .options-btn-small:active {
     scale: 0.9;
     background-color: rgba(255, 255, 255, 0.4);
 }
-
 .bottom-bar {
     width: 100%;
     height: 150px;
@@ -196,7 +174,6 @@
     flex-direction: row;
     padding: 0 40px;
 }
-
 .wave-container {
     background-color: rgba(0, 0, 0, 0.6);
     padding: 8px 30px;
@@ -206,14 +183,12 @@
     align-items: center;
     justify-content: center;
 }
-
 .wave-text {
     font-size: 30px;
     color: white;
     -unity-font-style: bold;
     text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
 }
-
 .wave-subtitle-text {
     font-size: 20px;
     color: rgb(240, 240, 240);
@@ -221,7 +196,6 @@
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
     margin-top: 5px;
 }
-
 .start-wave-btn {
     position: absolute;
     bottom: 155px;
@@ -239,17 +213,14 @@
     background-color: transparent;
     border-width: 0;
 }
-
 .start-wave-btn:hover {
     scale: 1.05;
     -unity-background-image-tint-color: rgb(140, 255, 160);
 }
-
 .start-wave-btn:active {
     scale: 0.95;
     -unity-background-image-tint-color: rgb(80, 200, 100);
 }
-
 .next-board-btn {
     position: absolute;
     bottom: 155px;
@@ -268,17 +239,14 @@
     background-color: transparent;
     border-width: 0;
 }
-
 .next-board-btn:hover {
     scale: 1.05;
     -unity-background-image-tint-color: rgb(120, 180, 220);
 }
-
 .next-board-btn:active {
     scale: 0.95;
     -unity-background-image-tint-color: rgb(80, 140, 180);
 }
-
 .big-announcer-container {
     position: absolute;
     top: 0;
@@ -292,7 +260,6 @@
     opacity: 0;
     scale: 0.8;
 }
-
 .big-announcer-text {
     font-size: 150px;
     color: rgb(241, 196, 15);
@@ -300,16 +267,13 @@
     text-shadow: 5px 5px 0 rgba(0, 0, 0, 0.8);
     -unity-text-align: middle-center;
 }
-
 .fade-in {
     opacity: 1;
     scale: 1;
 }
-
 .abilities-container {
     flex-direction: row;
 }
-
 .ability-slot {
     width: 110px;
     height: 110px;
@@ -325,38 +289,30 @@
     transition-property: scale, translate;
     background-image: none;
 }
-
 .ability-slot:hover {
     scale: 1.05;
 }
-
 .ability-slot:active {
     scale: 0.95;
 }
-
 .ability-slot.locked {
     background-color: rgba(50, 50, 50, 0.8);
     border-color: rgba(150, 150, 150, 0.8);
 }
-
 .ability-slot.locked .ability-hotkey {
     opacity: 0.5;
 }
-
 .ability-slot.locked .lock-overlay {
     display: flex;
     border-radius: 12px;
 }
-
 .buy-tower-btn.locked .lock-overlay {
     display: flex;
     background-color: transparent;
 }
-
 .buy-tower-btn.locked {
     -unity-background-image-tint-color: rgb(80, 80, 80);
 }
-
 .lock-overlay {
     position: absolute;
     left: 0;
@@ -368,13 +324,11 @@
     background-color: rgba(0, 0, 0, 0.6);
     display: none;
 }
-
 .lock-icon {
     width: 28px;
     height: 28px;
     margin-bottom: 2px;
 }
-
 .lock-price {
     font-size: 26px;
     color: rgb(241, 196, 15);
@@ -382,7 +336,6 @@
     -unity-text-outline-width: 1px;
     -unity-text-outline-color: black;
 }
-
 .buy-tower-btn {
     width: 250px;
     height: 165px;
@@ -395,7 +348,6 @@
     transition-property: translate;
     transition-duration: 0.05s;
 }
-
 .buy-tower-title {
     font-size: 25px;
     -unity-font-style: bold;
@@ -405,7 +357,6 @@
     -unity-text-outline-color: rgb(255, 255, 255);
     -unity-text-outline-width: 1px;
 }
-
 .buy-tower-price {
     font-size: 25px;
     -unity-font-style: bold;
@@ -414,7 +365,6 @@
     -unity-text-outline-width: 1px;
     -unity-text-outline-color: rgb(0, 0, 0);
 }
-
 .ability-hotkey {
     position: absolute;
     top: 2px;
@@ -424,7 +374,6 @@
     -unity-font-style: bold;
     text-shadow: 2px 2px 0 rgb(0, 0, 0);
 }
-
 .ability-icon-vector {
     position: absolute;
     left: 0;
@@ -432,7 +381,6 @@
     right: 0;
     bottom: 0;
 }
-
 .cooldown-overlay {
     position: absolute;
     left: 0;
@@ -440,7 +388,6 @@
     right: 0;
     bottom: 0;
 }
-
 .uses-label {
     position: absolute;
     right: 4px;
@@ -452,7 +399,6 @@
     -unity-text-outline-color: black;
     display: none;
 }
-
 .wave-subtitle-text {
     transition-property: opacity, scale;
     transition-duration: 0.5s, 1s;
@@ -460,12 +406,10 @@
     opacity: 1;
     scale: 1;
 }
-
 .wave-subtitle-text.breathe {
     scale: 1.1;
     opacity: 0.8;
 }
-
 .wave-subtitle-text.fade-out {
     opacity: 0;
 }

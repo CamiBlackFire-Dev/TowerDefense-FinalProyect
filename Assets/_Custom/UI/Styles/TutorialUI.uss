@@ -10,7 +10,6 @@
     justify-content: center;
     align-items: flex-start;
 }
-
 .tutorial-panel {
     width: 550px;
     background-image: url("project://database/Assets/_Custom/UI/Sprites/Backgrounds/Fondo2.png?fileID=2800000&guid=72b6550b8e6bcd44b8e6e066f339e28e&type=3#Fondo2");
@@ -20,7 +19,6 @@
     margin-left: 20px;
     padding: 90px 70px 80px 70px;
 }
-
 .tutorial-title {
     font-size: 45px;
     -unity-font-style: bold;
@@ -29,27 +27,22 @@
     margin-bottom: 25px;
     -unity-text-outline-width: 0px;
 }
-
 .tutorial-steps-container {
     margin-bottom: 30px;
 }
-
 .tutorial-step {
     font-size: 22px;
     color: rgb(70, 50, 30);
     margin-bottom: 12px;
     white-space: normal;
 }
-
 .tutorial-step-active {
     color: rgb(40, 20, 0);
 }
-
 .tutorial-step-done {
     color: rgb(39, 174, 96);
     opacity: 0.9;
 }
-
 .tutorial-message {
     font-size: 24px;
     color: rgb(50, 30, 10);
@@ -60,7 +53,6 @@
     border-width: 2px;
     border-color: rgba(80, 60, 40, 0.3);
 }
-
 .tutorial-glow {
     border-width: 5px;
     border-color: rgb(46, 204, 113);
@@ -77,7 +69,6 @@
     transition-duration: 0.2s;
     transition-property: scale, border-color;
 }
-
 .tutorial-key {
     width: 70px;
     height: 70px;
@@ -91,7 +82,6 @@
     background-image: url("project://database/Assets/_Custom/UI/Sprites/Boton.png?fileID=2800000&guid=b6a8459c55edcee49a0391d6800af88f&type=3#Boton");
     -unity-background-image-tint-color: rgb(200, 200, 200);
 }
-
 .tutorial-key-text {
     font-size: 40px;
     color: rgb(50, 50, 50);
