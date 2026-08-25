@@ -14,6 +14,8 @@ public class TowerShop : MonoBehaviour
     // en la escena si se deja vacio; si no hay ninguno se usa "board".
     [SerializeField] private BoardSelector boardSelector;
     [SerializeField] private int towerCost = 50;
+    // Config global de oro; si esta puesta, el costo sale de ahi.
+    [SerializeField] private GameEconomyConfig economyConfig;
 
     [Header("Audio")]
     [SerializeField] private AudioClip purchaseSound;
@@ -21,7 +23,7 @@ public class TowerShop : MonoBehaviour
     // una oleada en curso: cualquier intento de comprar que no funciona.
     [SerializeField] private AudioClip failureSound;
 
-    public int TowerCost => towerCost;
+    public int TowerCost => economyConfig != null ? economyConfig.towerCost : towerCost;
 
     // Donde va a aparecer la torre: el tablero elegido si el nivel tiene
     // selector, y si no el de siempre.
@@ -77,7 +79,7 @@ public class TowerShop : MonoBehaviour
         }
 
         // Si el dinero no alcanza tampoco se gasta nada.
-        if (!economy.TrySpend(towerCost))
+        if (!economy.TrySpend(TowerCost))
         {
             PlayFailureSound();
             return false;

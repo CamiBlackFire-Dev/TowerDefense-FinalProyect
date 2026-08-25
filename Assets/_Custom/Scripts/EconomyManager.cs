@@ -5,10 +5,19 @@ using UnityEngine;
 // las recompensas por eliminar enemigos entraran por AddCurrency.
 public class EconomyManager : MonoBehaviour
 {
-    [SerializeField] private int startingMoney = 150;
+    [SerializeField] private int startingMoney = 200;
+    // Config global de oro. Si esta puesta manda ella, para que todos los
+    // niveles arranquen igual; vacia, se usa el startingMoney de la escena.
+    [SerializeField] private GameEconomyConfig economyConfig;
 
     private int _money;
     private bool _initialized;
+
+    // El oro con el que arranca de verdad este nivel.
+    public int StartingMoney
+    {
+        get { return economyConfig != null ? economyConfig.startingMoney : startingMoney; }
+    }
 
     // Se dispara cada vez que cambia el dinero (lo usara el HUD mas adelante).
     public event Action<int> MoneyChanged;
@@ -69,7 +78,7 @@ public class EconomyManager : MonoBehaviour
             return;
 
         _initialized = true;
-        _money = startingMoney;
+        _money = StartingMoney;
     }
 
     private void NotifyMoneyChanged()

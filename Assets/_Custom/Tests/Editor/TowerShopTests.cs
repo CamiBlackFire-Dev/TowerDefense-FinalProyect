@@ -82,6 +82,9 @@ public class TowerShopTests
         SetPrivateField(shop, "board", board);
         SetPrivateField(shop, "economy", economy);
         SetPrivateField(shop, "towerCost", cost);
+        // Saldo fijo para no depender del oro inicial de balance, que ahora
+        // sale del GameEconomyConfig global y se ajusta seguido.
+        economy.SetMoney(150);
         return shop;
     }
 

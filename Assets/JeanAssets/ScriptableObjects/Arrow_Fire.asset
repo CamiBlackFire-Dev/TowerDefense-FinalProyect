@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArrowData
   arrowName: Fire
   prefab: {fileID: 6760192031667610764, guid: 5bbf78da2ddeae34e98de1de40af6d92, type: 3}
-  speed: 5
-  damage: 15
+  speed: 14
+  damage: 13
   effectType: 2
   effectDuration: 1.3
   effectValue: 0.4

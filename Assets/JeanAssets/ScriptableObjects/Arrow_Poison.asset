@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArrowData
   arrowName: Poison
   prefab: {fileID: 6760192031667610764, guid: c74c05b41be73fc4fa40f56413ed8524, type: 3}
-  speed: 5
+  speed: 14
   damage: 10
   effectType: 1
   effectDuration: 1.3

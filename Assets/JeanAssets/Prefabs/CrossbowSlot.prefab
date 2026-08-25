@@ -568,7 +568,7 @@ MonoBehaviour:
   arrowsPerShot: 3
   burstCount: 3
   burstInterval: 0.5
-  attackCooldown: 8
+  attackCooldown: 5
   predictionTime: 0.2
   maxPredictionDistance: 1.5
   targetSearchRadius: 10
@@ -576,7 +576,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   arrowVisual: {fileID: 5045973700507972707}
-  unlockEffect: {fileID: 3871730096559169795, guid: 83c08c075459659428032d0f6dbf1f7a, type: 3}
 --- !u!4 &3716923190820118697 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1329380249762036386, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}

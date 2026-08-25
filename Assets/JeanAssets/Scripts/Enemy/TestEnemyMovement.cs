@@ -21,6 +21,16 @@ public class TestEnemyMovement : MonoBehaviour
     [SerializeField] private EnemyAttack enemyAttack;
     public event System.Action<TestEnemyMovement> Finished;
 
+    // Velocidad real a la que se esta moviendo ahora mismo (ya con el
+    // frenado del EMP aplicado, si lo hay). La necesita quien tenga que
+    // adelantarse a donde va a estar el enemigo, como la punteria de las
+    // ballestas: sin esto solo se puede saber la direccion, no cuanto
+    // avanza por segundo.
+    public float CurrentSpeed
+    {
+        get { return movementSpeed; }
+    }
+
     [Header("Audio")]
     // En bucle mientras el enemigo esta activo (caminando, o retrocediendo
     // por Repulsion). Se detiene sola al morir o al llegar al final, porque

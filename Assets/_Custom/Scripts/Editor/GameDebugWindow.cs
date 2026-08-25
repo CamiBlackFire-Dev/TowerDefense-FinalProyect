@@ -29,6 +29,7 @@ public class GameDebugWindow : EditorWindow
     private int _previewWaves = 8;
     private bool _drawSpawnPoint = true; // marca el punto de salida en la escena
     private bool _showSpawnSources = true;
+    private bool _showEnemyTypes = true;
     private bool _showBoss = true;
     private BoardSelector _boardSelector;
     private CameraEdgePan _cameraPan;
@@ -527,13 +528,131 @@ public class GameDebugWindow : EditorWindow
             SceneView.RepaintAll();
 
         DrawSpawnSourcesSection();
+        DrawEnemyTypesSection();
         DrawBossSection();
         DrawWavePreview();
         DrawPlayModePersistence();
     }
 
-    // El jefe: en que oleada sale y con que numeros. Solo sale uno por
-    // nivel, al empezar la oleada elegida.
+    // Que enemigos pueden salir y desde/hasta que oleada cada uno. Vacio =
+    // se usa la lista plana "Enemigos" de arriba, mismo peso, siempre.
+    private void DrawEnemyTypesSection()
+    {
+        EnemyTypeEntry[] types = _spawner.enemyTypes;
+        int count = types != null ? types.Length : 0;
+
+        _showEnemyTypes = EditorGUILayout.Foldout(_showEnemyTypes, "Tipos de enemigo (" + count + ")", true);
+        if (!_showEnemyTypes)
+            return;
+
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+        if (count == 0)
+        {
+            EditorGUILayout.HelpBox(
+                "Sin tipos configurados: sale cualquiera de 'Enemigos' (arriba), " +
+                "mismo peso, en cualquier oleada.",
+                MessageType.None);
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            if (types[i] == null)
+                types[i] = new EnemyTypeEntry();
+
+            DrawEnemyTypeEntry(types[i]);
+        }
+
+        EditorGUILayout.Space();
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Agregar tipo"))
+            AddEnemyType();
+
+        EditorGUI.BeginDisabledGroup(count == 0);
+        if (GUILayout.Button("Quitar el ultimo"))
+            RemoveLastEnemyType();
+        EditorGUI.EndDisabledGroup();
+        EditorGUILayout.EndHorizontal();
+
+        if (count > 0)
+        {
+            EditorGUILayout.HelpBox(
+                "Cada tipo sale solo entre 'Desde' y 'Hasta' oleada (Hasta en 0 = " +
+                "sin limite). El peso decide que tan seguido sale frente a los demas " +
+                "tipos activos en esa oleada. Se puede revisar el resultado mas abajo, " +
+                "en 'Ver como quedan las proximas oleadas'.",
+                MessageType.None);
+        }
+
+        EditorGUILayout.EndVertical();
+    }
+
+    private void DrawEnemyTypeEntry(EnemyTypeEntry entry)
+    {
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+        EditorGUI.BeginChangeCheck();
+
+        entry.label = EditorGUILayout.TextField("Nombre", entry.label);
+        entry.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", entry.prefab, typeof(GameObject), false);
+        entry.weight = EditorGUILayout.FloatField("Peso", entry.weight);
+
+        EditorGUILayout.BeginHorizontal();
+        entry.minWave = EditorGUILayout.IntField("Desde oleada", entry.minWave);
+        entry.maxWave = EditorGUILayout.IntField("Hasta (0 = sin limite)", entry.maxWave);
+        EditorGUILayout.EndHorizontal();
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            entry.weight = Mathf.Max(0f, entry.weight);
+            entry.minWave = Mathf.Max(1, entry.minWave);
+            entry.maxWave = Mathf.Max(0, entry.maxWave);
+
+            if (!Application.isPlaying)
+                EditorUtility.SetDirty(_spawner);
+        }
+
+        EditorGUILayout.EndVertical();
+    }
+
+    private void AddEnemyType()
+    {
+        Undo.RecordObject(_spawner, "Agregar tipo de enemigo");
+
+        EnemyTypeEntry[] old = _spawner.enemyTypes;
+        int count = old != null ? old.Length : 0;
+        EnemyTypeEntry[] grown = new EnemyTypeEntry[count + 1];
+        for (int i = 0; i < count; i++)
+            grown[i] = old[i];
+
+        grown[count] = new EnemyTypeEntry();
+        grown[count].label = "Tipo " + (count + 1);
+        _spawner.enemyTypes = grown;
+
+        if (!Application.isPlaying)
+            EditorUtility.SetDirty(_spawner);
+    }
+
+    private void RemoveLastEnemyType()
+    {
+        EnemyTypeEntry[] old = _spawner.enemyTypes;
+        if (old == null || old.Length == 0)
+            return;
+
+        Undo.RecordObject(_spawner, "Quitar tipo de enemigo");
+
+        EnemyTypeEntry[] shrunk = new EnemyTypeEntry[old.Length - 1];
+        for (int i = 0; i < shrunk.Length; i++)
+            shrunk[i] = old[i];
+        _spawner.enemyTypes = shrunk;
+
+        if (!Application.isPlaying)
+            EditorUtility.SetDirty(_spawner);
+    }
+
+    // El jefe: en que oleada sale y con que numeros. Sale uno por nivel,
+    // como remate de la oleada elegida (recien al terminar de salir los
+    // enemigos normales de ella, no al empezarla).
     private void DrawBossSection()
     {
         _showBoss = EditorGUILayout.Foldout(_showBoss, "Jefe", true);
@@ -546,7 +665,7 @@ public class GameDebugWindow : EditorWindow
 
         GameObject bossPrefab = (GameObject)EditorGUILayout.ObjectField(
             "Prefab del jefe", _spawner.bossPrefab, typeof(GameObject), false);
-        int bossWave = EditorGUILayout.IntField("Sale en la oleada (0 = nunca)", _spawner.bossWave);
+        int bossWave = EditorGUILayout.IntField("Sale al final de la oleada (0 = nunca)", _spawner.bossWave);
         float bossHealth = EditorGUILayout.FloatField("Vida", _spawner.bossHealth);
         float bossSpeed = EditorGUILayout.FloatField("Velocidad", _spawner.bossSpeed);
         int bossReward = EditorGUILayout.IntField("Oro al derrotarlo", _spawner.bossReward);
@@ -590,8 +709,9 @@ public class GameDebugWindow : EditorWindow
         else
         {
             EditorGUILayout.HelpBox(
-                "Al llegar al castillo no desaparece: se queda golpeando y hay que " +
-                "matarlo para terminar la oleada.",
+                "Sale como remate de esa oleada: recien cuando ya salieron todos los " +
+                "enemigos normales de ella. Al llegar al castillo no desaparece: se " +
+                "queda golpeando y hay que matarlo para terminar la oleada.",
                 MessageType.None);
         }
 
@@ -682,6 +802,9 @@ public class GameDebugWindow : EditorWindow
             source.startWaypointIndex = EditorGUILayout.IntField("Sale del waypoint", source.startWaypointIndex);
 
         source.enemiesPerWave = EditorGUILayout.IntField("Enemigos (0 = el general)", source.enemiesPerWave);
+        EditorGUI.BeginDisabledGroup(source.enemiesPerWave <= 0);
+        source.enemiesGrowthPerWave = EditorGUILayout.FloatField("  +de mas por oleada", source.enemiesGrowthPerWave);
+        EditorGUI.EndDisabledGroup();
         source.spawnInterval = EditorGUILayout.FloatField("Intervalo (0 = el general)", source.spawnInterval);
         source.startDelay = EditorGUILayout.FloatField("Espera extra (s)", source.startDelay);
         source.healthMultiplier = EditorGUILayout.FloatField("Vida x", source.healthMultiplier);
@@ -690,6 +813,7 @@ public class GameDebugWindow : EditorWindow
         if (EditorGUI.EndChangeCheck())
         {
             source.enemiesPerWave = Mathf.Max(0, source.enemiesPerWave);
+            source.enemiesGrowthPerWave = Mathf.Max(0f, source.enemiesGrowthPerWave);
             source.spawnInterval = Mathf.Max(0f, source.spawnInterval);
             source.startDelay = Mathf.Max(0f, source.startDelay);
             source.healthMultiplier = Mathf.Max(0.01f, source.healthMultiplier);
@@ -862,6 +986,7 @@ public class GameDebugWindow : EditorWindow
         EditorGUILayout.LabelField("Vel.", EditorStyles.miniBoldLabel, GUILayout.Width(45f));
         EditorGUILayout.LabelField("Dano", EditorStyles.miniBoldLabel, GUILayout.Width(45f));
         EditorGUILayout.LabelField("Tirad.", EditorStyles.miniBoldLabel, GUILayout.Width(45f));
+        EditorGUILayout.LabelField("Tipos / Jefe", EditorStyles.miniBoldLabel, GUILayout.Width(220f));
         EditorGUILayout.EndHorizontal();
 
         for (int i = 0; i < _previewWaves; i++)
@@ -872,6 +997,10 @@ public class GameDebugWindow : EditorWindow
             int waveEnemies = _spawner.GetEnemiesForWave(wave);
             string enemiesText = waveEnemies > 0 ? waveEnemies.ToString() : "sin fin";
 
+            string typesText = _spawner.DescribeActiveEnemyTypes(wave);
+            if (_spawner.bossPrefab != null && _spawner.bossWave == wave)
+                typesText += "  + JEFE al final";
+
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(wave.ToString(), EditorStyles.miniLabel, GUILayout.Width(55f));
             EditorGUILayout.LabelField(enemiesText, EditorStyles.miniLabel, GUILayout.Width(45f));
@@ -879,6 +1008,7 @@ public class GameDebugWindow : EditorWindow
             EditorGUILayout.LabelField(_spawner.GetEnemySpeedForWave(wave).ToString("0.0"), EditorStyles.miniLabel, GUILayout.Width(45f));
             EditorGUILayout.LabelField(_spawner.GetShooterDamageForWave(wave).ToString("0.0"), EditorStyles.miniLabel, GUILayout.Width(45f));
             EditorGUILayout.LabelField((_spawner.GetShooterChanceForWave(wave) * 100f).ToString("0") + "%", EditorStyles.miniLabel, GUILayout.Width(45f));
+            EditorGUILayout.LabelField(typesText, EditorStyles.miniLabel, GUILayout.Width(220f));
             EditorGUILayout.EndHorizontal();
         }
 

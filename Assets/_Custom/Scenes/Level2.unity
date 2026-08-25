@@ -6034,6 +6034,7 @@ MonoBehaviour:
   ballistaCost: 100
   arrowUnlockCost: 150
   arrowSwitchCost: 50
+  economyConfig: {fileID: 11400000, guid: e4d4dc7281517b44c993309aee2a4aef, type: 2}
   arrowNormalData: {fileID: 11400000, guid: d8dcbbe73fd24704baf9ca84151a33d6, type: 2}
   arrowFireData: {fileID: 11400000, guid: a2bb7c646857e3648b803b92b94f8cdb, type: 2}
   arrowIceData: {fileID: 11400000, guid: 38bcd3e78c9d9854cbb81a06e6775837, type: 2}
@@ -11237,6 +11238,7 @@ MonoBehaviour:
   spawner: {fileID: 1250845398}
   boardSelector: {fileID: 0}
   towerCost: 50
+  economyConfig: {fileID: 11400000, guid: e4d4dc7281517b44c993309aee2a4aef, type: 2}
   purchaseSound: {fileID: 8300000, guid: 7fbfc3f08b3d83e4399db0c20bde55ad, type: 3}
   failureSound: {fileID: 8300000, guid: b3eafbfdcbddebe45a696438dd01ff3d, type: 3}
 --- !u!1 &1029911624
@@ -13366,6 +13368,32 @@ MonoBehaviour:
   - {fileID: 5379352500915273197, guid: ef500e37fd76b1f419487658bbbe6633, type: 3}
   - {fileID: 3634317810212343682, guid: 54a0dcc400375b248ba6c8e8f5445647, type: 3}
   - {fileID: 8142345231341369619, guid: 836395f1fcabe8347b0afa6b3f4224ec, type: 3}
+  enemyTypes:
+  - label: Skeleton_Mage
+    prefab: {fileID: 8980400495847641183, guid: 16bc9025d7105cc409aa7dca26ad95d3, type: 3}
+    weight: 1
+    minWave: 1
+    maxWave: 0
+  - label: Skeleton_Minion
+    prefab: {fileID: 5379352500915273197, guid: ef500e37fd76b1f419487658bbbe6633, type: 3}
+    weight: 1
+    minWave: 1
+    maxWave: 0
+  - label: Skeleton_Rogue
+    prefab: {fileID: 3634317810212343682, guid: 54a0dcc400375b248ba6c8e8f5445647, type: 3}
+    weight: 1
+    minWave: 1
+    maxWave: 0
+  - label: Skeleton_Warrior
+    prefab: {fileID: 8142345231341369619, guid: 836395f1fcabe8347b0afa6b3f4224ec, type: 3}
+    weight: 1
+    minWave: 1
+    maxWave: 0
+  - label: Esqueleto volador
+    prefab: {fileID: 3335202739544904628, guid: 1bf5b78d08a04c342a9f9a405a3ffada, type: 3}
+    weight: 1
+    minWave: 4
+    maxWave: 0
   pathBuilder: {fileID: 1373902778}
   economy: {fileID: 1974726861}
   playerBase: {fileID: 670656657}
@@ -13383,6 +13411,7 @@ MonoBehaviour:
     pathBuilder: {fileID: 1373902778}
     startWaypointIndex: 0
     enemiesPerWave: 3
+    enemiesGrowthPerWave: 0
     spawnInterval: 1.6
     startDelay: 0
     healthMultiplier: 1
@@ -13392,6 +13421,7 @@ MonoBehaviour:
     pathBuilder: {fileID: 1656494101}
     startWaypointIndex: 0
     enemiesPerWave: 3
+    enemiesGrowthPerWave: 0
     spawnInterval: 1.6
     startDelay: 0.8
     healthMultiplier: 1
@@ -13401,16 +13431,18 @@ MonoBehaviour:
     pathBuilder: {fileID: 467053692}
     startWaypointIndex: 0
     enemiesPerWave: 2
+    enemiesGrowthPerWave: 0
     spawnInterval: 2
     startDelay: 1.6
     healthMultiplier: 1
     speedMultiplier: 1
   waveSurvivalGold: 50
+  economyConfig: {fileID: 11400000, guid: e4d4dc7281517b44c993309aee2a4aef, type: 2}
   enemyHealth: 20
   enemyReward: 10
   enemySpeed: 2
   bossPrefab: {fileID: 7775042401366044771, guid: 2bfddf91a2fa8ae48bf26caaf547d618, type: 3}
-  bossWave: 5
+  bossWave: 10
   bossHealth: 400
   bossReward: 200
   bossSpeed: 1.2
@@ -14285,7 +14317,7 @@ Transform:
   m_GameObject: {fileID: 1316596472}
   serializedVersion: 2
   m_LocalRotation: {x: 0.4539905, y: 0, z: 0, w: 0.8910065}
-  m_LocalPosition: {x: 0, y: 16, z: -14}
+  m_LocalPosition: {x: 0, y: 8.43, z: -14}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -14350,8 +14382,8 @@ MonoBehaviour:
   panEnabled: 1
   edgeThickness: 40
   panSpeed: 18
-  limitMin: {x: -11, y: -24.62468}
-  limitMax: {x: 11, y: -5.6246805}
+  limitMin: {x: -13.395857, y: -16.126581}
+  limitMax: {x: 14.075215, y: 10.421126}
   drawLimitsGizmo: 1
 --- !u!114 &1317809207 stripped
 MonoBehaviour:
@@ -22508,6 +22540,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EconomyManager
   startingMoney: 150
+  economyConfig: {fileID: 11400000, guid: e4d4dc7281517b44c993309aee2a4aef, type: 2}
 --- !u!4 &1974726862
 Transform:
   m_ObjectHideFlags: 0

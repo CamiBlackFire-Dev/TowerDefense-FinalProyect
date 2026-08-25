@@ -1428,7 +1428,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 05104d798d491e74fb48cdd581a854ac, type: 2}
+  - {fileID: 2100000, guid: 008541be8ad8b3f42a5318e1c4a73d1c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2173,6 +2173,7 @@ MonoBehaviour:
   - {fileID: 5379352500915273197, guid: ef500e37fd76b1f419487658bbbe6633, type: 3}
   - {fileID: 3634317810212343682, guid: 54a0dcc400375b248ba6c8e8f5445647, type: 3}
   - {fileID: 8142345231341369619, guid: 836395f1fcabe8347b0afa6b3f4224ec, type: 3}
+  enemyTypes: []
   pathBuilder: {fileID: 1549257792}
   economy: {fileID: 1085780038}
   playerBase: {fileID: 1017545644}
@@ -2186,6 +2187,7 @@ MonoBehaviour:
   spawnWaypointIndex: 0
   spawnSources: []
   waveSurvivalGold: 50
+  economyConfig: {fileID: 11400000, guid: e4d4dc7281517b44c993309aee2a4aef, type: 2}
   enemyHealth: 10
   enemyReward: 10
   enemySpeed: 2
@@ -5395,6 +5397,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EconomyManager
   startingMoney: 150
+  economyConfig: {fileID: 11400000, guid: e4d4dc7281517b44c993309aee2a4aef, type: 2}
 --- !u!4 &1085780039
 Transform:
   m_ObjectHideFlags: 0
@@ -6493,6 +6496,7 @@ MonoBehaviour:
   spawner: {fileID: 0}
   boardSelector: {fileID: 0}
   towerCost: 50
+  economyConfig: {fileID: 11400000, guid: e4d4dc7281517b44c993309aee2a4aef, type: 2}
   purchaseSound: {fileID: 8300000, guid: 7fbfc3f08b3d83e4399db0c20bde55ad, type: 3}
   failureSound: {fileID: 8300000, guid: b3eafbfdcbddebe45a696438dd01ff3d, type: 3}
 --- !u!1 &1316596472
@@ -6648,8 +6652,8 @@ MonoBehaviour:
   panEnabled: 0
   edgeThickness: 40
   panSpeed: 18
-  limitMin: {x: -13.797, y: -18.283905}
-  limitMax: {x: 11.099999, y: -4.2349052}
+  limitMin: {x: -3.66, y: -4.82}
+  limitMax: {x: 4.86, y: 4.05}
   drawLimitsGizmo: 1
 --- !u!1 &1323661494
 GameObject:
@@ -7228,6 +7232,16 @@ MonoBehaviour:
   repairAbility: {fileID: 0}
   boardManager: {fileID: 0}
   gameFlow: {fileID: 11400000, guid: e5c8d12d4aa65284e83777bce081ca71, type: 2}
+  instantBallistaPlacement: 0
+  ballistaAbility: {fileID: 0}
+  ballistaCost: 100
+  arrowUnlockCost: 120
+  arrowSwitchCost: 25
+  economyConfig: {fileID: 11400000, guid: e4d4dc7281517b44c993309aee2a4aef, type: 2}
+  arrowNormalData: {fileID: 0}
+  arrowFireData: {fileID: 0}
+  arrowIceData: {fileID: 0}
+  arrowPoisonData: {fileID: 0}
   ability1Cooldown:
     cooldownSeconds: 6
     usageLimitMode: 0
@@ -7505,6 +7519,7 @@ MonoBehaviour:
   - {fileID: 5379352500915273197, guid: ef500e37fd76b1f419487658bbbe6633, type: 3}
   - {fileID: 3634317810212343682, guid: 54a0dcc400375b248ba6c8e8f5445647, type: 3}
   - {fileID: 8142345231341369619, guid: 836395f1fcabe8347b0afa6b3f4224ec, type: 3}
+  enemyTypes: []
   pathBuilder: {fileID: 0}
   economy: {fileID: 0}
   playerBase: {fileID: 0}
@@ -7518,6 +7533,7 @@ MonoBehaviour:
   spawnWaypointIndex: 0
   spawnSources: []
   waveSurvivalGold: 50
+  economyConfig: {fileID: 0}
   enemyHealth: 20
   enemyReward: 10
   enemySpeed: 2

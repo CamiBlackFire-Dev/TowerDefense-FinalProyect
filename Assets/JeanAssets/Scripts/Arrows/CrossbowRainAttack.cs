@@ -18,8 +18,12 @@ public class CrossbowRainAttack : MonoBehaviour
     [SerializeField] private float attackCooldown = 8f;
 
     [Header("Prediction")]
-    [SerializeField] private float predictionTime = 0.2f;
-    [SerializeField] private float maxPredictionDistance = 1.5f;
+    // Margen fijo que se suma al tiempo de vuelo (retardo de reaccion).
+    [SerializeField] private float predictionTime = 0.05f;
+    // Tope de cuanto se adelanta el disparo. Tiene que dar de sobra para el
+    // adelanto normal (velocidad del enemigo x tiempo de vuelo); esta solo
+    // para que un objetivo lejanisimo no apunte a un punto irreal.
+    [SerializeField] private float maxPredictionDistance = 8f;
 
     [Header("Target Search")]
     [SerializeField] private float targetSearchRadius = 10f;
@@ -182,26 +186,46 @@ public class CrossbowRainAttack : MonoBehaviour
         return transform.position;
     }
 
+    // A donde hay que apuntar para que la flecha y el enemigo lleguen al
+    // mismo punto. Se adelanta el tiempo que la flecha va a tardar en
+    // llegar, no una cantidad fija: una flecha lenta a un enemigo lejano
+    // necesita mucho mas adelanto que una cercana.
     private Vector3 GetPredictedPosition(Transform target)
     {
-        Vector3 velocity = Vector3.zero;
-
         TestEnemyMovement movement =
             target.GetComponentInParent<TestEnemyMovement>();
 
-        if (movement != null)
-        {
-            velocity = movement.transform.forward;
-        }
+        if (movement == null)
+            return target.position;
 
-        Vector3 prediction = velocity * predictionTime;
+        // transform.forward es un vector unitario (mide 1): es solo la
+        // direccion. Multiplicarlo por la velocidad real es lo que lo
+        // convierte en "cuanto avanza por segundo".
+        Vector3 velocity = movement.transform.forward * movement.CurrentSpeed;
 
-        prediction = Vector3.ClampMagnitude(
-            prediction,
+        float flightTime = GetFlightTime(target.position);
+
+        Vector3 lead = Vector3.ClampMagnitude(
+            velocity * flightTime,
             maxPredictionDistance
         );
 
-        return target.position + prediction;
+        return target.position + lead;
+    }
+
+    // Cuanto tarda la flecha en cubrir la distancia hasta el objetivo.
+    // predictionTime se suma como margen fijo (retardo de reaccion), y el
+    // total se topa para que un objetivo muy lejano no dispare un adelanto
+    // absurdo hacia un punto al que el enemigo nunca va a llegar (por
+    // ejemplo si el camino dobla antes).
+    private float GetFlightTime(Vector3 targetPosition)
+    {
+        if (arrowData == null || arrowData.speed <= 0f)
+            return predictionTime;
+
+        float distance = Vector3.Distance(GetFirePosition(), targetPosition);
+
+        return distance / arrowData.speed + predictionTime;
     }
 
     public bool SetArrowData(ArrowData newArrowData)

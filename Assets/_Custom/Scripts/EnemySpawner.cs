@@ -21,6 +21,11 @@ public class SpawnSource
     // Cuantos manda esta salida por oleada y cada cuanto. En 0 usan lo que
     // diga el spawner, para no tener que repetir el mismo numero en todas.
     public int enemiesPerWave = 0;
+    // Enemigos de mas por oleada, propio de esta salida (igual que
+    // enemiesGrowthPerWave pero por salida en vez de general). Solo se
+    // aplica si enemiesPerWave es > 0: una salida en 0 ya crece con el
+    // general (GetEnemiesForWave), asi que esto seria redundante.
+    public float enemiesGrowthPerWave = 0f;
     public float spawnInterval = 0f;
     // Espera propia antes del primer enemigo: sirve para escalonar las
     // salidas y que no lleguen todas a la vez.
@@ -33,6 +38,25 @@ public class SpawnSource
     public float speedMultiplier = 1f;
 }
 
+// Un tipo de enemigo disponible para el spawner, con desde/hasta que oleada
+// puede salir. Sirve para ir metiendo enemigos nuevos a medida que el juego
+// avanza (ej: el esqueleto volador recien desde la oleada 6) sin tener que
+// sacar los viejos de la lista ni tocar los niveles que ya estaban armados.
+[Serializable]
+public class EnemyTypeEntry
+{
+    // Solo para reconocerlo en el inspector, no lo usa el juego.
+    public string label = "Enemigo";
+    public GameObject prefab;
+    // Que tan seguido sale frente a los demas tipos activos en esa oleada.
+    // Con todos en el mismo numero, todos tienen la misma chance.
+    [Min(0f)] public float weight = 1f;
+    // Desde que oleada puede aparecer (1 = desde la primera).
+    [Min(1)] public int minWave = 1;
+    // Hasta que oleada aparece. 0 = sin limite, sigue saliendo siempre.
+    [Min(0)] public int maxWave = 0;
+}
+
 // Saca enemigos por el inicio del camino cada cierto tiempo.
 // A cada enemigo le pasa el camino, su vida y quien le paga al jugador,
 // asi el prefab del enemigo no necesita saber nada de la escena.
@@ -41,7 +65,13 @@ public class EnemySpawner : MonoBehaviour
     [Header("Enemigos")]
     // Prefabs de los enemigos. En cada spawn sale uno al azar de la lista.
     // Los crea el menu Tower Defense > Crear prefabs de enemigos.
+    // Se sigue usando tal cual si enemyTypes (abajo) esta vacio.
     public GameObject[] enemyPrefabs;
+    // Que enemigos pueden salir y desde/hasta que oleada. Vacio = se cae al
+    // comportamiento de siempre (enemyPrefabs, mismo peso, cualquier
+    // oleada). Con entradas aca cada tipo elige su propia ventana de
+    // oleadas, para ir sumando enemigos nuevos sin tocar los que ya estaban.
+    public EnemyTypeEntry[] enemyTypes;
     // Los cuatro de abajo se buscan solos si se dejan vacios.
     public PathBuilder pathBuilder; // camino que van a recorrer
     public EconomyManager economy;  // paga al jugador cuando mueren
@@ -78,6 +108,23 @@ public class EnemySpawner : MonoBehaviour
     // por completo y la partida queda sin salida.
     public int waveSurvivalGold = 50;
 
+    [Header("Economia")]
+    // Config global de oro. Si esta puesta, de ahi salen enemyReward y
+    // waveSurvivalGold, para que todos los niveles paguen igual.
+    public GameEconomyConfig economyConfig;
+
+    // Oro que paga cada enemigo y bono por terminar la oleada, ya
+    // resueltos contra la config global.
+    public int EnemyReward
+    {
+        get { return economyConfig != null ? economyConfig.enemyReward : enemyReward; }
+    }
+
+    public int WaveSurvivalGold
+    {
+        get { return economyConfig != null ? economyConfig.waveSurvivalGold : waveSurvivalGold; }
+    }
+
     [Header("Vida de los enemigos")]
     public float enemyHealth = 20f;
     public int enemyReward = 10;
@@ -86,9 +133,12 @@ public class EnemySpawner : MonoBehaviour
     [Header("Jefe")]
     // Prefab del jefe (el golem). Sin prefab no sale ninguno.
     public GameObject bossPrefab;
-    // En que oleada aparece. 0 = nunca. Sale uno solo, al empezar esa
-    // oleada, ademas de los enemigos normales.
-    public int bossWave = 5;
+    // En que oleada aparece. 0 = nunca. Sale uno solo, como remate de esa
+    // oleada: recien cuando ya salieron todos los enemigos normales de
+    // ella (no al empezar). En una oleada sin fin (enemiesPerWave/las
+    // salidas en 0) nunca llega a "terminar de salir", asi que el jefe
+    // tampoco saldria: bossWave necesita una oleada con cantidad definida.
+    public int bossWave = 10;
     public float bossHealth = 400f;
     public int bossReward = 200;
     public float bossSpeed = 1.2f;
@@ -136,6 +186,11 @@ public class EnemySpawner : MonoBehaviour
     // Se rehacen al empezar cada oleada.
     private float[] _sourceTimers;
     private int[] _sourceSpawned;
+    // Evita sacar el jefe mas de una vez por oleada. Sin este flag,
+    // SpawnBossIfDue se llamaria en TODOS los Update() posteriores a que
+    // terminen de salir los enemigos normales (esa condicion se queda en
+    // true el resto de la oleada), y sacaria un jefe nuevo en cada frame.
+    private bool _bossSpawnedThisWave;
 
     // Avisos para la interfaz: el HUD se sincroniza con estos.
     public event Action WaveStarted;
@@ -223,7 +278,7 @@ public class EnemySpawner : MonoBehaviour
         _waveNumber++;
 
         ResetSourceState();
-        SpawnBossIfDue();
+        _bossSpawnedThisWave = false;
 
         if (WaveStarted != null)
             WaveStarted();
@@ -267,6 +322,16 @@ public class EnemySpawner : MonoBehaviour
             }
         }
 
+        // El jefe sale como remate de su oleada: recien cuando ya no queda
+        // ningun enemigo normal por salir, no al arrancarla. Al spawnearlo
+        // aca (antes del chequeo de abajo) _aliveCount ya lo cuenta a el,
+        // asi que la oleada no se cierra sola en el mismo frame.
+        if (doneSpawning && !_bossSpawnedThisWave)
+        {
+            _bossSpawnedThisWave = true;
+            SpawnBossIfDue();
+        }
+
         // Oleada completa solo cuando ya salieron todos y ademas no queda
         // ninguno vivo (muerto o escapado). Hasta entonces no se avisa al
         // HUD, asi que el boton de la siguiente oleada sigue oculto.
@@ -276,10 +341,10 @@ public class EnemySpawner : MonoBehaviour
 
             if (economy != null)
             {
-                economy.AddCurrency(waveSurvivalGold);
+                economy.AddCurrency(WaveSurvivalGold);
 
-                if (goldPopupPrefab != null && waveSurvivalGold > 0 && castleTransform != null)
-                    goldPopupPrefab.Spawn(castleTransform.position, waveSurvivalGold);
+                if (goldPopupPrefab != null && WaveSurvivalGold > 0 && castleTransform != null)
+                    goldPopupPrefab.Spawn(castleTransform.position, WaveSurvivalGold);
             }
 
             if (WaveFinished != null)
@@ -411,7 +476,10 @@ public class EnemySpawner : MonoBehaviour
             return 0;
 
         if (source.enemiesPerWave > 0)
-            return source.enemiesPerWave;
+        {
+            int wavesPassed = Mathf.Max(0, waveNumber - 1);
+            return Mathf.Max(1, Mathf.RoundToInt(source.enemiesPerWave + source.enemiesGrowthPerWave * wavesPassed));
+        }
 
         return GetEnemiesForWave(waveNumber);
     }
@@ -500,23 +568,92 @@ public class EnemySpawner : MonoBehaviour
             source.speedMultiplier);
     }
 
-    // Indica si hay al menos un prefab de enemigo en la lista.
+    // Indica si hay al menos un prefab de enemigo utilizable, en enemyTypes
+    // o en la lista plana de siempre.
     public bool HasEnemies()
     {
-        if (enemyPrefabs == null)
-            return false;
+        if (enemyTypes != null)
+            for (int i = 0; i < enemyTypes.Length; i++)
+                if (enemyTypes[i] != null && enemyTypes[i].prefab != null)
+                    return true;
 
-        for (int i = 0; i < enemyPrefabs.Length; i++)
-            if (enemyPrefabs[i] != null)
-                return true;
+        if (enemyPrefabs != null)
+            for (int i = 0; i < enemyPrefabs.Length; i++)
+                if (enemyPrefabs[i] != null)
+                    return true;
 
         return false;
     }
 
-    // Elige al azar uno de los enemigos de la lista.
-    public GameObject PickEnemyPrefab()
+    // True si esta entrada puede salir en esa oleada: tiene prefab, algo de
+    // peso, y la oleada cae dentro de su ventana [minWave, maxWave] (0 = sin
+    // limite superior).
+    private static bool IsEnemyTypeActive(EnemyTypeEntry entry, int waveNumber)
     {
-        if (!HasEnemies())
+        if (entry == null || entry.prefab == null || entry.weight <= 0f)
+            return false;
+
+        if (waveNumber < Mathf.Max(1, entry.minWave))
+            return false;
+
+        if (entry.maxWave > 0 && waveNumber > entry.maxWave)
+            return false;
+
+        return true;
+    }
+
+    // Elige un enemigo para esta oleada. Si enemyTypes tiene algo valido
+    // para ella, sortea entre esos por peso; si no (nivel viejo sin tocar,
+    // o ninguna entrada activa todavia para esta oleada), cae a la lista
+    // plana de siempre con el mismo peso para todos.
+    public GameObject PickEnemyPrefab(int waveNumber)
+    {
+        GameObject fromTypes = PickFromEnemyTypes(waveNumber);
+        if (fromTypes != null)
+            return fromTypes;
+
+        return PickFromEnemyPrefabs();
+    }
+
+    private GameObject PickFromEnemyTypes(int waveNumber)
+    {
+        if (enemyTypes == null || enemyTypes.Length == 0)
+            return null;
+
+        float totalWeight = 0f;
+        for (int i = 0; i < enemyTypes.Length; i++)
+            if (IsEnemyTypeActive(enemyTypes[i], waveNumber))
+                totalWeight += enemyTypes[i].weight;
+
+        if (totalWeight <= 0f)
+            return null;
+
+        float roll = UnityEngine.Random.value * totalWeight;
+        for (int i = 0; i < enemyTypes.Length; i++)
+        {
+            if (!IsEnemyTypeActive(enemyTypes[i], waveNumber))
+                continue;
+
+            roll -= enemyTypes[i].weight;
+            if (roll <= 0f)
+                return enemyTypes[i].prefab;
+        }
+
+        // Redondeo de punto flotante: si nadie lo agarro, se devuelve el
+        // ultimo activo en vez de caer a enemyPrefabs sin necesidad.
+        for (int i = enemyTypes.Length - 1; i >= 0; i--)
+            if (IsEnemyTypeActive(enemyTypes[i], waveNumber))
+                return enemyTypes[i].prefab;
+
+        return null;
+    }
+
+    // El comportamiento de siempre: cualquiera de la lista plana, mismo
+    // peso, cualquier oleada. Sigue en pie para los niveles que no usan
+    // enemyTypes.
+    private GameObject PickFromEnemyPrefabs()
+    {
+        if (enemyPrefabs == null || enemyPrefabs.Length == 0)
             return null;
 
         // Se repite hasta encontrar uno que no este vacio.
@@ -528,6 +665,26 @@ public class EnemySpawner : MonoBehaviour
         }
 
         return null;
+    }
+
+    // Etiquetas de los tipos que pueden salir en esa oleada, separadas por
+    // coma. Solo para mostrarlo en Game Debug; el juego no lo usa.
+    public string DescribeActiveEnemyTypes(int waveNumber)
+    {
+        if (enemyTypes == null || enemyTypes.Length == 0)
+            return "(cualquiera de Enemigos)";
+
+        string result = "";
+        for (int i = 0; i < enemyTypes.Length; i++)
+        {
+            if (!IsEnemyTypeActive(enemyTypes[i], waveNumber))
+                continue;
+
+            string label = string.IsNullOrEmpty(enemyTypes[i].label) ? "?" : enemyTypes[i].label;
+            result += (result.Length > 0 ? ", " : "") + label;
+        }
+
+        return result.Length > 0 ? result : "(ninguno activo aun)";
     }
 
     // Crea un enemigo en el punto de salida configurado y lo deja listo.
@@ -545,13 +702,13 @@ public class EnemySpawner : MonoBehaviour
     private GameObject SpawnEnemyInternal(Path path, int waypointIndex,
         float healthMultiplier, float speedMultiplier)
     {
-        GameObject prefab = PickEnemyPrefab();
+        GameObject prefab = PickEnemyPrefab(_waveNumber);
         if (prefab == null)
             return null;
 
         GameObject enemy = CreateEnemy(prefab, path, waypointIndex,
             GetEnemyHealthForWave(_waveNumber) * healthMultiplier,
-            enemyReward,
+            EnemyReward,
             GetEnemySpeedForWave(_waveNumber) * speedMultiplier);
 
         if (enemy == null)

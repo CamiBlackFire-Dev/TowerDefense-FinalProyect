@@ -120,8 +120,43 @@ namespace Custom.UI
         public bool instantBallistaPlacement = false;
         public BallistaDragAbility ballistaAbility;
         public int ballistaCost = 100;
-        public int arrowUnlockCost = 150;
-        public int arrowSwitchCost = 50;
+        public int arrowUnlockCost = 120;
+        public int arrowSwitchCost = 25;
+
+        // Config global de oro. Si esta puesta, los costos de la ballesta,
+        // las flechas y los powerups salen de ahi en vez de los campos de
+        // esta escena, para que no se desincronicen entre niveles.
+        public GameEconomyConfig economyConfig;
+
+        public int BallistaCost => economyConfig != null ? economyConfig.ballistaCost : ballistaCost;
+        public int ArrowUnlockCost => economyConfig != null ? economyConfig.arrowUnlockCost : arrowUnlockCost;
+        public int ArrowSwitchCost => economyConfig != null ? economyConfig.arrowSwitchCost : arrowSwitchCost;
+
+        // Costo del powerup de la ranura pedida (1 a 5), resuelto contra la
+        // config global si la hay.
+        public int AbilityCost(int slot)
+        {
+            if (economyConfig != null)
+            {
+                switch (slot)
+                {
+                    case 1: return economyConfig.ability1Cost;
+                    case 2: return economyConfig.ability2Cost;
+                    case 3: return economyConfig.ability3Cost;
+                    case 4: return economyConfig.ability4Cost;
+                    case 5: return economyConfig.ability5Cost;
+                }
+            }
+
+            switch (slot)
+            {
+                case 1: return ability1Cost;
+                case 2: return ability2Cost;
+                case 3: return ability3Cost;
+                case 4: return ability4Cost;
+                default: return ability5Cost;
+            }
+        }
         public ArrowData arrowNormalData;
         public ArrowData arrowFireData;
         public ArrowData arrowIceData;
@@ -176,10 +211,10 @@ namespace Custom.UI
         // al armar los slots (OnEnable), asi que un cambio en Play Mode no
         // se nota hasta la proxima vez que se abra la escena.
         public int ability1Cost = 100;
-        public int ability2Cost = 200;
-        public int ability3Cost = 300;
-        public int ability4Cost = 400;
-        public int ability5Cost = 500;
+        public int ability2Cost = 150;
+        public int ability3Cost = 150;
+        public int ability4Cost = 150;
+        public int ability5Cost = 150;
 
         // Estado en vivo de cada ranura (boton + overlay + cooldown/usos
         // restantes). Se arma una vez en OnEnable a partir de los campos de
@@ -713,16 +748,6 @@ namespace Custom.UI
 
             if (!debugKeys) return;
 
-            if (keyboard.vKey.wasPressedThisFrame)
-            {
-                if (_victoryOverlay != null && _victoryOverlay.style.display == DisplayStyle.Flex) { _victoryOverlay.style.display = DisplayStyle.None; GameSpeedController.ApplyCurrentSpeed(); }
-                else ShowVictoryScreen(false);
-            }
-            if (keyboard.cKey.wasPressedThisFrame)
-            {
-                if (_creditsOverlay != null && _creditsOverlay.style.display == DisplayStyle.Flex) { _creditsOverlay.style.display = DisplayStyle.None; }
-                else ShowCreditsScreen();
-            }
             if (keyboard.fKey.wasPressedThisFrame)
             {
                 if (_gameCompleteOverlay != null && _gameCompleteOverlay.style.display == DisplayStyle.Flex) { _gameCompleteOverlay.style.display = DisplayStyle.None; GameSpeedController.ApplyCurrentSpeed(); }
@@ -1079,14 +1104,14 @@ namespace Custom.UI
         {
             // La ranura 1 (bomba) ya trae su propio sprite de fondo en el
             // UXML, asi que no necesita un icono dibujado a mano.
-            _slotAbility1 = BuildAbilitySlot(_ability1, root, "Ability1", ability1Cooldown, ability1Cost, bombAbility, null, null, ability1UnlockSound);
-            _slotAbility2 = BuildAbilitySlot(_ability2, root, "Ability2", ability2Cooldown, ability2Cost, empAbility, null, DrawLightningIcon, ability2UnlockSound);
-            _slotAbility3 = BuildAbilitySlot(_ability3, root, "Ability3", ability3Cooldown, ability3Cost, repulsionAbility, null, DrawRepulsionIcon, ability3UnlockSound);
-            _slotAbility4 = BuildAbilitySlot(_ability4, root, "Ability4", ability4Cooldown, ability4Cost, repairAbility, null, DrawHealIcon, ability4UnlockSound);
+            _slotAbility1 = BuildAbilitySlot(_ability1, root, "Ability1", ability1Cooldown, AbilityCost(1), bombAbility, null, null, ability1UnlockSound);
+            _slotAbility2 = BuildAbilitySlot(_ability2, root, "Ability2", ability2Cooldown, AbilityCost(2), empAbility, null, DrawLightningIcon, ability2UnlockSound);
+            _slotAbility3 = BuildAbilitySlot(_ability3, root, "Ability3", ability3Cooldown, AbilityCost(3), repulsionAbility, null, DrawRepulsionIcon, ability3UnlockSound);
+            _slotAbility4 = BuildAbilitySlot(_ability4, root, "Ability4", ability4Cooldown, AbilityCost(4), repairAbility, null, DrawHealIcon, ability4UnlockSound);
 
             // La ranura 5 no es de arrastre: se usa con un click y su efecto
             // es desbloquear el tablero durante unos segundos.
-            _slotAbility5 = BuildAbilitySlot(_ability5, root, "Ability5", ability5Cooldown, ability5Cost, null, UnlockBoardTemporarily, DrawUnlockIcon, ability5UnlockSound);
+            _slotAbility5 = BuildAbilitySlot(_ability5, root, "Ability5", ability5Cooldown, AbilityCost(5), null, UnlockBoardTemporarily, DrawUnlockIcon, ability5UnlockSound);
 
             _allSlots = new AbilitySlot[]
             {
@@ -1476,10 +1501,32 @@ namespace Custom.UI
                 ResetPerWaveUses(slot);
         }
 
-        // La oleada termino: vuelve a aparecer el boton para la siguiente.
+        // La oleada termino: vuelve a aparecer el boton para la siguiente,
+        // salvo que esa oleada era la del jefe: ahi el nivel ya se gano.
         private void OnWaveFinished()
         {
             SetWaveActive(false);
+
+            if (IsBossWaveJustCleared())
+            {
+                bool esNivelFinal = gameFlow != null
+                    && gameFlow.GetLevelNumber(SceneManager.GetActiveScene().name) >= gameFlow.LevelCount;
+                ShowVictoryScreen(esNivelFinal);
+            }
+        }
+
+        // True justo cuando termino la oleada del jefe (WaveFinished solo se
+        // dispara con la oleada entera resuelta, jefe incluido: mientras el
+        // jefe siga vivo la oleada no cierra, ver EnemySpawner). Sin jefe
+        // configurado (bossPrefab o bossWave en 0) el nivel no se da nunca
+        // por ganado solo, para no cambiar el comportamiento de niveles que
+        // todavia no tengan uno.
+        private bool IsBossWaveJustCleared()
+        {
+            return spawner != null
+                && spawner.bossPrefab != null
+                && spawner.bossWave > 0
+                && spawner.WaveNumber == spawner.bossWave;
         }
 
         // El dinero cambio: se refresca el numero de arriba.
@@ -1799,9 +1846,9 @@ namespace Custom.UI
                     return;
                 }
 
-                if (economy != null && economy.Money >= ballistaCost)
+                if (economy != null && economy.Money >= BallistaCost)
                 {
-                    economy.TrySpend(ballistaCost);
+                    economy.TrySpend(BallistaCost);
 
                     emptySlot.Unlock();
                     if (_currentGlobalArrow != null)
@@ -1822,9 +1869,9 @@ namespace Custom.UI
             }
             else
             {
-                if (economy != null && economy.Money >= ballistaCost)
+                if (economy != null && economy.Money >= BallistaCost)
                 {
-                    economy.TrySpend(ballistaCost);
+                    economy.TrySpend(BallistaCost);
                     _ballistaCount++;
                     UpdateBallistaUI();
                     PlayClickSound();
@@ -1901,9 +1948,9 @@ namespace Custom.UI
             if (!isUnlocked)
             {
                 // Try to unlock
-                if (economy != null && economy.Money >= arrowUnlockCost)
+                if (economy != null && economy.Money >= ArrowUnlockCost)
                 {
-                    economy.TrySpend(arrowUnlockCost);
+                    economy.TrySpend(ArrowUnlockCost);
 
                     switch (type)
                     {
@@ -1930,7 +1977,7 @@ namespace Custom.UI
                 // Already unlocked, try to switch
                 if (_currentGlobalArrow != dataToUse)
                 {
-                    int cost = (type == ArrowEffectType.Normal) ? 0 : arrowSwitchCost;
+                    int cost = (type == ArrowEffectType.Normal) ? 0 : ArrowSwitchCost;
 
                     if (economy != null && economy.Money >= cost)
                     {
@@ -1993,7 +2040,7 @@ namespace Custom.UI
 
             if (_ballistaPriceText != null)
             {
-                _ballistaPriceText.text = ballistaCost.ToString();
+                _ballistaPriceText.text = BallistaCost.ToString();
             }
 
             var goldColor = new StyleColor(new Color32(241, 196, 15, 255));
@@ -2023,7 +2070,7 @@ namespace Custom.UI
                     bool isSelected = (_currentGlobalArrow == arrowFireData);
                     _firePriceContainer.style.display = isSelected ? DisplayStyle.None : DisplayStyle.Flex;
                     var priceLabel = _firePriceContainer.Q<Label>("FirePriceText");
-                    if (priceLabel != null) priceLabel.text = _fireUnlocked ? arrowSwitchCost.ToString() : arrowUnlockCost.ToString();
+                    if (priceLabel != null) priceLabel.text = _fireUnlocked ? ArrowSwitchCost.ToString() : ArrowUnlockCost.ToString();
                 }
             }
 
@@ -2051,7 +2098,7 @@ namespace Custom.UI
                     bool isSelected = (_currentGlobalArrow == arrowIceData);
                     _icePriceContainer.style.display = isSelected ? DisplayStyle.None : DisplayStyle.Flex;
                     var priceLabel = _icePriceContainer.Q<Label>("IcePriceText");
-                    if (priceLabel != null) priceLabel.text = _iceUnlocked ? arrowSwitchCost.ToString() : arrowUnlockCost.ToString();
+                    if (priceLabel != null) priceLabel.text = _iceUnlocked ? ArrowSwitchCost.ToString() : ArrowUnlockCost.ToString();
                 }
             }
 
@@ -2079,7 +2126,7 @@ namespace Custom.UI
                     bool isSelected = (_currentGlobalArrow == arrowPoisonData);
                     _poisonPriceContainer.style.display = isSelected ? DisplayStyle.None : DisplayStyle.Flex;
                     var priceLabel = _poisonPriceContainer.Q<Label>("PoisonPriceText");
-                    if (priceLabel != null) priceLabel.text = _poisonUnlocked ? arrowSwitchCost.ToString() : arrowUnlockCost.ToString();
+                    if (priceLabel != null) priceLabel.text = _poisonUnlocked ? ArrowSwitchCost.ToString() : ArrowUnlockCost.ToString();
                 }
             }
 
