@@ -6,11 +6,14 @@ using UnityEngine.InputSystem.Controls;
 // Lee el teclado y envia comandos de movimiento sin conocer BoardManager.
 public class InputController : MonoBehaviour
 {
+    #region Events
     public event Action<GridDirection> MoveRequested;
     public event Action BuyRequested;
     // Cambiar de tablero, en los niveles que tienen mas de uno (Tab).
     public event Action NextBoardRequested;
+    #endregion
 
+    #region Unity Lifecycle
     private void Update()
     {
         if (!Application.isPlaying || Keyboard.current == null)
@@ -53,7 +56,9 @@ public class InputController : MonoBehaviour
                 NextBoardRequested();
         }
     }
+    #endregion
 
+    #region Public API
     // Permite probar la correspondencia entre teclas y direcciones sin hardware.
     public static bool TryGetDirection(Key key, out GridDirection direction)
     {
@@ -86,7 +91,9 @@ public class InputController : MonoBehaviour
     {
         return key == Key.B;
     }
+    #endregion
 
+    #region Internal Helpers
     private bool IsPressed(KeyControl primary, KeyControl alternative)
     {
         return primary.wasPressedThisFrame || alternative.wasPressedThisFrame;
@@ -97,4 +104,5 @@ public class InputController : MonoBehaviour
         if (MoveRequested != null)
             MoveRequested(direction);
     }
+    #endregion
 }
