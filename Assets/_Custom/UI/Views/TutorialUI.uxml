@@ -3,10 +3,10 @@
     <Style src="project://database/Assets/_Custom/UI/Styles/Variables.uss?fileID=7433441132597879392&amp;guid=0d88b972d2caa264ca392885da4c93eb&amp;type=3#Variables"/>
     <Style src="project://database/Assets/_Custom/UI/Styles/Common.uss?fileID=7433441132597879392&amp;guid=777eec23bf60d49468cb154ccb488532&amp;type=3#Common"/>
     <ui:VisualElement name="TutorialOverlay" class="tutorial-overlay" picking-mode="Ignore">
-        <ui:VisualElement name="DimTop" picking-mode="Ignore" style="position: absolute; background-color: rgba(0, 0, 0, 0.45); top: 0; left: 0; right: 0;" />
-        <ui:VisualElement name="DimBottom" picking-mode="Ignore" style="position: absolute; background-color: rgba(0, 0, 0, 0.45); bottom: 0; left: 0; right: 0;" />
-        <ui:VisualElement name="DimLeft" picking-mode="Ignore" style="position: absolute; background-color: rgba(0, 0, 0, 0.45);" />
-        <ui:VisualElement name="DimRight" picking-mode="Ignore" style="position: absolute; background-color: rgba(0, 0, 0, 0.45);" />
+        <ui:VisualElement name="DimTop" picking-mode="Position" style="position: absolute; background-color: rgba(0, 0, 0, 0.45); top: 0; left: 0; right: 0;" />
+        <ui:VisualElement name="DimBottom" picking-mode="Position" style="position: absolute; background-color: rgba(0, 0, 0, 0.45); bottom: 0; left: 0; right: 0;" />
+        <ui:VisualElement name="DimLeft" picking-mode="Position" style="position: absolute; background-color: rgba(0, 0, 0, 0.45);" />
+        <ui:VisualElement name="DimRight" picking-mode="Position" style="position: absolute; background-color: rgba(0, 0, 0, 0.45);" />
         <ui:VisualElement name="SpotlightBox" picking-mode="Ignore" style="position: absolute; border-radius: 10px;" />
         <ui:VisualElement name="TutorialPanel" class="tutorial-panel">
             <ui:Label text="TUTORIAL" class="tutorial-title"/>

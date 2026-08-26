@@ -56,6 +56,7 @@ public class TutorialManager : MonoBehaviour
     private int _lastMoney = 0;
     private int _targetGold = 0;
     private bool _hasMoved = false;
+    private bool _bombUsedDuringWave = false;
 
     private Button _activeTargetButton;
     private bool _isGlowUrgent;
@@ -230,7 +231,13 @@ public class TutorialManager : MonoBehaviour
 
             case TutorialState.UseBomb:
                 BombAbility[] explosions = FindObjectsByType<BombAbility>(FindObjectsSortMode.None);
-                if (explosions.Length > 0 && !_step7.ClassListContains("tutorial-step-done"))
+                BombDragAbility bombDrag = FindFirstObjectByType<BombDragAbility>();
+                if (explosions.Length > 0 && _enemySpawner != null && _enemySpawner.IsRunning)
+                {
+                    _bombUsedDuringWave = true;
+                }
+
+                if (_bombUsedDuringWave && !_step7.ClassListContains("tutorial-step-done"))
                 {
                     MarkStepDone(_step7);
                     _tutorialMessage.text = "¡Excelente! Has usado la bomba. Ahora defiende tu castillo hasta que termine la oleada.";
@@ -239,6 +246,46 @@ public class TutorialManager : MonoBehaviour
                 if (_step7.ClassListContains("tutorial-step-done") && _enemySpawner != null && !_enemySpawner.IsRunning)
                 {
                     AdvanceState(TutorialState.Finished);
+                }
+                if (!_step7.ClassListContains("tutorial-step-done"))
+                {
+                    if (_enemySpawner != null && !_enemySpawner.IsRunning)
+                    {
+                        SetTargetButton(_startWaveButton, true);
+                        _tutorialMessage.text = "¡Espera! Pulsa EMPEZAR OLEADA para que vengan enemigos y puedas probar la bomba.";
+                        Time.timeScale = 1f;
+                    }
+                    else if (_enemySpawner != null)
+                    {
+                        int waveTotal = _enemySpawner.GetEnemiesForWave(_enemySpawner.WaveNumber);
+                        if (waveTotal <= 0) waveTotal = 6;
+                        if (_enemySpawner.WaveNumber >= 2 && _enemySpawner.SpawnedCount >= waveTotal / 2)
+                        {
+                            if (bombDrag != null && bombDrag.IsDragging)
+                            {
+                                SetTargetButton(null);
+                                Time.timeScale = 1f;
+                                _tutorialMessage.text = "¡Lanza la bomba sobre los enemigos para destruirlos!";
+                            }
+                            else
+                            {
+                                SetTargetButton(_ability1Button, true);
+                                Time.timeScale = 0f;
+                                _tutorialMessage.text = "¡Vienen muchos enemigos! Selecciona la bomba AHORA para detenerlos.";
+                            }
+                        }
+                        else
+                        {
+                            SetTargetButton(null);
+                            Time.timeScale = 1f;
+                            _tutorialMessage.text = "Mantén pulsado el botón de la Bomba, arrástrala sobre el camino de los enemigos y suéltala.";
+                        }
+                    }
+                }
+                else
+                {
+                    Time.timeScale = 1f;
+                    SetTargetButton(null);
                 }
                 break;
 

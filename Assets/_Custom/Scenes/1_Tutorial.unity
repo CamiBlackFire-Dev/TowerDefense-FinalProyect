@@ -5397,7 +5397,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EconomyManager
   startingMoney: 150
-  economyConfig: {fileID: 11400000, guid: e4d4dc7281517b44c993309aee2a4aef, type: 2}
+  economyConfig: {fileID: 0}
 --- !u!4 &1085780039
 Transform:
   m_ObjectHideFlags: 0
@@ -7279,7 +7279,6 @@ MonoBehaviour:
   ability3UnlockSound: {fileID: 8300000, guid: f636f389362c30c43a5a0ceac6387b19, type: 3}
   ability4UnlockSound: {fileID: 8300000, guid: 8b12370610f304344acd11832aa44650, type: 3}
   ability5UnlockSound: {fileID: 8300000, guid: 61449a3b7c6c8e7459c3fbf9470e305a, type: 3}
-  debugKeys: 1
 --- !u!114 &1472961076
 MonoBehaviour:
   m_ObjectHideFlags: 0
