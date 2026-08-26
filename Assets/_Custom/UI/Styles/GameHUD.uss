@@ -226,12 +226,12 @@
     bottom: 155px;
     left: 15px;
     padding: 10px 20px;
-    font-size: 28px;
+    font-size: 20px;
     color: white;
     -unity-font-style: bold;
     -unity-text-align: middle-center;
-    height: 140px;
-    width: 360px;
+    height: 80px;
+    width: 260px;
     margin: 0;
     -unity-text-outline-width: 1px;
     -unity-text-outline-color: rgb(0, 0, 0);
