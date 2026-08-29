@@ -144,7 +144,7 @@ public class EnemyTypesAndBossTimingTests
         Assert.AreEqual(3, presentation.VisualTier);
         Assert.AreEqual(1.8f, presentation.ScaleMultiplier, 0.001f);
         Assert.AreEqual(Vector3.one * 1.8f, boss.transform.localScale);
-        Assert.IsNotNull(GameObject.Find("BossArmor_WarHelm"));
+        Assert.IsNotNull(GameObject.Find("BossArmor_Chest"));
     }
 
     [Test]
@@ -161,7 +161,26 @@ public class EnemyTypesAndBossTimingTests
         Assert.AreEqual("B-head", crown.parent.name);
         Assert.AreEqual("B-hand.R", weapon.parent.name);
         Assert.IsFalse(System.Array.Exists(children,
-            child => child.name.StartsWith("BossArmor_Crown")));
+            child => child.name.StartsWith("BossArmor_Crown")
+                || child.name.Contains("Helm")
+                || child.name.Contains("Visor")));
+    }
+
+    [Test]
+    public void EnemyProjectile_UsaMaterialRojoDistintoDelProyectilAliado()
+    {
+        GameObject enemyProjectile = AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/_Custom/Prefabs/VFX/Projectile_EnemyShot.prefab");
+        GameObject towerProjectile = AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/_Custom/Prefabs/VFX/Projectile_Cannonball.prefab");
+        Material enemyMaterial = enemyProjectile.GetComponentInChildren<Renderer>(true).sharedMaterial;
+        Material towerMaterial = towerProjectile.GetComponentInChildren<Renderer>(true).sharedMaterial;
+        Color enemyColor = enemyMaterial.GetColor("_BaseColor");
+
+        Assert.Greater(enemyColor.r, 0.9f);
+        Assert.Less(enemyColor.g, 0.1f);
+        Assert.Less(enemyColor.b, 0.1f);
+        Assert.AreNotSame(enemyMaterial, towerMaterial);
     }
 
     private EnemySpawner CrearSpawner()

@@ -74,6 +74,14 @@ public class BoardManager : MonoBehaviour
     public AnimationCurve moveCurve;            // suavizado del deslizamiento
     public int maxBufferedMoves = 8;            // movimientos encolados maximo
 
+    [Header("Destruccion de torres")]
+    public GameObject towerDowngradeVfx;
+    public float towerDowngradeVfxScale = 0.8f;
+    public float towerDowngradeVfxDuration = 3f;
+    public GameObject towerDestroyedVfx;
+    public float towerDestroyedVfxScale = 1.2f;
+    public float towerDestroyedVfxDuration = 7f;
+
     [Header("Input")]
     public InputController inputController;
     // Si el nivel tiene mas de un tablero, solo el elegido hace caso a las
@@ -543,20 +551,63 @@ public class BoardManager : MonoBehaviour
         if (!key.HasValue)
             return;
 
-        int newLevel = tower.Level - 1;
+        int currentLevel = tower.Level;
+        int newLevel = currentLevel - 1;
+        Vector3 effectPosition = TowerEffectPosition(tower);
         if (newLevel <= 0)
         {
+            SpawnTowerDepletionVfx(currentLevel, effectPosition);
             _grid.SetLevel(key.Value.x, key.Value.y, 0);
             DestroyTowerVisual(tower);
             return;
         }
 
+        SpawnTowerDepletionVfx(currentLevel, effectPosition);
         _grid.SetLevel(key.Value.x, key.Value.y, newLevel);
         tower.SetModel(TowerModelForLevel(newLevel));
         ApplyTowerColors(tower);
         tower.SetLevel(newLevel);
         tower.PositionOnCell(TowerPosition(key.Value.x, key.Value.y));
         health.ForceRefreshStats();
+    }
+
+    public GameObject TowerDepletionVfxForLevel(int currentLevel)
+    {
+        return currentLevel > 1 ? towerDowngradeVfx : towerDestroyedVfx;
+    }
+
+    private void SpawnTowerDepletionVfx(int currentLevel, Vector3 position)
+    {
+        if (!Application.isPlaying)
+            return;
+
+        GameObject prefab = TowerDepletionVfxForLevel(currentLevel);
+        if (prefab == null)
+            return;
+
+        bool downgrade = currentLevel > 1;
+        float scale = downgrade ? towerDowngradeVfxScale : towerDestroyedVfxScale;
+        float duration = downgrade ? towerDowngradeVfxDuration : towerDestroyedVfxDuration;
+        GameObject effect = Instantiate(prefab, position, Quaternion.identity);
+        effect.name = downgrade ? "Tower Downgrade VFX" : "Tower Destroyed VFX";
+        effect.transform.localScale *= Mathf.Max(0.01f, scale);
+        Destroy(effect, Mathf.Max(0.1f, duration));
+    }
+
+    private static Vector3 TowerEffectPosition(Tower tower)
+    {
+        TowerVisual visual = tower != null ? tower.Visual : null;
+        Transform root = visual != null ? visual.visualRoot : null;
+        Renderer[] renderers = root != null
+            ? root.GetComponentsInChildren<Renderer>(true)
+            : new Renderer[0];
+        if (renderers.Length == 0)
+            return tower != null ? tower.transform.position + Vector3.up * 0.5f : Vector3.zero;
+
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+            bounds.Encapsulate(renderers[i].bounds);
+        return bounds.center;
     }
 
     // Procesa en orden el movimiento actual y todos los encolados.

@@ -2197,6 +2197,8 @@ MonoBehaviour:
   bossReward: 200
   bossSpeed: 1.2
   bossSourceIndex: 0
+  bossVisualTier: 1
+  bossScale: 1.35
   healthGrowthPerWave: 0.15
   speedGrowthPerWave: 0.05
   shooterDamageGrowthPerWave: 0.1
@@ -2208,7 +2210,7 @@ MonoBehaviour:
   shooterAttackRate: 0.5
   shooterProjectilePrefab: {fileID: 0}
   shooterProjectileSpeed: 8
-  shooterPopupPrefab: {fileID: 0}
+  shooterPopupPrefab: {fileID: 1259023133563206875, guid: 371c9b1a7ce7ced4db364038bfd68fa7, type: 3}
 --- !u!1 &466526416
 GameObject:
   m_ObjectHideFlags: 0
@@ -3471,6 +3473,12 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   maxBufferedMoves: 8
+  towerDowngradeVfx: {fileID: 9169863999176627214, guid: d80674d25b4036a43a9e0b72ed9f4fad, type: 3}
+  towerDowngradeVfxScale: 0.8
+  towerDowngradeVfxDuration: 3
+  towerDestroyedVfx: {fileID: 5013878782555061258, guid: d9fa0c80412e48448acaa78def63d086, type: 3}
+  towerDestroyedVfxScale: 1.2
+  towerDestroyedVfxDuration: 7
   inputController: {fileID: 1260824858}
   acceptsInput: 1
   spawner: {fileID: 0}
@@ -5510,6 +5518,12 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   maxBufferedMoves: 8
+  towerDowngradeVfx: {fileID: 9169863999176627214, guid: d80674d25b4036a43a9e0b72ed9f4fad, type: 3}
+  towerDowngradeVfxScale: 0.8
+  towerDowngradeVfxDuration: 3
+  towerDestroyedVfx: {fileID: 5013878782555061258, guid: d9fa0c80412e48448acaa78def63d086, type: 3}
+  towerDestroyedVfxScale: 1.2
+  towerDestroyedVfxDuration: 7
   inputController: {fileID: 1260824858}
   acceptsInput: 1
   spawner: {fileID: 0}
@@ -6652,6 +6666,10 @@ MonoBehaviour:
   panEnabled: 0
   edgeThickness: 40
   panSpeed: 18
+  zoomEnabled: 1
+  zoomStep: 1.25
+  zoomInDistance: 2
+  zoomOutDistance: 6
   limitMin: {x: -3.66, y: -4.82}
   limitMax: {x: 4.86, y: 4.05}
   drawLimitsGizmo: 1
@@ -7542,6 +7560,8 @@ MonoBehaviour:
   bossReward: 200
   bossSpeed: 1.2
   bossSourceIndex: 0
+  bossVisualTier: 1
+  bossScale: 1.35
   healthGrowthPerWave: 0.15
   speedGrowthPerWave: 0.05
   shooterDamageGrowthPerWave: 0.1
@@ -7553,7 +7573,7 @@ MonoBehaviour:
   shooterAttackRate: 0.5
   shooterProjectilePrefab: {fileID: 0}
   shooterProjectileSpeed: 8
-  shooterPopupPrefab: {fileID: 0}
+  shooterPopupPrefab: {fileID: 1259023133563206875, guid: 371c9b1a7ce7ced4db364038bfd68fa7, type: 3}
 --- !u!114 &1549257791
 MonoBehaviour:
   m_ObjectHideFlags: 0

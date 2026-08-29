@@ -19,6 +19,7 @@ public class TowerHealth : MonoBehaviour
     public bool showHealthBar = true;    // barra flotante sobre la torre
 
     private Tower _tower;
+    private TowerVisual _visual;
     private float _currentHealth;
     private bool _ready;
     private int _appliedLevel = -1;
@@ -83,6 +84,11 @@ public class TowerHealth : MonoBehaviour
 
         if (HealthChanged != null)
             HealthChanged(_currentHealth);
+
+        if (_visual == null)
+            _visual = GetComponent<TowerVisual>();
+        if (_visual != null)
+            _visual.PlayDamageFeedback();
 
         if (_currentHealth <= 0f && Depleted != null)
             Depleted(this);

@@ -416,6 +416,11 @@
     display: flex;
     border-radius: 12px;
 }
+.ability-price-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
 .buy-tower-btn.locked .lock-overlay {
     display: flex;
     background-color: transparent;

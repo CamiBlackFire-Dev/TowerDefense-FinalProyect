@@ -14,6 +14,12 @@ public class CameraEdgePan : MonoBehaviour
     // Unidades por segundo. No depende de la velocidad del juego (x1/x2/x3).
     public float panSpeed = 18f;
 
+    [Header("Zoom")]
+    public bool zoomEnabled = true;
+    public float zoomStep = 1.25f;
+    public float zoomInDistance = 2f;
+    public float zoomOutDistance = 6f;
+
     [Header("Limites del nivel (plano XZ)")]
     // Rectangulo donde puede estar la camara. Se marca por nivel: fuera de
     // esto no se puede mover, asi no se pierde de vista el tablero.
@@ -21,6 +27,32 @@ public class CameraEdgePan : MonoBehaviour
     public Vector2 limitMax = new Vector2(10f, 5f);
     // Dibuja el rectangulo en la vista de escena aunque no este seleccionada.
     public bool drawLimitsGizmo = true;
+
+    private float _initialHeight;
+    private bool _zoomHeightInitialized;
+
+    public float MinZoomHeight
+    {
+        get
+        {
+            EnsureZoomHeight();
+            return _initialHeight - Mathf.Max(0f, zoomInDistance);
+        }
+    }
+
+    public float MaxZoomHeight
+    {
+        get
+        {
+            EnsureZoomHeight();
+            return _initialHeight + Mathf.Max(0f, zoomOutDistance);
+        }
+    }
+
+    private void Awake()
+    {
+        EnsureZoomHeight();
+    }
 
     private void Update()
     {
@@ -34,6 +66,8 @@ public class CameraEdgePan : MonoBehaviour
         if (Time.timeScale == 0f)
             return;
 
+        HandleZoomInput();
+
         Vector2 direction;
         if (!TryGetEdgeDirection(out direction))
             return;
@@ -42,6 +76,38 @@ public class CameraEdgePan : MonoBehaviour
         // viene multiplicado y la camara saldria disparada. La velocidad de
         // la camara es cosa del jugador, no del ritmo de la partida.
         Move(direction, Time.unscaledDeltaTime);
+    }
+
+    private void HandleZoomInput()
+    {
+        if (!zoomEnabled || Mouse.current == null)
+            return;
+
+        float scroll = Mouse.current.scroll.ReadValue().y;
+        if (Mathf.Abs(scroll) < 0.01f)
+            return;
+
+        Zoom(-Mathf.Sign(scroll) * zoomStep);
+    }
+
+    public void Zoom(float heightDelta)
+    {
+        if (heightDelta == 0f)
+            return;
+
+        EnsureZoomHeight();
+        Vector3 position = transform.position;
+        position.y = Mathf.Clamp(position.y + heightDelta, MinZoomHeight, MaxZoomHeight);
+        transform.position = position;
+    }
+
+    private void EnsureZoomHeight()
+    {
+        if (_zoomHeightInitialized)
+            return;
+
+        _initialHeight = transform.position.y;
+        _zoomHeightInitialized = true;
     }
 
     // Que direccion pide el puntero segun el borde que este tocando.

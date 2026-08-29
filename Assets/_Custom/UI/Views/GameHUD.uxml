@@ -87,8 +87,7 @@
                     <ui:Button name="Ability1" class="ability-slot locked" style="background-image: url(&quot;project://database/Assets/_Custom/Models/PowerUps/Bomb/BombaIcono.png?fileID=2800000&amp;guid=7c0517bb66c43d44191132a2ea3d1da4&amp;type=3#BombaIcono&quot;); background-size: 70% 70%; -unity-background-scale-mode: scale-to-fit;">
                     <ui:Label text="1" class="ability-hotkey"/>
                     <ui:VisualElement class="lock-overlay">
-                        <ui:VisualElement name="Ability1LockIcon" class="lock-icon" picking-mode="Ignore"/>
-                        <ui:VisualElement style="flex-direction: row; align-items: center;">
+                        <ui:VisualElement class="ability-price-row">
                             <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
                             <ui:Label text="100" class="lock-price"/>
                         </ui:VisualElement>
@@ -100,8 +99,7 @@
                     <ui:Label text="2" class="ability-hotkey"/>
                     <ui:VisualElement name="Ability2Icon" class="ability-icon-vector" picking-mode="Ignore"/>
                     <ui:VisualElement class="lock-overlay">
-                        <ui:VisualElement name="Ability2LockIcon" class="lock-icon" picking-mode="Ignore"/>
-                        <ui:VisualElement style="flex-direction: row; align-items: center;">
+                        <ui:VisualElement class="ability-price-row">
                             <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
                             <ui:Label text="200" class="lock-price"/>
                         </ui:VisualElement>
@@ -113,8 +111,7 @@
                     <ui:Label text="3" class="ability-hotkey"/>
                     <ui:VisualElement name="Ability3Icon" class="ability-icon-vector" picking-mode="Ignore"/>
                     <ui:VisualElement class="lock-overlay">
-                        <ui:VisualElement name="Ability3LockIcon" class="lock-icon" picking-mode="Ignore"/>
-                        <ui:VisualElement style="flex-direction: row; align-items: center;">
+                        <ui:VisualElement class="ability-price-row">
                             <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
                             <ui:Label text="300" class="lock-price"/>
                         </ui:VisualElement>
@@ -126,8 +123,7 @@
                     <ui:Label text="4" class="ability-hotkey"/>
                     <ui:VisualElement name="Ability4Icon" class="ability-icon-vector" picking-mode="Ignore"/>
                     <ui:VisualElement class="lock-overlay">
-                        <ui:VisualElement name="Ability4LockIcon" class="lock-icon" picking-mode="Ignore"/>
-                        <ui:VisualElement style="flex-direction: row; align-items: center;">
+                        <ui:VisualElement class="ability-price-row">
                             <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
                             <ui:Label text="400" class="lock-price"/>
                         </ui:VisualElement>
@@ -139,8 +135,7 @@
                     <ui:Label text="5" class="ability-hotkey"/>
                     <ui:VisualElement name="Ability5Icon" class="ability-icon-vector" picking-mode="Ignore"/>
                     <ui:VisualElement class="lock-overlay">
-                        <ui:VisualElement name="Ability5LockIcon" class="lock-icon" picking-mode="Ignore"/>
-                        <ui:VisualElement style="flex-direction: row; align-items: center;">
+                        <ui:VisualElement class="ability-price-row">
                             <ui:VisualElement class="currency-icon-small" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Coin.png?fileID=2800000&amp;guid=e25d2c5eb8c1a254ea10134db714d5cf&amp;type=3#Coin&quot;);"/>
                             <ui:Label text="500" class="lock-price"/>
                         </ui:VisualElement>

@@ -524,6 +524,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2097040646031744436}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2541654401260729008}
   m_SourcePrefab: {fileID: 100100000, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}
 --- !u!4 &2769002131913424352 stripped
 Transform:
@@ -576,6 +579,23 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   arrowVisual: {fileID: 5045973700507972707}
+--- !u!114 &2541654401260729008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3253472946463696730}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d08ad0be7a985b4381738357a023191, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CrossbowCooldownIndicator
+  barWidth: 2
+  barHeight: 0.22
+  heightOffset: 3.8
+  rechargingColor: {r: 1, g: 0.22, b: 0.08, a: 1}
+  readyColor: {r: 0.2, g: 1, b: 0.35, a: 1}
 --- !u!4 &3716923190820118697 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1329380249762036386, guid: aeb769ef4e423ce4486468a03ae3cf91, type: 3}

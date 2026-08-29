@@ -128,6 +128,39 @@ public class CameraEdgePanTests
         Assert.IsFalse(_pan.IsInsideLimits());
     }
 
+    [Test]
+    public void Zoom_PositivoElevaLaCamaraSinMoverlaEnXZ()
+    {
+        _pan.Zoom(2f);
+
+        Assert.AreEqual(12f, _go.transform.position.y, 0.001f);
+        Assert.AreEqual(0f, _go.transform.position.x, 0.001f);
+        Assert.AreEqual(0f, _go.transform.position.z, 0.001f);
+    }
+
+    [Test]
+    public void Zoom_RespetaLosLimitesRelativosAAlturaInicial()
+    {
+        _pan.zoomInDistance = 2f;
+        _pan.zoomOutDistance = 6f;
+
+        _pan.Zoom(100f);
+        Assert.AreEqual(16f, _go.transform.position.y, 0.001f);
+
+        _pan.Zoom(-100f);
+        Assert.AreEqual(8f, _go.transform.position.y, 0.001f);
+    }
+
+    [Test]
+    public void Zoom_CadaPasoUsaLaDistanciaConfigurada()
+    {
+        _pan.zoomStep = 1.25f;
+
+        _pan.Zoom(_pan.zoomStep);
+
+        Assert.AreEqual(11.25f, _go.transform.position.y, 0.001f);
+    }
+
     private static float DistanciaEnElPlano(Vector3 a, Vector3 b)
     {
         a.y = 0f;

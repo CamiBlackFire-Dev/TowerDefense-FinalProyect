@@ -27,6 +27,11 @@ public class TowerVisual : MonoBehaviour
     [Header("Fusion")]
     public float[] mergePulsePerLevel;
 
+    [Header("Daño")]
+    public Color damageFlashColor = new Color(1f, 0.08f, 0.05f);
+    public float damageFeedbackDuration = 0.22f;
+    public float damageBounceScale = 0.055f;
+
     // Los colores NO se editan aqui: se eligen una sola vez en el Board Manager
     // (apartado "Colores de las torres") y el tablero se los pasa a cada torre
     // cuando la crea, con SetLevelColors.
@@ -41,6 +46,7 @@ public class TowerVisual : MonoBehaviour
     private bool _setupDone;
     private Coroutine _spawnCoroutine;
     private Coroutine _pulseCoroutine;
+    private Coroutine _damageCoroutine;
 
     // Factor de escala actual (tamano del modelo en este nivel).
     public float CurrentScaleFactor
@@ -156,6 +162,16 @@ public class TowerVisual : MonoBehaviour
         _pulseCoroutine = StartCoroutine(PulseCoroutine(duration));
     }
 
+    public void PlayDamageFeedback()
+    {
+        EnsureSetup();
+        if (!Application.isPlaying || damageFeedbackDuration <= 0f)
+            return;
+
+        StopAllVisualFeedback();
+        _damageCoroutine = StartCoroutine(DamageCoroutine());
+    }
+
     // Detiene cualquier animacion visual previa y restaura la escala exacta.
     private void StopAllVisualFeedback()
     {
@@ -169,6 +185,12 @@ public class TowerVisual : MonoBehaviour
         {
             StopCoroutine(_pulseCoroutine);
             _pulseCoroutine = null;
+        }
+
+        if (_damageCoroutine != null)
+        {
+            StopCoroutine(_damageCoroutine);
+            _damageCoroutine = null;
         }
 
         ApplyScale(_currentScaleFactor);
@@ -343,6 +365,45 @@ public class TowerVisual : MonoBehaviour
         ApplyScale(target);
         ApplyAppearance(_currentLevel);
         _pulseCoroutine = null;
+    }
+
+    private IEnumerator DamageCoroutine()
+    {
+        float target = _currentScaleFactor;
+        if (_propertyBlock == null)
+            _propertyBlock = new MaterialPropertyBlock();
+
+        float t = 0f;
+        while (t < damageFeedbackDuration)
+        {
+            t += Time.deltaTime;
+            float progress = Mathf.Clamp01(t / damageFeedbackDuration);
+            float intensity = Mathf.Sin(progress * Mathf.PI);
+
+            ApplyScale(target * (1f + damageBounceScale * intensity));
+
+            for (int i = 0; i < _renderers.Length; i++)
+            {
+                Color baseColor = _useLevelColors ? LevelColor(_currentLevel) : RendererBaseColor(_renderers[i]);
+                _renderers[i].GetPropertyBlock(_propertyBlock);
+                _propertyBlock.SetColor("_BaseColor", Color.Lerp(baseColor, damageFlashColor, intensity));
+                _renderers[i].SetPropertyBlock(_propertyBlock);
+            }
+
+            yield return null;
+        }
+
+        ApplyScale(target);
+        ApplyAppearance(_currentLevel);
+        _damageCoroutine = null;
+    }
+
+    private static Color RendererBaseColor(Renderer renderer)
+    {
+        Material material = renderer != null ? renderer.sharedMaterial : null;
+        return material != null && material.HasProperty("_BaseColor")
+            ? material.GetColor("_BaseColor")
+            : Color.white;
     }
 
     // Intensidad del pulso segun el nivel alcanzado.

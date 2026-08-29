@@ -98,6 +98,21 @@ public class TowerHealthTests
         Assert.AreEqual(20f, health.CurrentHealth, 0.01f);
     }
 
+    [Test]
+    public void TakeDamage_ConVisualConfigurado_NoModificaElMaterialCompartido()
+    {
+        _towerObject = new GameObject("Tower Feedback Test");
+        GameObject model = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        model.transform.SetParent(_towerObject.transform, false);
+        Material sharedMaterial = model.GetComponent<Renderer>().sharedMaterial;
+        _towerObject.AddComponent<Tower>();
+        TowerHealth health = _towerObject.AddComponent<TowerHealth>();
+        health.maxHealth = 20f;
+
+        Assert.DoesNotThrow(() => health.TakeDamage(5f));
+        Assert.AreSame(sharedMaterial, model.GetComponent<Renderer>().sharedMaterial);
+    }
+
     private TowerHealth CrearTorre(int nivel, float vida)
     {
         _towerObject = new GameObject("Tower Health Test");

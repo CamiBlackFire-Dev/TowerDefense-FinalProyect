@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 
 // Pruebas de la conexion entre el modelo BoardGrid y las torres visibles.
@@ -482,6 +483,49 @@ public class BoardManagerTests
 
         Assert.AreEqual(0, board.Grid.GetLevel(2, 2));
         Assert.IsFalse(board.TryGetTower(2, 2, out torre));
+    }
+
+    [Test]
+    public void TowerDepletionVfx_DistingueDegradacionDeDestruccionFinal()
+    {
+        BoardManager board = CrearBoard();
+        GameObject downgrade = new GameObject("Downgrade VFX");
+        GameObject destroyed = new GameObject("Destroyed VFX");
+        downgrade.transform.SetParent(_boardObject.transform);
+        destroyed.transform.SetParent(_boardObject.transform);
+        board.towerDowngradeVfx = downgrade;
+        board.towerDestroyedVfx = destroyed;
+
+        Assert.AreSame(downgrade, board.TowerDepletionVfxForLevel(2));
+        Assert.AreSame(destroyed, board.TowerDepletionVfxForLevel(1));
+    }
+
+    [Test]
+    public void EnemyDamageNumber_UsaColorRojoPersonalizado()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/_Custom/Prefabs/VFX/EnemyDamageNumber.prefab");
+        var damageNumber = prefab.GetComponent<DamageNumbersPro.DamageNumber>();
+        SerializedObject serialized = new SerializedObject(damageNumber);
+        Color color = serialized.FindProperty("numberSettings.color").colorValue;
+
+        Assert.IsTrue(serialized.FindProperty("numberSettings.customColor").boolValue);
+        Assert.Greater(color.r, 0.9f);
+        Assert.Less(color.g, 0.15f);
+        Assert.Less(color.b, 0.15f);
+    }
+
+    [Test]
+    public void AlliedDamageNumber_ConservaElTextoBlanco()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/_Custom/Prefabs/VFX/DamageNumber.prefab");
+        var damageNumber = prefab.GetComponent<DamageNumbersPro.DamageNumber>();
+        SerializedObject serialized = new SerializedObject(damageNumber);
+        TMPro.TMP_Text text = prefab.GetComponentInChildren<TMPro.TMP_Text>(true);
+
+        Assert.IsFalse(serialized.FindProperty("numberSettings.customColor").boolValue);
+        Assert.AreEqual(Color.white, text.color);
     }
 
     // Renderer de una casilla concreta del tablero.

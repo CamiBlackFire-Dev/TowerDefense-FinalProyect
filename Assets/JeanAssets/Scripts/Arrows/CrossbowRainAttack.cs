@@ -37,6 +37,21 @@ public class CrossbowRainAttack : MonoBehaviour
     private bool isAttacking;
     private float cooldownTimer;
 
+    public bool IsRecharging => isAttacking || cooldownTimer > 0f;
+
+    public float CooldownProgress
+    {
+        get
+        {
+            if (isAttacking)
+                return 0f;
+            if (attackCooldown <= 0f || cooldownTimer <= 0f)
+                return 1f;
+
+            return Mathf.Clamp01(1f - cooldownTimer / attackCooldown);
+        }
+    }
+
     private void Awake()
     {
         detector = GetComponent<TowerTargetDetector>();

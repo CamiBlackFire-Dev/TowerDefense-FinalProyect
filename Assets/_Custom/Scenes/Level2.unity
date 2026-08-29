@@ -8289,6 +8289,12 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   maxBufferedMoves: 8
+  towerDowngradeVfx: {fileID: 9169863999176627214, guid: d80674d25b4036a43a9e0b72ed9f4fad, type: 3}
+  towerDowngradeVfxScale: 0.8
+  towerDowngradeVfxDuration: 3
+  towerDestroyedVfx: {fileID: 5013878782555061258, guid: d9fa0c80412e48448acaa78def63d086, type: 3}
+  towerDestroyedVfxScale: 1.2
+  towerDestroyedVfxDuration: 7
   inputController: {fileID: 780821679}
   acceptsInput: 1
   spawner: {fileID: 1250845398}
@@ -13459,7 +13465,7 @@ MonoBehaviour:
   shooterAttackRate: 0.5
   shooterProjectilePrefab: {fileID: 5175319666275068441, guid: 4a1e8296c170a6647b9e4be22295154c, type: 3}
   shooterProjectileSpeed: 8
-  shooterPopupPrefab: {fileID: 1259023133563206875, guid: a70b8c9c7454d27459bfa9ddaf62acb8, type: 3}
+  shooterPopupPrefab: {fileID: 1259023133563206875, guid: 371c9b1a7ce7ced4db364038bfd68fa7, type: 3}
 --- !u!4 &1250845399
 Transform:
   m_ObjectHideFlags: 0
@@ -14383,6 +14389,10 @@ MonoBehaviour:
   panEnabled: 1
   edgeThickness: 40
   panSpeed: 18
+  zoomEnabled: 1
+  zoomStep: 1.25
+  zoomInDistance: 2
+  zoomOutDistance: 6
   limitMin: {x: -13.395857, y: -16.126581}
   limitMax: {x: 14.075215, y: 10.421126}
   drawLimitsGizmo: 1

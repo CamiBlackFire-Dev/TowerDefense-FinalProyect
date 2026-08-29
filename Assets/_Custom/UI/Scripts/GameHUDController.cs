@@ -239,12 +239,8 @@ namespace Custom.UI
             public float RemainingCooldown;
             public int UsesRemaining;
             public Action<MeshGenerationContext> DrawCallback;
-            // Icono de la habilidad (dibujado a mano, ver DrawLockIcon)
-            // y el candado que se le superpone mientras esta bloqueada.
             public VisualElement IconElement;
             public Action<MeshGenerationContext> IconDrawCallback;
-            public VisualElement LockIconElement;
-            public Action<MeshGenerationContext> LockIconDrawCallback;
             // Cuanto cuesta desbloquearla la primera vez.
             public int Cost;
             // Sonido al desbloquearla (distinto del click generico).
@@ -1164,14 +1160,6 @@ namespace Custom.UI
                 slot.IconElement.generateVisualContent += slot.IconDrawCallback;
             }
 
-            // Candado del overlay "bloqueada": igual en las cinco ranuras.
-            slot.LockIconElement = root.Q<VisualElement>(elementPrefix + "LockIcon");
-            if (slot.LockIconElement != null)
-            {
-                slot.LockIconDrawCallback = DrawLockIcon;
-                slot.LockIconElement.generateVisualContent += slot.LockIconDrawCallback;
-            }
-
             // El desbloqueo (comprar el powerup) siempre es un click normal.
             slot.ClickedCallback = () => OnSlotClicked(slot);
             button.clicked += slot.ClickedCallback;
@@ -1203,9 +1191,6 @@ namespace Custom.UI
 
             if (slot.IconElement != null && slot.IconDrawCallback != null)
                 slot.IconElement.generateVisualContent -= slot.IconDrawCallback;
-
-            if (slot.LockIconElement != null && slot.LockIconDrawCallback != null)
-                slot.LockIconElement.generateVisualContent -= slot.LockIconDrawCallback;
 
             if (slot.ClickedCallback != null)
                 slot.Button.clicked -= slot.ClickedCallback;
