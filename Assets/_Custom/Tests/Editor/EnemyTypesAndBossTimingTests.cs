@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 
 // Que tipo de enemigo sale en cada oleada (enemyTypes) y cuando aparece el
@@ -124,6 +125,43 @@ public class EnemyTypesAndBossTimingTests
 
         Assert.IsNotNull(boss);
         Assert.IsNotNull(boss.GetComponent<BossEnemy>());
+    }
+
+    [Test]
+    public void SpawnBoss_AplicaEscalaArmaduraYNotificaAlHUD()
+    {
+        EnemySpawner spawner = CrearSpawner();
+        spawner.bossPrefab = CrearFalso("Jefe");
+        spawner.bossVisualTier = 3;
+        spawner.bossScale = 1.8f;
+        GameObject notifiedBoss = null;
+        spawner.BossSpawned += boss => notifiedBoss = boss;
+
+        GameObject boss = spawner.SpawnBoss();
+        BossEnemy presentation = boss.GetComponent<BossEnemy>();
+
+        Assert.AreSame(boss, notifiedBoss);
+        Assert.AreEqual(3, presentation.VisualTier);
+        Assert.AreEqual(1.8f, presentation.ScaleMultiplier, 0.001f);
+        Assert.AreEqual(Vector3.one * 1.8f, boss.transform.localScale);
+        Assert.IsNotNull(GameObject.Find("BossArmor_WarHelm"));
+    }
+
+    [Test]
+    public void BossPrefab_CoronaYArmaSiguenLosHuesosAnimados()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+            "Assets/_Custom/Prefabs/Enemies/Boss_Golem.prefab");
+        Transform[] children = prefab.GetComponentsInChildren<Transform>(true);
+        Transform crown = System.Array.Find(children, child => child.name == "Crown_Golden");
+        Transform weapon = System.Array.Find(children, child => child.name == "Weapon_Axe");
+
+        Assert.IsNotNull(crown);
+        Assert.IsNotNull(weapon);
+        Assert.AreEqual("B-head", crown.parent.name);
+        Assert.AreEqual("B-hand.R", weapon.parent.name);
+        Assert.IsFalse(System.Array.Exists(children,
+            child => child.name.StartsWith("BossArmor_Crown")));
     }
 
     private EnemySpawner CrearSpawner()

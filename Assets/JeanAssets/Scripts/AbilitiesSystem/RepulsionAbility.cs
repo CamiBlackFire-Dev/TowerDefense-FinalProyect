@@ -10,9 +10,6 @@ public class RepulsionAbility : MonoBehaviour
     [SerializeField] private LayerMask enemyLayer;
     private bool showGizmo;
 
-    [Header("Detection")]
-    [SerializeField] private Path path;
-
     public void ActivateRepulsion(Vector3 position)
     {
         Collider[] enemies = Physics.OverlapSphere(position, repulsionRadius, enemyLayer);
@@ -21,13 +18,6 @@ public class RepulsionAbility : MonoBehaviour
 
         foreach (Collider enemy in enemies)
         {
-            int closestWaypoint = GetClosestWaypoint(enemy.transform.position);
-
-            int previousWaypointIndex = closestWaypoint - 1;
-
-            if (previousWaypointIndex < 0)
-                continue;
-
             TestEnemyMovement enemyMovement = enemy.GetComponent<TestEnemyMovement>();
 
             if (enemyMovement != null)
@@ -35,29 +25,6 @@ public class RepulsionAbility : MonoBehaviour
                 enemyMovement.ReversePath(repulsionDuration);
             }
         }
-    }
-
-    private int GetClosestWaypoint(Vector3 enemyPosition)
-    {
-        Transform[] waypoints = path.GetWaypoints();
-
-        int closestIndex = 0;
-
-        float closestDistance = Mathf.Infinity;
-
-        for (int i = 0; i < waypoints.Length; i++)
-        {
-            float distance = Vector3.Distance(enemyPosition, waypoints[i].position);
-
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-
-                closestIndex = i;
-            }
-        }
-
-        return closestIndex;
     }
 
     public void SetGizmoVisible(bool visible)

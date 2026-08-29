@@ -163,6 +163,22 @@
         <ui:VisualElement name="BigAnnouncerContainer" picking-mode="Ignore" class="big-announcer-container">
             <ui:Label text="WAVE 1" name="BigAnnouncerText" class="big-announcer-text"/>
         </ui:VisualElement>
+        <ui:VisualElement name="DangerVignette" picking-mode="Ignore" class="danger-vignette">
+            <ui:VisualElement class="danger-corner danger-corner-top-left"/>
+            <ui:VisualElement class="danger-corner danger-corner-top-right"/>
+            <ui:VisualElement class="danger-corner danger-corner-bottom-left"/>
+            <ui:VisualElement class="danger-corner danger-corner-bottom-right"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="BossWarning" picking-mode="Ignore" class="boss-warning">
+            <ui:VisualElement class="boss-warning-panel">
+                <ui:Label text="!" class="boss-warning-icon"/>
+                <ui:VisualElement class="boss-warning-copy">
+                    <ui:Label text="¡CUIDADO!" class="boss-warning-title"/>
+                    <ui:Label text="EL GOLEM HA APARECIDO" class="boss-warning-subtitle"/>
+                </ui:VisualElement>
+                <ui:Label text="!" class="boss-warning-icon"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
     <ui:VisualElement name="OptionsOverlay" class="options-overlay" style="display: none;">
         <ui:VisualElement class="options-panel" style="background-image: url(&quot;project://database/Assets/_Custom/UI/Sprites/Backgrounds/Fondo2.png?fileID=2800000&amp;guid=72b6550b8e6bcd44b8e6e066f339e28e&amp;type=3#Fondo2&quot;); display: flex;">

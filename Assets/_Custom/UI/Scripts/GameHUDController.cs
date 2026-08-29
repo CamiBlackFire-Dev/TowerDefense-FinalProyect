@@ -61,6 +61,9 @@ namespace Custom.UI
 
         private VisualElement _bigAnnouncerContainer;
         private Label _bigAnnouncerText;
+        private VisualElement _bossWarning;
+        private VisualElement _dangerVignette;
+        private IVisualElementScheduledItem _dangerPulse;
 
         private VisualElement _optionsOverlay;
         private Button _backButton;
@@ -346,6 +349,8 @@ namespace Custom.UI
 
             _bigAnnouncerContainer = root.Q<VisualElement>("BigAnnouncerContainer");
             _bigAnnouncerText = root.Q<Label>("BigAnnouncerText");
+            _bossWarning = root.Q<VisualElement>("BossWarning");
+            _dangerVignette = root.Q<VisualElement>("DangerVignette");
 
             _optionsOverlay = root.Q<VisualElement>("OptionsOverlay");
             _backButton = root.Q<Button>("BackButton");
@@ -589,7 +594,9 @@ namespace Custom.UI
             {
                 spawner.WaveStarted += OnWaveStarted;
                 spawner.WaveFinished += OnWaveFinished;
+                spawner.BossSpawned += OnBossSpawned;
                 SetWaveActive(spawner.IsRunning);
+                SetFinalWaveDanger(spawner.IsRunning && IsFinalWave());
             }
 
             // El dinero se actualiza solo cuando cambia.
@@ -699,7 +706,10 @@ namespace Custom.UI
             {
                 spawner.WaveStarted -= OnWaveStarted;
                 spawner.WaveFinished -= OnWaveFinished;
+                spawner.BossSpawned -= OnBossSpawned;
             }
+
+            SetFinalWaveDanger(false);
 
             if (economy != null)
                 economy.MoneyChanged -= OnMoneyChanged;
@@ -1486,6 +1496,7 @@ namespace Custom.UI
         {
             SetWaveActive(true);
             UpdateWave(spawner.WaveNumber);
+            SetFinalWaveDanger(IsFinalWave());
             foreach (AbilitySlot slot in _allSlots)
                 ResetPerWaveUses(slot);
         }
@@ -1495,6 +1506,7 @@ namespace Custom.UI
         private void OnWaveFinished()
         {
             SetWaveActive(false);
+            SetFinalWaveDanger(false);
 
             if (IsBossWaveJustCleared())
             {
@@ -1502,6 +1514,54 @@ namespace Custom.UI
                     && gameFlow.GetLevelNumber(SceneManager.GetActiveScene().name) >= gameFlow.LevelCount;
                 ShowVictoryScreen(esNivelFinal);
             }
+        }
+
+        private void OnBossSpawned(GameObject boss)
+        {
+            if (_bossWarning == null)
+                return;
+
+            _bossWarning.RemoveFromClassList("boss-warning-visible");
+            _bossWarning.schedule.Execute(() =>
+            {
+                _bossWarning.AddToClassList("boss-warning-visible");
+            }).StartingIn(20);
+            _bossWarning.schedule.Execute(() =>
+            {
+                _bossWarning.RemoveFromClassList("boss-warning-visible");
+            }).StartingIn(3200);
+        }
+
+        private bool IsFinalWave()
+        {
+            return spawner != null
+                && spawner.bossPrefab != null
+                && spawner.bossWave > 0
+                && spawner.WaveNumber == spawner.bossWave;
+        }
+
+        private void SetFinalWaveDanger(bool active)
+        {
+            if (_dangerVignette == null)
+                return;
+
+            if (!active)
+            {
+                if (_dangerPulse != null)
+                    _dangerPulse.Pause();
+                _dangerPulse = null;
+                _dangerVignette.RemoveFromClassList("danger-vignette-active");
+                _dangerVignette.RemoveFromClassList("danger-vignette-bright");
+                return;
+            }
+
+            _dangerVignette.AddToClassList("danger-vignette-active");
+            if (_dangerPulse != null)
+                _dangerPulse.Pause();
+            _dangerPulse = _dangerVignette.schedule.Execute(() =>
+            {
+                _dangerVignette.ToggleInClassList("danger-vignette-bright");
+            }).Every(450);
         }
 
         // True justo cuando termino la oleada del jefe (WaveFinished solo se
@@ -1533,6 +1593,7 @@ namespace Custom.UI
         // Se acabaron las vidas: aparece la pantalla de derrota.
         private void OnPlayerDefeated()
         {
+            SetFinalWaveDanger(false);
             ShowDefeatScreen();
         }
 

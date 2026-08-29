@@ -12283,6 +12283,8 @@ MonoBehaviour:
   bossReward: 200
   bossSpeed: 1.2
   bossSourceIndex: 0
+  bossVisualTier: 3
+  bossScale: 1.8
   healthGrowthPerWave: 0.15
   speedGrowthPerWave: 0.05
   shooterDamageGrowthPerWave: 0.1
@@ -24793,7 +24795,6 @@ MonoBehaviour:
   ability3UnlockSound: {fileID: 8300000, guid: f636f389362c30c43a5a0ceac6387b19, type: 3}
   ability4UnlockSound: {fileID: 8300000, guid: 8b12370610f304344acd11832aa44650, type: 3}
   ability5UnlockSound: {fileID: 8300000, guid: 61449a3b7c6c8e7459c3fbf9470e305a, type: 3}
-  debugKeys: 1
 --- !u!114 &1611901704
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28342,7 +28343,6 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 8
-  path: {fileID: 0}
 --- !u!1001 &1812840392
 PrefabInstance:
   m_ObjectHideFlags: 0

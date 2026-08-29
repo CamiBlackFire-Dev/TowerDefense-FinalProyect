@@ -145,6 +145,8 @@ public class EnemySpawner : MonoBehaviour
     // Por que salida entra. Si el nivel tiene salidas multiples es el
     // indice dentro de esa lista; si no, se usa el camino principal.
     public int bossSourceIndex = 0;
+    [Range(1, 3)] public int bossVisualTier = 1;
+    [Min(1f)] public float bossScale = 1.35f;
 
     [Header("Aumento por oleada")]
     // Cuanto se endurece cada oleada respecto de la primera. El crecimiento
@@ -201,6 +203,7 @@ public class EnemySpawner : MonoBehaviour
     // feedback visual del castillo, separado de PlayerBase.LivesChanged
     // para no depender de que "perder vidas" siempre signifique esto.
     public event Action EnemyReachedEnd;
+    public event Action<GameObject> BossSpawned;
 
     // Numero de la ultima oleada arrancada (1, 2, 3...).
     public int WaveNumber
@@ -447,8 +450,14 @@ public class EnemySpawner : MonoBehaviour
 
         // Sin BossEnemy se comportaria como un enemigo normal y
         // desapareceria al llegar al castillo.
-        if (boss.GetComponent<BossEnemy>() == null)
-            boss.AddComponent<BossEnemy>();
+        BossEnemy bossEnemy = boss.GetComponent<BossEnemy>();
+        if (bossEnemy == null)
+            bossEnemy = boss.AddComponent<BossEnemy>();
+
+        bossEnemy.ConfigurePresentation(bossVisualTier, bossScale);
+
+        if (BossSpawned != null)
+            BossSpawned(boss);
 
         return boss;
     }
